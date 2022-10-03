@@ -15,12 +15,16 @@
 
   <meta name="theme-color" content="#fafafa">
 </head>
-<body>
+<body onload="draw();">
 
   <img class="cover-image" src="assets/graphics/10000-things-cover.png" id="cover-image">
 
   <div class="player" id="player">
-    <canvas class='player-canvas' width="1000" height="500"></canvas>
+    <a href="https://microfestrecords.com/" target="_blank">
+      <img class="logo-link" src="assets/graphics/microfest-logo.png" id="logo-image">
+    </a>
+
+    <canvas class='player-canvas' id="player-canvas" width="1296" height="563"></canvas>
   </div>
 
 

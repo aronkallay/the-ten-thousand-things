@@ -1,6 +1,8 @@
 //fade in cover image
 var cover_img = document.getElementById("cover-image");
 var player = document.getElementById("player");
+var logo = document.getElementById("logo");
+
 
 //**** auto fade
 // setTimeout(() => {
@@ -16,6 +18,22 @@ cover_img.addEventListener("click", function(){
   fadeout(cover_img, 50);
   fadein(player);
 }, {once: true});
+
+
+//draw grey curved background shape
+function draw(){
+  const canvas = document.getElementById('player-canvas')
+  const ctx = canvas.getContext('2d');
+
+  ctx.beginPath();
+  ctx.moveTo(0, 67);
+  ctx.bezierCurveTo(20, -20,  1296 - 20, -20, 1296, 67);
+  ctx.moveTo(0, 440);
+  ctx.bezierCurveTo(70, 600, 1296 - 70, 600, 1296, 440);
+  ctx.fill();
+}
+
+
 
 
 //fade out
