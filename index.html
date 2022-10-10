@@ -20,11 +20,121 @@
   <img class="cover-image" src="assets/graphics/10000-things-cover.png" id="cover-image">
 
   <div class="player" id="player">
+
+    <!-- some images -->
     <a href="https://microfestrecords.com/" target="_blank">
       <img class="logo-link" src="assets/graphics/microfest-logo.png" id="logo-image">
     </a>
+    <img class="hexagram" src="assets/graphics/hexagram.png" id="hexagram">
+    <img class="signature" src="assets/graphics/cage-signature.png" id="signature">
 
+
+    <!-- main canvas with static drawings -->
     <canvas class='player-canvas' id="player-canvas" width="1296" height="563"></canvas>
+
+
+    <!-- checkboxes -->
+    <label class="check-container">
+      <input type='checkbox' checked='checked' id='check1'>
+      <span class='checkmark check-1 '></span>
+    </label>
+    <label class="check-container">
+      <input type='checkbox' checked='checked' id='check2'>
+      <span class='checkmark check-2 '></span>
+    </label>
+    <label class="check-container">
+      <input type='checkbox' checked='checked' id='check3'>
+      <span class='checkmark check-3 '></span>
+    </label>
+    <label class="check-container">
+      <input type='checkbox' checked='checked' id='check4'>
+      <span class='checkmark check-4 '></span>
+    </label>
+    <label class="check-container">
+      <input type='checkbox' checked='checked' id='check5'>
+      <span class='checkmark check-5 '></span>
+    </label>
+
+
+    <!-- volume / mute buttons -->
+    <label class="vol-container">
+      <input type='checkbox' checked='checked' id='vol1'>
+      <span class='volume vol-1'></span>
+    </label>
+    <label class="vol-container">
+      <input type='checkbox' checked='checked' id='vol2'>
+      <span class='volume vol-2'></span>
+    </label>
+    <label class="vol-container">
+      <input type='checkbox' checked='checked' id='vol3'>
+      <span class='volume vol-3'></span>
+    </label>
+    <label class="vol-container">
+      <input type='checkbox' checked='checked' id='vol4'>
+      <span class='volume vol-4'></span>
+    </label>
+    <label class="vol-container">
+      <input type='checkbox' checked='checked' id='vol5'>
+      <span class='volume vol-5'></span>
+    </label>
+
+    <!-- playback control buttons -->
+    <button class="buttons playback-controls return" id="return-button"></button>
+    <button class="buttons playback-controls pause" id="pause-button"></button>
+    <button class="buttons playback-controls play" id="play-button"></button>
+    <!-- popup buttons -->
+    <button class="buttons popup-buttons instructions" id="instr-button"><div>instructions</div></button>
+    <button class="buttons popup-buttons about" id="about-button"><div>about</div></button>
+
+
+    <!-- main volume slider with mute control -->
+    <label class="mastervol-container">
+      <input type='checkbox' checked='checked' id='master-vol'>
+      <span class='volume master-vol'></span>
+    </label>
+
+    <input type="range" min="0" max="100" value="50" class="master-slider" id="master-slider">
+
+    <!-- title text -->
+    <span class="text title" id="title-text">
+      The Ten Thousand Things for speaker, string player, percussionist, and two pianists
+    </span>
+
+    <!-- track titles -->
+    <span class="text tracks track-1" id="track-1-text">
+      26' 1.1499" for a string player
+    </span>
+    <span class="text tracks track-2" id="track-2-text">
+      27' 10.554" for percussion
+    </span>
+    <span class="text tracks track-3" id="track-3-text">
+      31' 57.9864" for piano
+    </span>
+    <span class="text tracks track-4" id="track-4-text">
+      34' 46.776" for piano
+    </span>
+    <span class="text tracks track-5" id="track-5-text">
+      45' for a speaker
+    </span>
+
+    <!-- playback timer -->
+    <span class="timer" id="timer">
+      03:00
+    </span>
+
+
+    <!-- wiper -->
+    <input type="range" min="0" max="100" value="0" class="wiper" id="wiper">
+
+
+    <!-- timeline -->
+    <div class="timeline"
+    <span class="zero-mark" id="zero-mark">0'</span>
+    <span class="ten-mark" id="ten-mark">10'</span>
+    <span class="twenty-mark" id="twenty-mark">20'</span>
+    <span class="thirty-mark" id="thirty-mark">30'</span>
+    <span class="forty-mark" id="forty-mark">40'</span>
+    </div>
   </div>
 
 

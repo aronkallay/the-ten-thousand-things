@@ -27,6 +27,24 @@ body{
   z-index: 2;
 }
 
+.hexagram{
+  position: absolute;
+  width: 4.7%;
+  top: calc(50vh + .25 * var(--main-height));
+  transform: translate(50%, 50%);
+  z-index: 2;
+  left: 29.5vw;
+}
+
+.signature{
+  position: absolute;
+  top: calc(50vh + .21*var(--main-height));
+  right: 32vw;
+  transform: translate(50%, 50%);
+  width: 14%;
+  z-index: 2;
+}
+
 .player {
   position: absolute;
   top: 50%;
@@ -45,7 +63,440 @@ body{
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #999999;
   z-index: 1;
   margin: auto;
+}
+
+
+
+
+
+/**********************CHECKBOXES**********************/
+.check-container {
+  position: absolute;
+  left: calc(50vw - .479*var(--main-width));
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  z-index: 2;
+}
+
+/* Hide the browser's default checkbox */
+.check-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: calc(.039*var(--main-height));
+  width: calc(.039*var(--main-height));
+  background-color: white;
+  border: calc(0.0053*var(--main-height)) solid black;
+  border-radius: calc(0.0053*var(--main-height));
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.check-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.check-container .checkmark:after {
+  content: "\2713";
+  font-size: calc(.071*var(--main-height));
+  bottom: calc(-0.0124*var(--main-height));
+}
+
+.check-container .check-1 {
+  top: calc(50vh - .23*var(--main-height));
+  transform: translate(-50%, -50%);
+}
+.check-container .check-2 {
+  top: calc(50vh - .115*var(--main-height));
+  transform: translate(-50%, -50%);
+}
+.check-container .check-3 {
+  top: calc(50vh + 0*var(--main-height));
+  transform: translate(-50%, -50%);
+}
+.check-container .check-4 {
+  top: calc(50vh + .115*var(--main-height));
+  transform: translate(-50%, -50%);
+}
+.check-container .check-5 {
+  top: calc(50vh + .23*var(--main-height));
+  transform: translate(-50%, -50%);
+}
+
+
+
+
+/*****************VOLUME/MUTE BUTTONS********************/
+
+/* volume containers */
+.vol-container {
+  position: absolute;
+  left: calc(50vw + .4815*var(--main-width));
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  z-index: 2;
+}
+
+/* Hide the browser's default checkbox */
+.vol-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom volume image */
+.volume {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: calc(.026*var(--main-height));
+  width: calc(.026*var(--main-height));
+  background: url('../assets/graphics/mute.png') no-repeat;
+  background-size: contain;
+}
+
+/* Show the speaker when checked */
+.vol-container input:checked ~ .volume {
+  background: url('../assets/graphics/speaker.png') no-repeat;
+  background-size: contain;
+}
+
+/*placing each volume object */
+.vol-container .vol-1 {
+  top: calc(50vh - .28*var(--main-height));
+  transform: translate(-50%, -50%);
+}
+.vol-container .vol-2 {
+  top: calc(50vh - .165*var(--main-height));
+  transform: translate(-50%, -50%);
+}
+.vol-container .vol-3 {
+  top: calc(50vh - .05*var(--main-height));
+  transform: translate(-50%, -50%);
+}
+.vol-container .vol-4 {
+  top: calc(50vh + .06*var(--main-height));
+  transform: translate(-50%, -50%);
+}
+.vol-container .vol-5 {
+  top: calc(50vh + .175*var(--main-height));
+  transform: translate(-50%, -50%);
+}
+
+
+/* MASTER VOLUME ******************************/
+.mastervol-container {
+  position: absolute;
+  left: calc(50vw - .44*var(--main-width));
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  z-index: 2;
+}
+
+/* Hide the browser's default checkbox */
+.mastervol-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.mastervol-container .volume {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: calc(.05*var(--main-height));
+  width: calc(.05*var(--main-height));
+  background: url('../assets/graphics/mute.png') no-repeat;
+  background-size: contain;
+}
+
+.mastervol-container .master-vol {
+  top: calc(50vh + .32*var(--main-height));
+  transform: translate(-50%, -50%);
+}
+
+/* Show the speaker when checked */
+.mastervol-container input:checked ~ .volume {
+  background: url('../assets/graphics/speaker.png') no-repeat;
+  background-size: contain;
+}
+
+/****************PLAYBACK BUTTONS ***********************/
+.buttons {
+  cursor: pointer;
+  border: calc(0.0053*var(--main-height)) solid black;
+  border-radius: calc(0.013*var(--main-height));
+  z-index: 2;
+  position: absolute;
+  height: calc(0.0639*var(--main-height));
+  display: block;
+
+}
+
+.playback-controls{
+  width: calc(0.0366*var(--main-width));
+  top: calc(50vh + .3*var(--main-height));
+}
+
+.popup-buttons{
+  background: #d9d9d9;
+  font-family: Papyrus, fantasy;
+  font-style: italic;
+  font-size: calc(0.0266*var(--main-height));
+  text-align: center;
+  top: calc(50vh + .38*var(--main-height));
+}
+
+.popup-buttons > div {
+  position: absolute;
+  top: calc(8 / 563 * var(--main-height));
+  left: calc( 2 / 563 * var(--main-height));
+  z-index: 2;
+}
+
+
+.buttons:active {
+  background-color: #569416;
+}
+
+.return{
+  left: calc(50vw - .023*var(--main-width));
+  background: url('../assets/graphics/return.png') no-repeat, #d9d9d9;
+  background-size: contain;
+  background-position: center;
+}
+
+.pause{
+  left: calc(50vw + .017*var(--main-width));
+  background: url('../assets/graphics/pause.png') no-repeat, #d9d9d9;
+  background-size: contain;
+  background-position: center;
+}
+
+.play{
+  left: calc(50vw + .057*var(--main-width));
+  background: url('../assets/graphics/play.png') no-repeat, #d9d9d9;
+  background-size: contain;
+  background-position: center;
+}
+
+.instructions{
+  left: calc(50vw - .0565*var(--main-width));
+  width: calc(0.16*var(--main-height));
+}
+
+.about{
+  width: calc(0.09*var(--main-height));
+  left: calc(50vw + 0.017*var(--main-width));
+}
+
+/*MASTER VOLUME SLIDER ****************************/
+
+.master-slider {
+  -webkit-appearance: none;
+  width: calc(0.09*var(--main-width));
+  height: calc(11 / 563 * var(--main-height));
+  position: absolute;
+  transform: translate( -50%, -50%);
+  top: calc(50vh + 0.32*var(--main-height));
+  left: calc(50vw - 0.38*var(--main-width));
+  z-index: 2;
+  border-radius: calc(4 / 563 * var(--main-height));
+  background: black;
+}
+
+
+.master-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: calc(20 / 563 * var(--main-height));
+  height: calc(10 / 563 * var(--main-height));
+  border-radius: calc(4 / 563 * var(--main-height));
+  border-style: solid;
+  border-color: black;
+  border-width: calc(3 / 563 * var(--main-height));
+  background: white;
+  cursor: pointer;
+}
+
+.master-slider::-moz-range-thumb {
+  width: calc(15 / 563 * var(--main-height));
+  height: calc(6 / 563 * var(--main-height));
+  border-radius: calc(2 / 563 * var(--main-height));
+  background: white;
+  cursor: pointer;
+}
+
+/************WIPER**********************/
+
+.wiper {
+  -webkit-appearance: none;
+  position: absolute;
+  width: calc(1190 / 1296 * var(--main-width));
+  height: calc(322 / 563 * var(--main-height));
+  left: calc(50vw - .5*var(--main-width) + 64 / 1296 * var(--main-width));
+  top: calc(50vh - .5*var(--main-height) + 113 / 563 * var(--main-height));
+  z-index: 4;
+  background: none;
+}
+
+
+.wiper::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 2px;
+  height: calc(322 / 563 * var(--main-height));
+  border-radius: calc(4 / 563 * var(--main-height));
+  background: red;
+  cursor: pointer;
+}
+
+.wiper::-moz-range-thumb {
+  width: 2px;
+  height: calc(322 / 563 * var(--main-height));
+  border-radius: calc(4 / 563 * var(--main-height));
+  background: red;
+  cursor: pointer;
+}
+
+/************TEXT***********************/
+.text{
+  position: absolute;
+  font-size: calc( 27 / 563 * var(--main-height));
+  font-family: Papyrus, fantasy;
+  font-style: italic;
+  z-index: 5;
+}
+
+.title{
+  transform: translate(-50%, -50%);
+  font-size: calc( 27 / 563 * var(--main-height));
+  top: calc(50vh - 0.415*var(--main-height));
+  left: 50vw;
+  width: 100%;
+  text-align: center;
+  color: white;
+}
+
+.tracks{
+  transform: translate(0, -50%);
+  left: calc(50vw - 0.45*var(--main-width));
+  text-align: left;
+  color: black;
+}
+
+.track-1{
+  top: calc(50vh - 0.225*var(--main-height));
+  width: calc(345 / 563 * var(--main-height));
+}
+
+.track-2{
+  top: calc(50vh - 0.11*var(--main-height));
+  width: calc(307 / 563 * var(--main-height));
+}
+
+.track-3{
+  top: 50vh;
+  width: calc(257 / 563 * var(--main-height));
+}
+
+.track-4{
+  top: calc(50vh + 0.11*var(--main-height));
+  width: calc(253 / 563 * var(--main-height));
+}
+
+.track-5{
+  top: calc(50vh + 0.225*var(--main-height));
+  width: calc(212 / 563 * var(--main-height));
+}
+
+
+/*********TIMER*****************/
+.timer{
+  position: absolute;
+  font-family: Arial;
+  font-size: calc(32 / 563 * var(--main-height));
+  transform: translate(-50%, -50%);
+  top: calc(50vh + 0.335*var(--main-height));
+  left: calc(50vw - 0.06*var(--main-width));
+  z-index: 2;
+}
+
+
+/************TIMELINE*************/
+.timeline{
+  position: absolute;
+  font-family: Papyrus, fantasy;
+  font-size: calc(20 / 563 * var(--main-height));
+  font-style: italic;
+  transform: translate(-50%, -50%);
+  left: calc(50vw + .008*var(--main-width));
+  top: calc(50vh - .345*var(--main-height));
+  width: calc(1203 / 1296 * var(--main-width));
+  z-index: 5;
+  text-align: left;
+}
+
+.zero-mark{
+  position:relative;
+  display: inline;
+  left: 0px;
+}
+
+.ten-mark{
+  position: relative;
+  transform: translate(-50%, -50%);
+  display: inline;
+  left: calc(70/45*10*15 / 1296 * var(--main-width));
+}
+
+.twenty-mark{
+  position: relative;
+  display: inline;
+  left: calc(70/45*20*15 / 1296 * var(--main-width));
+}
+
+.thirty-mark{
+  position: relative;
+  transform: translate(-50%, -50%);
+  display: inline;
+  left: calc(70/45*30*15 / 1296 * var(--main-width));
+}
+
+.forty-mark{
+  position: relative;
+  transform: translate(-50%, -50%);
+  display: inline;
+  left: calc(70/45*40*15 / 1296 * var(--main-width));
 }
