@@ -28,7 +28,7 @@
     <img class="hexagram" src="assets/graphics/hexagram.png" id="hexagram">
     <img class="signature" src="assets/graphics/cage-signature.png" id="signature">
 
-
+    <img class="headshot" src="assets/graphics/john-cage-headshot.png" id="headshot">
     <!-- main canvas with static drawings -->
     <canvas class='player-canvas' id="player-canvas" width="1296" height="563"></canvas>
 
@@ -92,7 +92,6 @@
       <input type='checkbox' checked='checked' id='master-vol'>
       <span class='volume master-vol'></span>
     </label>
-
     <input type="range" min="0" max="100" value="50" class="master-slider" id="master-slider">
 
     <!-- title text -->
@@ -135,6 +134,46 @@
     <span class="thirty-mark" id="thirty-mark">30'</span>
     <span class="forty-mark" id="forty-mark">40'</span>
     </div>
+
+
+
+    <!-- colored tracks -->
+    <div class="track-container" id='track-container'>
+
+      <canvas class='track-canvas speaker' id="speaker-canvas" width="1204" height="100"></canvas>
+      <canvas class='track-canvas piano2' id="piano2-canvas" width="1204" height="100"></canvas>
+
+
+      <canvas class='track-canvas piano1' id="piano1-canvas" width="1204" height="100"></canvas>
+
+      <canvas class='track-canvas perc' id="perc-canvas" width="1204" height="100"></canvas>
+
+      <canvas class='track-canvas string' id="string-canvas" width="1204" height="100"></canvas>
+    </div>
+
+    <!-- audio bars -->
+
+    <div class="level-bg string-level"></div>
+    <div class="level-color string-level string-color"></div>
+    <div class="level-overlay string-level"></div>
+
+    <div class="level-bg perc-level"></div>
+    <div class="level-color perc-level perc-color"></div>
+    <div class="level-overlay perc-level"></div>
+
+    <div class="level-bg piano1-level"></div>
+    <div class="level-color piano1-level piano1-color"></div>
+    <div class="level-overlay piano1-level"></div>
+
+    <div class="level-bg piano2-level"></div>
+    <div class="level-color piano2-level piano2-color"></div>
+    <div class="level-overlay piano2-level"></div>
+
+    <div class="level-bg speaker-level"></div>
+    <div class="level-color speaker-level speaker-color"></div>
+    <div class="level-overlay speaker-level"></div>
+
+    <canvas class='border-canvas' id="border-canvas" width="1296" height="563"></canvas>
   </div>
 
 
