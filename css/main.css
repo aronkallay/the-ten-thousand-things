@@ -582,6 +582,7 @@ body{
   height: calc(42 / 563 * var(--main-height));
   left: calc(50vw + .4753*var(--main-width));
   background: url('../assets/graphics/level-2.png') no-repeat;
+  background-size: contain;
   background-position: center;
   z-index: 4;
 }
@@ -601,6 +602,7 @@ body{
   left: calc(50vw + .4753*var(--main-width));
   z-index: 6;
   background: url('../assets/graphics/level.png') no-repeat;
+  background-size: contain;
   background-position: center;
 }
 

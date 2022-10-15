@@ -6,6 +6,9 @@ var return_button = document.getElementById("return-button");
 var wiper = document.getElementById("wiper");
 var play_button = document.getElementById("play-button");
 
+var instr_button = document.getElementById("instr-button");
+var about_button = document.getElementById("about-button");
+
 var check1 = document.getElementById("check1");
 var check2 = document.getElementById("check2");
 var check3 = document.getElementById("check3");
@@ -77,6 +80,20 @@ cover_img.addEventListener("click", function(){
   fadeout(cover_img, 50);
   fadein(player);
 }, {once: true});
+
+
+//open popup windows
+let instr_params = `status=no,location=no,toolbar=no,menubar=no,
+width=650,height=700,left=100,top=100`;
+instr_button.onclick = () => {
+  window.open('pages/instructions.html', "instructions", instr_params);
+};
+
+let about_params = `status=no,location=no,toolbar=no,menubar=no,
+width=750,height=420,left=700,top=100`;
+about_button.onclick = () => {
+  window.open('pages/about.html', "about", about_params);
+};
 
 
 //TESTING TESTING TESTING!!!!

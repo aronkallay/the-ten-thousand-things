@@ -1,0 +1,44 @@
+.background {
+  width: 710px;
+  height: 370px;
+  margin: auto;
+  border: 3px solid black;
+  border-radius: 10px;
+  background-color: #888888;
+  display: block;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  left: 50vw;
+  top: 50vh;
+}
+
+h1{
+  font-family: Papyrus, fantasy;
+  font-size: 30px;
+  font-style: italic;
+  justify-content: left;
+  margin-left: 20px;
+  margin-top: 10px;
+}
+
+.main-text {
+  font-family: Papyrus, fantasy;
+  font-size: 18px;
+  font-style: italic;
+  line-height: 30px;
+  width: 670px;
+  height: 300px;
+  position: absolute;
+  top: 50px;
+  left: 20px;
+  margin: auto;
+  border: 3px solid black;
+  border-radius: 8px;
+  background-color: white;
+
+}
+
+p {
+  margin: 20px;
+  cursor: pointer;
+}
