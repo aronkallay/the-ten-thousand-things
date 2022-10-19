@@ -65,21 +65,18 @@ durations_piano2 = [73.17299319727891, 212.04233560090702, 86.22367346938775, 41
                     89.19965986394558, 81.88766439909297, 52.12233560090703, 43.706326530612245];
 
 //**** auto fade
-// setTimeout(() => {
-//   fadeout(cover_img, 50);
-// }, 2000);
-// setTimeout(() => {
-//   fadein(player);
-// }, 2000);
+setTimeout(() => {
+   fadeout(cover_img, 50);
+ }, 500);
+ setTimeout(() => {
+   fadein(player);
+ }, 500);
 
 
 
 //fade in cover image on click
-fadein(cover_img);
-cover_img.addEventListener("click", function(){
-  fadeout(cover_img, 50);
-  fadein(player);
-}, {once: true});
+//fadein(cover_img);
+
 
 
 //open popup windows
