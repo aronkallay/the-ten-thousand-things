@@ -387,9 +387,9 @@ body{
 .wiper {
   -webkit-appearance: none;
   position: absolute;
-  width: calc(1190 / 1296 * var(--main-width));
+  width: calc(1199 / 1296 * var(--main-width));
   height: calc(320/ 563 * var(--main-height));
-  left: calc(50vw - .5*var(--main-width) + 64 / 1296 * var(--main-width));
+  left: calc(50vw - .5*var(--main-width) + 57 / 1296 * var(--main-width));
   top: calc(50vh - .5*var(--main-height) + 114 / 563 * var(--main-height));
   z-index: 8;
   background: none;
@@ -543,28 +543,29 @@ body{
 
 
 .string {
-  top: calc(20 / 563* var(--main-height));
-  background: #c59aae;
+  top: calc(19 / 563* var(--main-height));
+  opacity: 0;
 }
 
 .perc {
-  top: calc(84/563 * var(--main-height));
-  background: #cbc799;
+  top: calc(83/563 * var(--main-height));
+  opacity: 0;
 }
 
 .piano1 {
-  top: calc(148/563 * var(--main-height));
-  background: #ff98ff;
+  top: calc(147/563 * var(--main-height));
+  opacity: 0;
 }
 
 .piano2 {
-  top: calc(212/563 * var(--main-height));
-  background: #b5cb99;
+  top: calc(211/563 * var(--main-height));
+  opacity: 0;
 }
 
 .speaker {
   top: calc(279/563 * var(--main-height));
   background: #9bafc0;
+  opacity: 0;
 }
 
 .track-canvas {
