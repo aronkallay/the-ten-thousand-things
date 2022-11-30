@@ -7,27 +7,76 @@
 // const master_slider = document.getElementById("master-slider");
 //
 
-var sound = new Howl({
-  src: ["assets/audio/45' for a speaker/45' - 1.wav"]
-});
-
-document.addEventListener("mousedown", function(){
-
-  // sound.once("play", () => {
-  //   sound.seek(4000);
-  // });
-  sound.seek(100);
-  sound.play();
 
 
-})
+const string_sounds = [];
+const perc_sounds = [];
+const piano1_sounds = [];
+const piano2_sounds = [];
+const speaker_sounds = [];
 
+for (var i = 0; i < 22; i++){
+  var sound = new Howl({
+    src: ["assets/audio/26'/26' - " + (i+1).toString() + ".wav"],
+    onload: loaded("string" + (i+1).toString())
+  })
+  string_sounds.push(sound);
+}
 
-const string_audios = [];
-const perc_audios = [];
-const piano1_audios = [];
-const piano2_audios = [];
-const speaker_audios = [];
+for (var i = 0; i < 28; i++){
+  var sound = new Howl({
+    src: ["assets/audio/27'/27' - " + (i+1).toString() + ".wav"],
+    onload: loaded("perc" + (i+1).toString())
+  })
+  perc_sounds.push(sound);
+}
+
+for (var i = 0; i < 22; i++){
+  var sound = new Howl({
+    src: ["assets/audio/31'/31' - " + (i+1).toString() + ".wav"],
+    onload: loaded("piano1" + (i+1).toString())
+  })
+  piano1_sounds.push(sound);
+}
+
+for (var i = 0; i < 24; i++){
+  var sound = new Howl({
+    src: ["assets/audio/34'/34' - " + (i+1).toString() + ".wav"],
+    onload: loaded("piano2" + (i+1).toString())
+  })
+  piano2_sounds.push(sound);
+}
+
+for (var i = 0; i < 12; i++){
+
+  if (i == 0){
+    var sound = new Howl({
+      src: ["assets/audio/45' for a Speaker/45' - " + (i+1).toString() + ".wav"],
+      onload: firstLoaded()
+    })
+  }
+  else{
+    var sound = new Howl({
+      src: ["assets/audio/45' for a Speaker/45' - " + (i+1).toString() + ".wav"],
+      onload: loaded("speaker" + (i+1).toString())
+    })
+  }
+
+  speaker_sounds.push(sound);
+}
+
+function loaded(x){
+  console.log(x);
+}
+
+function firstLoaded(){
+  console.log('firstloaded');
+  document.addEventListener("mousedown", function(){
+    //speaker_sounds[0].seek(10);
+    speaker_sounds[0].play();
+  })
+}
+
 
 // setTimeout(function(){
 // for (var i = 0; i < 22; i++){
@@ -107,7 +156,7 @@ var speaker_audio2_fileno = 2;
 var elapsed_time = 0.;
 var curr_time = 0.;
 
-console.log(curr_speaker_audio.currentTime);
+//console.log(curr_speaker_audio.currentTime);
 
 
 
@@ -304,8 +353,8 @@ function pause(){
     playing = false;
     console.log("paused");
     //stop longest audio
-    curr_speaker_audio.pause();
-    stop_time_display();
+    // curr_speaker_audio.pause();
+    // stop_time_display();
   }
 }
 
@@ -347,13 +396,13 @@ function play_single_click(){
     playing = true;
     console.log("playing");
     //start longest audio
-    console.log(speaker_audio1.currentTime);
-    speaker_audio1.currentTime = 180;
-    console.log(speaker_audio1.currentTime);
-    //speaker_audio1.play();
-    //console.log(curr_speaker_audio.currentTime);
-    //curr_speaker_audio.play();
-    start_time_display();
+    // console.log(speaker_audio1.currentTime);
+    // speaker_audio1.currentTime = 180;
+    // console.log(speaker_audio1.currentTime);
+    // //speaker_audio1.play();
+    // //console.log(curr_speaker_audio.currentTime);
+    // //curr_speaker_audio.play();
+    // start_time_display();
 
   }
 
@@ -362,67 +411,64 @@ function play_single_click(){
 //curr_speaker_audio.currentTime = 180;
 //speaker_audio2.currentTime = 170;
 
-speaker_audio1.addEventListener("ended", speaker1_ended);
-speaker_audio2.addEventListener("ended", speaker2_ended);
-
-function speaker1_ended(){
-  //switch to second audio object
-  curr_speaker_audio = speaker_audio2;
-  //speaker_audio2.currentTime = speaker_audio2.duration - 10;
-  curr_speaker_audio.play();
-  console.log(curr_speaker_audio.src);
-
-  //add audio time to elapsed time
-  elapsed_time += speaker_audio1.duration;
-
-  //load next audio file
-  if (speaker_audio1_fileno != 11){
-    speaker_audio1_fileno += 2;
-    speaker_audio1.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio1_fileno.toString() + ".wav";
-    speaker_audio1.load();
-  }
-}
-
-function speaker2_ended(){
-  //if it's not the last one
-  if (speaker_audio2_fileno != 12){
-    //add audio time to elapsed time
-    elapsed_time += speaker_audio2.duration;
-    //switch to first audio object
-    curr_speaker_audio = speaker_audio1;
-    //speaker_audio1.currentTime = speaker_audio1.duration - 10;
-    curr_speaker_audio.play();
-    console.log(curr_speaker_audio.src);
-
-    //load next audio file
-    speaker_audio2_fileno += 2;
-    speaker_audio2.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio2_fileno.toString() + ".wav";
-    speaker_audio2.load();
-  }
-  else{
-    playing = false;
-  }
-}
-
-
-
-
-//function to start time display
-var time_poller;
-function start_time_display(){
-  time_poller = setInterval(function(){
-
-    curr_time = elapsed_time + curr_speaker_audio.currentTime;
-    time_display.innerHTML = sec_to_minsec(Math.round(curr_time));
-
-    wiper.value = curr_time;
-
-  }, 1000);
-}
-//function to stop time display
-function stop_time_display(){
-  clearInterval(time_poller);
-}
+// speaker_audio1.addEventListener("ended", speaker1_ended);
+// speaker_audio2.addEventListener("ended", speaker2_ended);
+//
+// function speaker1_ended(){
+//   //switch to second audio object
+//   curr_speaker_audio = speaker_audio2;
+//   //speaker_audio2.currentTime = speaker_audio2.duration - 10;
+//   curr_speaker_audio.play();
+//   console.log(curr_speaker_audio.src);
+//
+//   //add audio time to elapsed time
+//   elapsed_time += speaker_audio1.duration;
+//
+//   //load next audio file
+//   if (speaker_audio1_fileno != 11){
+//     speaker_audio1_fileno += 2;
+//     speaker_audio1.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio1_fileno.toString() + ".wav";
+//     speaker_audio1.load();
+//   }
+// }
+//
+// function speaker2_ended(){
+//   //if it's not the last one
+//   if (speaker_audio2_fileno != 12){
+//     //add audio time to elapsed time
+//     elapsed_time += speaker_audio2.duration;
+//     //switch to first audio object
+//     curr_speaker_audio = speaker_audio1;
+//     //speaker_audio1.currentTime = speaker_audio1.duration - 10;
+//     curr_speaker_audio.play();
+//     console.log(curr_speaker_audio.src);
+//
+//     //load next audio file
+//     speaker_audio2_fileno += 2;
+//     speaker_audio2.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio2_fileno.toString() + ".wav";
+//     speaker_audio2.load();
+//   }
+//   else{
+//     playing = false;
+//   }
+// }
+//
+// //function to start time display
+// var time_poller;
+// function start_time_display(){
+//   time_poller = setInterval(function(){
+//
+//     curr_time = elapsed_time + curr_speaker_audio.currentTime;
+//     time_display.innerHTML = sec_to_minsec(Math.round(curr_time));
+//
+//     wiper.value = curr_time;
+//
+//   }, 1000);
+// }
+// //function to stop time display
+// function stop_time_display(){
+//   clearInterval(time_poller);
+// }
 
 
 
