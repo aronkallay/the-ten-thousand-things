@@ -8,8 +8,7 @@
 //
 
 var sound = new Howl({
-  src: ["assets/audio/45' for a speaker/45' - 1.wav"],
-
+  src: ["assets/audio/45' for a speaker/45' - 1.wav"]
 });
 
 document.addEventListener("mousedown", function(){
