@@ -12,28 +12,38 @@ const piano1_audios = [];
 const piano2_audios = [];
 const speaker_audios = [];
 
+setTimeout(function(){
 for (var i = 0; i < 22; i++){
-  string_audios.push(document.getElementById("string-audio-" + (i+1).toString));
+  string_audios.push(document.getElementById("string-audio-" + (i+1).toString()));
 }
 
 for (var i = 0; i < 28; i++){
-  perc_audios.push(document.getElementById("perc-audio-" + (i+1).toString));
+  perc_audios.push(document.getElementById("perc-audio-" + (i+1).toString()));
 }
 
 for (var i = 0; i < 22; i++){
-  piano1_audios.push(document.getElementById("piano1-audio-" + (i+1).toString));
+  piano1_audios.push(document.getElementById("piano1-audio-" + (i+1).toString()));
 }
 
 for (var i = 0; i < 24; i++){
-  piano2_audios.push(document.getElementById("piano2-audio-" + (i+1).toString));
+  piano2_audios.push(document.getElementById("piano2-audio-" + (i+1).toString()));
 }
 
 for (var i = 0; i < 12; i++){
-  speaker_audios.push(document.getElementById("speaker-audio-" + (i+1).toString));
+  speaker_audio = document.getElementById("speaker-audio-" + (i+1).toString());
+  speaker_audios.push(speaker_audio);
+  console.log(speaker_audio.duration);
+  speaker_audio.currentTime = 10;
+  console.log(speaker_audio.currentTime);
 }
+}, 2000);
 
   const speaker_audio1 = document.getElementById("speaker-audio-1");
   const speaker_audio2 = document.getElementById("speaker-audio-2");
+
+  //speaker_audio1.currentTime = 180;
+  //console.log(speaker_audio1.currentTime);
+
 // var speaker_node1;
 // var speaker_node2;
 // var speaker_gain;
@@ -79,6 +89,8 @@ var speaker_audio1_fileno = 1;
 var speaker_audio2_fileno = 2;
 var elapsed_time = 0.;
 var curr_time = 0.;
+
+console.log(curr_speaker_audio.currentTime);
 
 
 
@@ -318,7 +330,12 @@ function play_single_click(){
     playing = true;
     console.log("playing");
     //start longest audio
-    curr_speaker_audio.play();
+    console.log(speaker_audio1.currentTime);
+    speaker_audio1.currentTime = 180;
+    console.log(speaker_audio1.currentTime);
+    //speaker_audio1.play();
+    //console.log(curr_speaker_audio.currentTime);
+    //curr_speaker_audio.play();
     start_time_display();
 
   }
