@@ -8,97 +8,101 @@
 //
 
 
+//*********HOWLER STUFF!!!
 
-const string_sounds = [];
-const perc_sounds = [];
-const piano1_sounds = [];
-const piano2_sounds = [];
-const speaker_sounds = [];
+// const string_sounds = [];
+// const perc_sounds = [];
+// const piano1_sounds = [];
+// const piano2_sounds = [];
+// const speaker_sounds = [];
+//
+// var string_soundno = 0;
+// var perc_soundno = 0;
+// var piano1_soundno = 0;
+// var piano2_soundno = 0;
+// var speaker_soundno = 0;
+//
+// // for (var i = 0; i < 22; i++){
+// //   var sound = new Howl({
+// //     src: ["assets/audio/26'/26' - " + (i+1).toString() + ".wav"],
+// //     onload: loaded("string" + (i+1).toString())
+// //   })
+// //   string_sounds.push(sound);
+// // }
+// //
+// // for (var i = 0; i < 28; i++){
+// //   var sound = new Howl({
+// //     src: ["assets/audio/27'/27' - " + (i+1).toString() + ".wav"],
+// //     onload: loaded("perc" + (i+1).toString())
+// //   })
+// //   perc_sounds.push(sound);
+// // }
+// //
+// // for (var i = 0; i < 22; i++){
+// //   var sound = new Howl({
+// //     src: ["assets/audio/31'/31' - " + (i+1).toString() + ".wav"],
+// //     onload: loaded("piano1" + (i+1).toString())
+// //   })
+// //   piano1_sounds.push(sound);
+// // }
+// //
+// // for (var i = 0; i < 24; i++){
+// //   var sound = new Howl({
+// //     src: ["assets/audio/34'/34' - " + (i+1).toString() + ".wav"],
+// //     onload: console.log("loaded")//loaded("piano2" + (i+1).toString())
+// //   })
+// //   piano2_sounds.push(sound);
+// // }
+// //
+// // //load speaker audios
+// // for (var i = 0; i < 12; i++){
+// //
+// //   if (i == 11){
+// //     var sound = new Howl({
+// //       src: ["assets/audio/45' for a Speaker/45' - " + (i+1).toString() + ".wav"],
+// //       onload: lastSpeakerLoaded(),
+// //
+// //     })
+// //   }
+// //   else{
+// //     var sound = new Howl({
+// //       src: ["assets/audio/45' for a Speaker/45' - " + (i+1).toString() + ".wav"],
+// //     })
+// //   }
+// //
+// //   speaker_sounds.push(sound);
+// // }
+//
+// function loaded(x){
+//   console.log(x);
+// }
+//
+// var elapsed_time = 0.;
+// var curr_time = 0.;
+//
+// //once last speaker file is loaded, add onend functions (with small delay for adding to array)
+// function lastSpeakerLoaded(){
+//   setTimeout(function(){
+//
+//     //add onend functions to all but last file
+//     for (var i = 0; i < 11; i++){
+//
+//
+//       speaker_sounds[i].on("end", function(){
+//         //add finished duration to elapsed time
+//         elapsed_time += speaker_sounds[speaker_soundno].duration();
+//         //increment current sound number
+//         speaker_soundno += 1;
+//         //play that sound
+//         //speaker_sounds[speaker_soundno].seek(speaker_sounds[speaker_soundno].duration() - 10); //seek to 180 here for testing jumping
+//         speaker_sounds[speaker_soundno].play();
+//         console.log('playing', speaker_soundno);
+//       });
+//     }
+//     //speaker_sounds[0].seek(180);
+//   }, 100);
+// }
 
-var string_soundno = 0;
-var perc_soundno = 0;
-var piano1_soundno = 0;
-var piano2_soundno = 0;
-var speaker_soundno = 0;
-
-for (var i = 0; i < 22; i++){
-  var sound = new Howl({
-    src: ["assets/audio/26'/26' - " + (i+1).toString() + ".wav"],
-    onload: loaded("string" + (i+1).toString())
-  })
-  string_sounds.push(sound);
-}
-
-for (var i = 0; i < 28; i++){
-  var sound = new Howl({
-    src: ["assets/audio/27'/27' - " + (i+1).toString() + ".wav"],
-    onload: loaded("perc" + (i+1).toString())
-  })
-  perc_sounds.push(sound);
-}
-
-for (var i = 0; i < 22; i++){
-  var sound = new Howl({
-    src: ["assets/audio/31'/31' - " + (i+1).toString() + ".wav"],
-    onload: loaded("piano1" + (i+1).toString())
-  })
-  piano1_sounds.push(sound);
-}
-
-for (var i = 0; i < 24; i++){
-  var sound = new Howl({
-    src: ["assets/audio/34'/34' - " + (i+1).toString() + ".wav"],
-    onload: loaded("piano2" + (i+1).toString())
-  })
-  piano2_sounds.push(sound);
-}
-
-for (var i = 0; i < 12; i++){
-
-  if (i == 11){
-    var sound = new Howl({
-      src: ["assets/audio/45' for a Speaker/45' - " + (i+1).toString() + ".wav"],
-      onload: lastLoaded(),
-    })
-  }
-  else{
-    var sound = new Howl({
-      src: ["assets/audio/45' for a Speaker/45' - " + (i+1).toString() + ".wav"],
-    })
-  }
-
-  speaker_sounds.push(sound);
-}
-
-function loaded(x){
-  console.log(x);
-}
-
-function lastLoaded(){
-  setTimeout(function(){
-    for (var i = 0; i < 12; i++){
-      speaker_sounds[i].on("end", function(){
-        sound_ended(speaker_sounds, 12);
-      });
-    }
-    speaker_sounds[0].seek(180);
-  }, 1000);
-
-
-}
-
-function sound_ended(sounds, max){
-
-  //if there's a next sound to play
-  if(speaker_soundno< max-1){
-    //increment current sound number
-    speaker_soundno += 1;
-    //play that sound
-    sounds[speaker_soundno].seek(sounds[speaker_soundno].duration() - 10);
-    sounds[speaker_soundno].play();
-    console.log('playing', speaker_soundno);
-  }
-}
 
 // function firstLoaded(){
 //   console.log('firstloaded');
@@ -109,6 +113,13 @@ function sound_ended(sounds, max){
 //     speaker_sounds[0].play();
 //   })
 // }
+
+
+//*****END HOWLER STUFF!!!!!!!!
+
+
+
+
 
 
 // setTimeout(function(){
@@ -137,8 +148,8 @@ function sound_ended(sounds, max){
 // }
 // }, 2000);
 
-  const speaker_audio1 = document.getElementById("speaker-audio-1");
-  const speaker_audio2 = document.getElementById("speaker-audio-2");
+  //const speaker_audio1 = document.getElementById("speaker-audio-1");
+//  const speaker_audio2 = document.getElementById("speaker-audio-2");
 
   //speaker_audio1.currentTime = 180;
   //console.log(speaker_audio1.currentTime);
@@ -186,8 +197,7 @@ function sound_ended(sounds, max){
 // var curr_speaker_audio = speaker_audio1;
 // var speaker_audio1_fileno = 1;
 // var speaker_audio2_fileno = 2;
-// var elapsed_time = 0.;
-// var curr_time = 0.;
+
 
 //console.log(curr_speaker_audio.currentTime);
 
@@ -385,9 +395,13 @@ function pause(){
   if (playing){
     playing = false;
     console.log("paused");
+    curr_speaker_sound.pause();
+
+    //stop_time_display();
+    //speaker_sounds[speaker_soundno].pause();
     //stop longest audio
     // curr_speaker_audio.pause();
-    // stop_time_display();
+
   }
 }
 
@@ -428,8 +442,10 @@ function play_single_click(){
   if (playing == false){
     playing = true;
     console.log("playing");
-
-    speaker_sounds[speaker_soundno].play();
+    console.log(curr_speaker_sound.seek());
+    curr_speaker_sound.play();
+    //start_time_display();
+    //speaker_sounds[speaker_soundno].play();
 
     //start longest audio
     // console.log(speaker_audio1.currentTime);
@@ -438,7 +454,7 @@ function play_single_click(){
     // //speaker_audio1.play();
     // //console.log(curr_speaker_audio.currentTime);
     // //curr_speaker_audio.play();
-    // start_time_display();
+
 
   }
 
@@ -490,90 +506,118 @@ function play_single_click(){
 // }
 //
 // //function to start time display
-// var time_poller;
-// function start_time_display(){
-//   time_poller = setInterval(function(){
-//
-//     curr_time = elapsed_time + curr_speaker_audio.currentTime;
-//     time_display.innerHTML = sec_to_minsec(Math.round(curr_time));
-//
-//     wiper.value = curr_time;
-//
-//   }, 1000);
-// }
-// //function to stop time display
-// function stop_time_display(){
-//   clearInterval(time_poller);
-// }
+var time_poller;
+function start_time_display(){
+  time_poller = setInterval(function(){
+
+    curr_time = elapsed_time + speaker_sounds[speaker_soundno].seek();
+    time_display.innerHTML = sec_to_minsec(Math.round(curr_time));
+
+    wiper.value = curr_time;
 
 
-
-
-
-
-
-
-//when wiper is clicked, go to that time in the music
-function wiper_clicked(){
-
-  stop_time_display();
-
-  //briefly set current time
-  time_display.innerHTML = sec_to_minsec(Math.round(wiper.value));
-  //stop current audio
-  curr_speaker_audio.pause();
-
-  //then, figure out what the elapsed time should be
-  var i = 0;
-  elapsed_time = 0;
-  while(wiper.value > elapsed_time + durations_speaker[i]){
-    elapsed_time += durations_speaker[i];
-    i+= 1;
-  }
-  //the files to load (load into 1 or 2 depending on the number)
-  if (i%2 == 0){
-    speaker_audio1_fileno = i+1;
-    speaker_audio1.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio1_fileno.toString() + ".wav";
-    speaker_audio1.load();
-    if (i+2 <= 12){
-      speaker_audio2_fileno = i+2;
-      speaker_audio2.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio2_fileno.toString() + ".wav";
-      speaker_audio2.load();
-    }
-    curr_speaker_audio = speaker_audio1;
-  }
-  else{
-    speaker_audio2_fileno = i+1;
-    speaker_audio2.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio2_fileno.toString() + ".wav";
-    speaker_audio2.load();
-    if (i+2 <= 11){
-      speaker_audio1_fileno = i+2;
-      speaker_audio1.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio1_fileno.toString() + ".wav";
-      speaker_audio1.load();
-    }
-    curr_speaker_audio = speaker_audio2;
-  }
-
-  //get current time of the playing audio
-  if (!isNaN(curr_speaker_audio.duration)) {
-    curr_speaker_audio.currentTime = wiper.value - elapsed_time;
-    console.log(curr_speaker_audio.currentTime);
-    console.log(wiper.value - elapsed_time);
-  }
-
-
-
-
-  //play, if it's playing
-  if (playing){
-      if (!isNaN(curr_speaker_audio.duration)) {
-        curr_speaker_audio.play();
-        console.log(curr_speaker_audio.src);
-        console.log(curr_speaker_audio.currentTime);
-      }
-    start_time_display();
-  }
+  }, 1000);
 }
+//function to stop time display
+function stop_time_display(){
+  clearInterval(time_poller);
+}
+
+
+//howler wiper clicked
+// function wiper_clicked(){
+//
+//   //stop updating timer from audio
+//   stop_time_display();
+//
+//   //update timer to wiper location
+//   time_display.innerHTML = sec_to_minsec(Math.round(wiper.value));
+//
+//   //stop current audio
+//   speaker_sounds[speaker_soundno].pause();
+//
+//   //figure out what the elapsed time should be
+//   var i = 0;
+//   elapsed_time = 0;
+//   while(wiper.value > elapsed_time + durations_speaker[i]){
+//     elapsed_time += durations_speaker[i];
+//     i+=1;
+//   }
+//   //get the file to play
+//   speaker_soundno = i;
+//   //set file seek time
+//   speaker_sounds[speaker_soundno].seek(wiper.value - elapsed_time);
+//   //play, if playiing
+//   if(playing){
+//     start_time_display();
+//     speaker_sounds[speaker_soundno].play();
+//   }
+//
+//
+// }
+
+
+//old wiper clicked
+// function wiper_clicked(){
+//
+//   stop_time_display();
+//
+//   //briefly set current time
+//   time_display.innerHTML = sec_to_minsec(Math.round(wiper.value));
+//   //stop current audio
+//   curr_speaker_audio.pause();
+//
+//   //then, figure out what the elapsed time should be
+//   var i = 0;
+//   elapsed_time = 0;
+//   while(wiper.value > elapsed_time + durations_speaker[i]){
+//     elapsed_time += durations_speaker[i];
+//     i+= 1;
+//   }
+//   //the files to load (load into 1 or 2 depending on the number)
+//   if (i%2 == 0){
+//     speaker_audio1_fileno = i+1;
+//     speaker_audio1.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio1_fileno.toString() + ".wav";
+//     speaker_audio1.load();
+//     if (i+2 <= 12){
+//       speaker_audio2_fileno = i+2;
+//       speaker_audio2.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio2_fileno.toString() + ".wav";
+//       speaker_audio2.load();
+//     }
+//     curr_speaker_audio = speaker_audio1;
+//   }
+//   else{
+//     speaker_audio2_fileno = i+1;
+//     speaker_audio2.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio2_fileno.toString() + ".wav";
+//     speaker_audio2.load();
+//     if (i+2 <= 11){
+//       speaker_audio1_fileno = i+2;
+//       speaker_audio1.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio1_fileno.toString() + ".wav";
+//       speaker_audio1.load();
+//     }
+//     curr_speaker_audio = speaker_audio2;
+//   }
+//
+//   //get current time of the playing audio
+//   if (!isNaN(curr_speaker_audio.duration)) {
+//     curr_speaker_audio.currentTime = wiper.value - elapsed_time;
+//     console.log(curr_speaker_audio.currentTime);
+//     console.log(wiper.value - elapsed_time);
+//   }
+//
+//
+//
+//
+//   //play, if it's playing
+//   if (playing){
+//       if (!isNaN(curr_speaker_audio.duration)) {
+//         curr_speaker_audio.play();
+//         console.log(curr_speaker_audio.src);
+//         console.log(curr_speaker_audio.currentTime);
+//       }
+//     start_time_display();
+//   }
+// }
 
 
 
@@ -612,6 +656,86 @@ function update_track_activation(){
 
 
 
+
+
+
+
+
+function wiper_clicked(){
+
+}
+
+
+var speaker_sound1 = new Howl({
+  src: ["assets/audio/45' for a Speaker/45' - 1.wav"],
+  onend: speaker1_ended,
+  onload: function(){
+    this.seek(this.duration() - 10);
+  }
+})
+var speaker_sound2 = new Howl({
+  src: ["assets/audio/45' for a Speaker/45' - 2.wav"],
+  onend: speaker2_ended,
+  onload: function(){
+    this.seek(this.duration() - 10);
+  }
+})
+
+var speaker_sound1_fileno = 1;
+var speaker_sound2_fileno = 2;
+
+var curr_speaker_sound = speaker_sound1;
+
+var elapsed_time = 0.0;
+var curr_time = 0.0;
+
+
+speaker_sound1.seek(speaker_sound1.duration() - 10);
+
+function speaker1_ended(){
+  //switch to second audio object
+  curr_speaker_sound = speaker_sound2;
+  curr_speaker_sound.play();
+  console.log(speaker_sound2_fileno);
+
+  //add audio time to elapsed time
+  elapsed_time += speaker_sound1.duration();
+
+  //load next audio file
+  if (speaker_sound1_fileno != 11){
+    speaker_sound1_fileno += 2;
+    var old_howl = speaker_sound1;
+    speaker_sound1 = new Howl({
+      src: ["assets/audio/45' for a Speaker/45' - " + speaker_sound1_fileno.toString() + ".wav"],
+      onend: speaker1_ended
+    })
+    old_howl.unload();
+  }
+}
+
+function speaker2_ended(){
+  //if it's not the last one
+  if (speaker_sound2_fileno != 12){
+    //add audio time to elapsed time
+    elapsed_time += speaker_sound2.duration();
+    //switch to first audio object
+    curr_speaker_sound = speaker_sound1;
+    curr_speaker_sound.play();
+    console.log(speaker_sound1_fileno);
+
+    //load next audio file
+    speaker_sound2_fileno += 2;
+    var old_howl = speaker_sound2;
+    speaker_sound2 = new Howl({
+      src: ["assets/audio/45' for a Speaker/45' - " + speaker_sound2_fileno.toString() + ".wav"],
+      onend: speaker2_ended
+    })
+    old_howl.unload();
+  }
+  else{
+    playing = false;
+  }
+}
 
 
 
