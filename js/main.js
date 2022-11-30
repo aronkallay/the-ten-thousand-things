@@ -6,8 +6,34 @@
 // var master_gain;
 // const master_slider = document.getElementById("master-slider");
 //
- const speaker_audio1 = document.getElementById("speaker-audio-1");
- const speaker_audio2 = document.getElementById("speaker-audio-2");
+const string_audios = [];
+const perc_audios = [];
+const piano1_audios = [];
+const piano2_audios = [];
+const speaker_audios = [];
+
+for (var i = 0; i < 22; i++){
+  string_audios.push(document.getElementById("string-audio-" + (i+1).toString));
+}
+
+for (var i = 0; i < 28; i++){
+  perc_audios.push(document.getElementById("perc-audio-" + (i+1).toString));
+}
+
+for (var i = 0; i < 22; i++){
+  piano1_audios.push(document.getElementById("piano1-audio-" + (i+1).toString));
+}
+
+for (var i = 0; i < 24; i++){
+  piano2_audios.push(document.getElementById("piano2-audio-" + (i+1).toString));
+}
+
+for (var i = 0; i < 12; i++){
+  speaker_audios.push(document.getElementById("speaker-audio-" + (i+1).toString));
+}
+
+  const speaker_audio1 = document.getElementById("speaker-audio-1");
+  const speaker_audio2 = document.getElementById("speaker-audio-2");
 // var speaker_node1;
 // var speaker_node2;
 // var speaker_gain;
@@ -413,16 +439,22 @@ function wiper_clicked(){
   }
 
   //get current time of the playing audio
-  curr_speaker_audio.currentTime = wiper.value - elapsed_time;
-  console.log(curr_speaker_audio.currentTime);
+  if (!isNaN(curr_speaker_audio.duration)) {
+    curr_speaker_audio.currentTime = wiper.value - elapsed_time;
+    console.log(curr_speaker_audio.currentTime);
+    console.log(wiper.value - elapsed_time);
+  }
+
+
 
 
   //play, if it's playing
   if (playing){
-      curr_speaker_audio.play();
-      console.log(curr_speaker_audio.src);
-      console.log(curr_speaker_audio.currentTime);
-
+      if (!isNaN(curr_speaker_audio.duration)) {
+        curr_speaker_audio.play();
+        console.log(curr_speaker_audio.src);
+        console.log(curr_speaker_audio.currentTime);
+      }
     start_time_display();
   }
 }
