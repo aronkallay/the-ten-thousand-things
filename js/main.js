@@ -1,18 +1,77 @@
-//getting html elements....
+
+//build audio structure first
+var audioCtx;
+var gotContext = false;
+
+var master_gain;
+const master_slider = document.getElementById("master-slider");
+
+const speaker_audio1 = document.getElementById("speaker-audio-1");
+const speaker_audio2 = document.getElementById("speaker-audio-2");
+var speaker_node1;
+var speaker_node2;
+var speaker_gain;
+
+//create audio context & nodes on first mousepress
+document.addEventListener("mousedown", mousedown);
+
+function mousedown(){
+
+  if (!gotContext){
+    audioCtx = new AudioContext();
+    gotContext = true;
+    console.log('gotContext');
+    if (audioCtx.state === "suspended"){
+      audioCtx.resume();
+    }
+    document.removeEventListener('mousedown', mousedown);
+  }
+
+  //make all audio things
+
+  //make master gain & connect to destination
+  master_gain = audioCtx.createGain();
+  master_gain.connect(audioCtx.destination);
+  master_slider.oninput = function(){
+    master_gain.gain.value = master_slider.value;
+  };
+
+  //speaker things
+  speaker_node1 = audioCtx.createMediaElementSource(speaker_audio1);
+  speaker_node2 = audioCtx.createMediaElementSource(speaker_audio2);
+  speaker_gain = audioCtx.createGain();
+  //connect speaker things
+  speaker_node1.connect(speaker_gain);
+  speaker_node2.connect(speaker_gain);
+  speaker_gain.connect(master_gain);
+
+}
+
+//other audio variables
+var curr_speaker_audio = speaker_audio1;
+var speaker_audio1_fileno = 1;
+var speaker_audio2_fileno = 2;
+var elapsed_time = 0.;
+var curr_time = 0.;
 
 
+
+
+//get html elements....
 var cover_img = document.getElementById("cover-image");
 var player = document.getElementById("player");
 var logo = document.getElementById("logo");
 var title = document.getElementById("title-text");
 var return_button = document.getElementById("return-button");
 var wiper = document.getElementById("wiper");
+wiper.addEventListener('change', wiper_clicked);
+
 var play_button = document.getElementById("play-button");
 var pause_button = document.getElementById("pause-button");
+var time_display = document.getElementById("timer");
 
 var instr_button = document.getElementById("instr-button");
 var about_button = document.getElementById("about-button");
-
 
 //checkboxes
 var check1 = document.getElementById("check1");
@@ -32,10 +91,12 @@ var forty_mark = document.getElementById("forty-mark");
 
 //variables for updating timeline and title
 var longest = 0;
-var lengths = [0, 26, 27.17, 32, 34.75, 45];
+var lengths = [0, 27.23, 27.25, 31.96, 36.22, 45.28];
 var marks = [ten_mark, twenty_mark, thirty_mark, forty_mark];
 var all_checked = true;
 var num_checked = 5;
+
+wiper.max = lengths[5]*60.;
 
 //variables for colored TRACKS
 var track_container = document.getElementById("track-container");
@@ -62,6 +123,10 @@ string_ctx.fillStyle = "#c59aae";
 perc_ctx.fillStyle = "#cbc799";
 piano1_ctx.fillStyle = "#ff98ff";
 piano2_ctx.fillStyle = "#b5cb99";
+
+
+
+
 
 //durations of audio files
 const durations_string = [54.73034013605442, 65.07165532879819, 27.380997732426305, 86.49034013605443,
@@ -112,6 +177,13 @@ const num_piano2_segs = durations_piano2.length;
 var piano2_total_dur = 0;
 for (var i = 0; i < num_piano2_segs; i++){ piano2_total_dur += durations_piano2[i]; }
 var piano2_seg_locs = [...Array(num_piano2_segs).keys()];
+
+const durations_speaker = [190.65049886621316, 175.34950113378684, 167.45727891156463,
+                            344.04272108843537, 184.5, 274.0, 160.0, 298.0, 266.0, 276.0,
+                            248.0, 133.00766439909296];
+const num_speaker_segs = durations_speaker.length;
+var speaker_total_dur = 0;
+for (var i = 0; i < num_speaker_segs; i++){ speaker_total_dur += durations_speaker[i]; };
 
 var all_durations = [durations_string, durations_perc, durations_piano1, durations_piano2];
 var all_num_segs = [num_string_segs, num_perc_segs, num_piano1_segs, num_piano2_segs];
@@ -176,6 +248,9 @@ function pause(){
   if (playing){
     playing = false;
     console.log("paused");
+    //stop longest audio
+    curr_speaker_audio.pause();
+    stop_time_display();
   }
 }
 
@@ -216,9 +291,143 @@ function play_single_click(){
   if (playing == false){
     playing = true;
     console.log("playing");
+    //start longest audio
+    curr_speaker_audio.play();
+    start_time_display();
+
   }
 
 }
+
+//curr_speaker_audio.currentTime = 180;
+//speaker_audio2.currentTime = 170;
+
+speaker_audio1.addEventListener("ended", speaker1_ended);
+speaker_audio2.addEventListener("ended", speaker2_ended);
+
+function speaker1_ended(){
+  //switch to second audio object
+  curr_speaker_audio = speaker_audio2;
+  //speaker_audio2.currentTime = speaker_audio2.duration - 10;
+  curr_speaker_audio.play();
+  console.log(curr_speaker_audio.src);
+
+  //add audio time to elapsed time
+  elapsed_time += speaker_audio1.duration;
+
+  //load next audio file
+  if (speaker_audio1_fileno != 11){
+    speaker_audio1_fileno += 2;
+    speaker_audio1.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio1_fileno.toString() + ".wav";
+    speaker_audio1.load();
+  }
+}
+
+function speaker2_ended(){
+  //if it's not the last one
+  if (speaker_audio2_fileno != 12){
+    //add audio time to elapsed time
+    elapsed_time += speaker_audio2.duration;
+    //switch to first audio object
+    curr_speaker_audio = speaker_audio1;
+    //speaker_audio1.currentTime = speaker_audio1.duration - 10;
+    curr_speaker_audio.play();
+    console.log(curr_speaker_audio.src);
+
+    //load next audio file
+    speaker_audio2_fileno += 2;
+    speaker_audio2.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio2_fileno.toString() + ".wav";
+    speaker_audio2.load();
+  }
+  else{
+    playing = false;
+  }
+}
+
+
+
+
+//function to start time display
+var time_poller;
+function start_time_display(){
+  time_poller = setInterval(function(){
+
+    curr_time = elapsed_time + curr_speaker_audio.currentTime;
+    time_display.innerHTML = sec_to_minsec(Math.round(curr_time));
+
+    wiper.value = curr_time;
+
+  }, 1000);
+}
+//function to stop time display
+function stop_time_display(){
+  clearInterval(time_poller);
+}
+
+
+
+
+
+
+
+
+//when wiper is clicked, go to that time in the music
+function wiper_clicked(){
+
+  stop_time_display();
+
+  //briefly set current time
+  time_display.innerHTML = sec_to_minsec(Math.round(wiper.value));
+  //stop current audio
+  curr_speaker_audio.pause();
+
+  //then, figure out what the elapsed time should be
+  var i = 0;
+  elapsed_time = 0;
+  while(wiper.value > elapsed_time + durations_speaker[i]){
+    elapsed_time += durations_speaker[i];
+    i+= 1;
+  }
+  //the files to load (load into 1 or 2 depending on the number)
+  if (i%2 == 0){
+    speaker_audio1_fileno = i+1;
+    speaker_audio1.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio1_fileno.toString() + ".wav";
+    speaker_audio1.load();
+    if (i+2 <= 12){
+      speaker_audio2_fileno = i+2;
+      speaker_audio2.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio2_fileno.toString() + ".wav";
+      speaker_audio2.load();
+    }
+    curr_speaker_audio = speaker_audio1;
+  }
+  else{
+    speaker_audio2_fileno = i+1;
+    speaker_audio2.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio2_fileno.toString() + ".wav";
+    speaker_audio2.load();
+    if (i+2 <= 11){
+      speaker_audio1_fileno = i+2;
+      speaker_audio1.src = "assets/audio/45' for a Speaker/45' - " + speaker_audio1_fileno.toString() + ".wav";
+      speaker_audio1.load();
+    }
+    curr_speaker_audio = speaker_audio2;
+  }
+
+  //get current time of the playing audio
+  curr_speaker_audio.oncanplay = function(){
+    curr_speaker_audio.currentTime = wiper.value - elapsed_time;
+  }
+  console.log(curr_speaker_audio.currentTime);
+  //play, if it's playing
+  if (playing){
+    curr_speaker_audio.play();
+    console.log(curr_speaker_audio.src);
+    console.log(curr_speaker_audio.currentTime);
+    start_time_display();
+  }
+}
+
+
+
 
 
 
@@ -261,92 +470,7 @@ function update_track_activation(){
 
 
 
-//draw static canvas shapes; this gets called every time the canvas is resized! & once on load-in of the page
-function draw(){
 
-  //drawing static things....
-  const canvas = document.getElementById('player-canvas');
-  const ctx = canvas.getContext('2d');
-
-  const border_canvas = document.getElementById('border-canvas');
-  const border_ctx = border_canvas.getContext('2d');
-
-  //grey background
-  ctx.fillStyle = "#999999";
-  ctx.beginPath();
-  ctx.moveTo(0, 67);
-  ctx.bezierCurveTo(20, -20,  1296 - 20, -20, 1296, 67);
-  ctx.moveTo(0, 440);
-  ctx.bezierCurveTo(70, 600, 1296 - 70, 600, 1296, 440);
-  ctx.fill();
-  ctx.fillRect(0, 67, 1296, 373);
-
-  //white playback area
-  ctx.roundRect(55, 113, 1203, 322, 3);
-
-  ctx.fillStyle = "white";
-  ctx.fill();
-
-  //black border lines
-  border_ctx.roundRect(55, 113, 1203, 322, 3);
-  border_ctx.strokeStyle = "black";
-  border_ctx.lineWidth = 2;
-  border_ctx.stroke();
-
-
-  //grey lines separating tracks
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = "#888888";
-  ctx.beginPath();
-  ctx.moveTo(55, 177);
-  ctx.lineTo(1258, 177);
-  ctx.moveTo(55, 241);
-  ctx.lineTo(1258, 241);
-  ctx.moveTo(55, 305);
-  ctx.lineTo(1258, 305);
-  ctx.moveTo(55, 369);
-  ctx.lineTo(1258, 369);
-  ctx.closePath();
-  ctx.stroke();
-
-
-  //volume rectangles
-  ctx.strokeStyle = "black";
-  ctx.lineWidth = 4;
-  ctx.fillStyle = "#888888";
-  ctx.roundRect(1262, 113, 20, 62, 2);
-  ctx.stroke();
-  ctx.fill();
-  ctx.roundRect(1262, 178, 20, 61, 2);
-  ctx.stroke();
-  ctx.fill();
-  ctx.roundRect(1262, 242, 20, 61, 2);
-  ctx.stroke();
-  ctx.fill();
-  ctx.roundRect(1262, 306, 20, 61, 2);
-  ctx.stroke();
-  ctx.fill();
-  ctx.roundRect(1262, 370, 20, 65, 2);
-  ctx.stroke();
-  ctx.fill();
-
-  //timeline ticks
-  ctx.strokeStyle = "black";
-  ctx.lineWidth = 1;
-  for(var i = 0; i < 70; i++){
-    ctx.beginPath();
-    ctx.moveTo(65 + i*17.2, 97);
-    ctx.lineTo(65 + i*17.2, 107);
-    ctx.closePath();
-    ctx.stroke();
-  }
-
-
-
-  //draw colored track segments, according to current randomization positions
-  draw_colored_tracks();
-
-}
 
 
 
@@ -375,16 +499,16 @@ function draw(){
 
 //testing audio levels with volume slider
 const root = document.querySelector(':root');
-const master_slider = document.getElementById("master-slider");
+
 // set css variable
 
-master_slider.oninput = function() {
-    root.style.setProperty('--string-level', master_slider.value);
-    root.style.setProperty('--perc-level', master_slider.value);
-    root.style.setProperty('--piano1-level', master_slider.value);
-    root.style.setProperty('--piano2-level', master_slider.value);
-    root.style.setProperty('--speaker-level', master_slider.value);
-}
+// master_slider.oninput = function() {
+//     root.style.setProperty('--string-level', master_slider.value);
+//     root.style.setProperty('--perc-level', master_slider.value);
+//     root.style.setProperty('--piano1-level', master_slider.value);
+//     root.style.setProperty('--piano2-level', master_slider.value);
+//     root.style.setProperty('--speaker-level', master_slider.value);
+// }
 
 
 
@@ -624,6 +748,7 @@ function load_tracks(){
 }
 
 //updates timeline based on checked values
+//also updates wiper size
 function draw_timeline(){
   length = lengths[longest];
   if (length == 0){
@@ -642,6 +767,8 @@ function draw_timeline(){
     thirty_mark.style.left = "calc(70/" + length + "*30*15 / 1296 * var(--main-width))";
     forty_mark.style.left = "calc(70/" + length + "*40*15 / 1296 * var(--main-width))";
   }
+
+  wiper.max = lengths[longest] * 60.;
 }
 
 //get the longest checked track
@@ -734,4 +861,102 @@ function shuffle(array) {
   }
 
   return array;
+}
+
+
+//draw static canvas shapes; this gets called every time the canvas is resized! & once on load-in of the page
+function draw(){
+
+  //drawing static things....
+  const canvas = document.getElementById('player-canvas');
+  const ctx = canvas.getContext('2d');
+
+  const border_canvas = document.getElementById('border-canvas');
+  const border_ctx = border_canvas.getContext('2d');
+
+  //grey background
+  ctx.fillStyle = "#999999";
+  ctx.beginPath();
+  ctx.moveTo(0, 67);
+  ctx.bezierCurveTo(20, -20,  1296 - 20, -20, 1296, 67);
+  ctx.moveTo(0, 440);
+  ctx.bezierCurveTo(70, 600, 1296 - 70, 600, 1296, 440);
+  ctx.fill();
+  ctx.fillRect(0, 67, 1296, 373);
+
+  //white playback area
+  ctx.roundRect(55, 113, 1203, 322, 3);
+
+  ctx.fillStyle = "white";
+  ctx.fill();
+
+  //black border lines
+  border_ctx.roundRect(55, 113, 1203, 322, 3);
+  border_ctx.strokeStyle = "black";
+  border_ctx.lineWidth = 2;
+  border_ctx.stroke();
+
+
+  //grey lines separating tracks
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#888888";
+  ctx.beginPath();
+  ctx.moveTo(55, 177);
+  ctx.lineTo(1258, 177);
+  ctx.moveTo(55, 241);
+  ctx.lineTo(1258, 241);
+  ctx.moveTo(55, 305);
+  ctx.lineTo(1258, 305);
+  ctx.moveTo(55, 369);
+  ctx.lineTo(1258, 369);
+  ctx.closePath();
+  ctx.stroke();
+
+
+  //volume rectangles
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 4;
+  ctx.fillStyle = "#888888";
+  ctx.roundRect(1262, 113, 20, 62, 2);
+  ctx.stroke();
+  ctx.fill();
+  ctx.roundRect(1262, 178, 20, 61, 2);
+  ctx.stroke();
+  ctx.fill();
+  ctx.roundRect(1262, 242, 20, 61, 2);
+  ctx.stroke();
+  ctx.fill();
+  ctx.roundRect(1262, 306, 20, 61, 2);
+  ctx.stroke();
+  ctx.fill();
+  ctx.roundRect(1262, 370, 20, 65, 2);
+  ctx.stroke();
+  ctx.fill();
+
+  //timeline ticks
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 1;
+  for(var i = 0; i < 70; i++){
+    ctx.beginPath();
+    ctx.moveTo(65 + i*17.2, 97);
+    ctx.lineTo(65 + i*17.2, 107);
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+
+
+  //draw colored track segments, according to current randomization positions
+  draw_colored_tracks();
+
+}
+
+//turn seconds into formatted xx:xx minutes and seconds
+function sec_to_minsec(seconds){
+  let minutes = Math.floor(seconds / 60);
+  let extraSeconds = seconds % 60;
+  minutes = minutes < 10 ? "0" + minutes : minutes;
+  extraSeconds = extraSeconds < 10 ? "0" + extraSeconds : extraSeconds;
+
+  return(minutes.toString() + ":" + extraSeconds.toString());
 }
