@@ -6,6 +6,17 @@
 // var master_gain;
 // const master_slider = document.getElementById("master-slider");
 //
+
+var sound = new Howl({
+  src: ["assets/audio/45' for a speaker/45' - 1.wav"],
+  html5: true
+});
+
+document.addEventListener("mousedown", function(){
+  sound.play();
+})
+
+
 const string_audios = [];
 const perc_audios = [];
 const piano1_audios = [];
