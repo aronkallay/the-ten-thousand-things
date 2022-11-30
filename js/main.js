@@ -287,6 +287,7 @@ const num_string_segs = durations_string.length;
 var string_total_dur = 0;
 for (var i = 0; i < num_string_segs; i++){ string_total_dur += durations_string[i]; }
 var string_seg_locs = [...Array(num_string_segs).keys()];
+var string_order = [...Array(num_string_segs).keys()];
 
 const durations_perc = [137.6209977324263, 38.92233560090703, 44.10632653061224, 41.14099773242631,
                   90.79433106575964, 76.0690022675737, 60.500997732426306, 36.57566893424036,
@@ -300,6 +301,7 @@ const num_perc_segs = durations_perc.length;
 var perc_total_dur = 0;
 for (var i = 0; i < num_perc_segs; i++){ perc_total_dur += durations_perc[i]; }
 var perc_seg_locs = [...Array(num_perc_segs).keys()];
+var perc_order = [...Array(num_perc_segs).keys()];
 
 const durations_piano1 = [54.9809977324263, 81.8290022675737, 102.12766439909296, 50.69832199546485,
                     47.16233560090703, 75.77566893424036, 132.39433106575964, 54.83700680272109,
@@ -312,6 +314,7 @@ const num_piano1_segs = durations_piano1.length;
 var piano1_total_dur = 0;
 for (var i = 0; i < num_piano1_segs; i++){ piano1_total_dur += durations_piano1[i]; }
 var piano1_seg_locs = [...Array(num_piano1_segs).keys()];
+var piano1_order = [...Array(num_piano1_segs).keys()];
 
 const durations_piano2 = [73.17299319727891, 212.04233560090702, 86.22367346938775, 41.044988662131516,
                     147.9409977324263, 68.00498866213152, 107.99433106575964, 91.83433106575964,
@@ -324,6 +327,7 @@ const num_piano2_segs = durations_piano2.length;
 var piano2_total_dur = 0;
 for (var i = 0; i < num_piano2_segs; i++){ piano2_total_dur += durations_piano2[i]; }
 var piano2_seg_locs = [...Array(num_piano2_segs).keys()];
+var piano2_order = [...Array(num_piano2_segs).keys()];
 
 const durations_speaker = [190.65049886621316, 175.34950113378684, 167.45727891156463,
                             344.04272108843537, 184.5, 274.0, 160.0, 298.0, 266.0, 276.0,
@@ -336,6 +340,10 @@ var all_durations = [durations_string, durations_perc, durations_piano1, duratio
 var all_num_segs = [num_string_segs, num_perc_segs, num_piano1_segs, num_piano2_segs];
 var all_total_durs = [string_total_dur, perc_total_dur, piano1_total_dur, piano2_total_dur];
 var all_seg_locs = [string_seg_locs, perc_seg_locs, piano1_seg_locs, piano2_seg_locs];
+var all_orders = [string_order, perc_order, piano1_order, piano2_order];
+
+var next_events = [string_seg_locs[0], perc_seg_locs[0], piano1_seg_locs[0], piano2_seg_locs[0]];
+var current_events = [null, null, null, null];
 
 
 var playing = false;
@@ -508,16 +516,68 @@ function play_single_click(){
 //   }
 // }
 //
+
+
+
+var sound_event_functions = [string_event, perc_event, piano1_event, piano2_event];
+
+function string_event(){
+  console.log("string event");
+  //play and load string sounds etc. etc.
+  current_events[0] = [next_events[0], string_seg_locs[next_events[0]]+durations_string[string_order[next_events[0]]]];
+  next_events[0] += 1;
+}
+
+function perc_event(){
+  console.log("perc event");
+  //play and load string sounds etc. etc.
+  current_events[1] = [next_events[1], perc_seg_locs[next_events[1]]+durations_perc[perc_order[next_events[1]]]];
+  next_events[1] += 1;
+}
+
+function piano1_event(){
+  console.log("piano1 event");
+  //play and load string sounds etc. etc.
+  current_events[2] = [next_events[2], piano1_seg_locs[next_events[2]]+durations_piano1[piano1_order[next_events[2]]]];
+  next_events[2] += 1;
+}
+
+function piano2_event(){
+  console.log("piano2 event");
+  //play and load string sounds etc. etc.
+  current_events[3] = [next_events[3], piano2_seg_locs[next_events[3]]+durations_piano2[piano2_order[next_events[3]]]];
+  next_events[3] += 1;
+}
+
 // //function to start time display
 var time_poller;
 function start_time_display(){
   time_poller = setInterval(function(){
 
-    curr_time = elapsed_time + curr_speaker_sound.seek();
-    time_display.innerHTML = sec_to_minsec(Math.round(curr_time));
-
+    //set current time
+    curr_time = Math.round(elapsed_time + curr_speaker_sound.seek());
+    time_display.innerHTML = sec_to_minsec(curr_time);
     wiper.value = curr_time;
 
+
+    for (var i = 0; i < next_events.length; i++){
+
+      //check for starting next events
+      if (curr_time == all_seg_locs[i][next_events[i]]){
+        sound_event_functions[i]();
+        console.log(next_events);
+        console.log(current_events);
+      }
+
+      //check for ending current events
+      if (current_events[i] != null){
+        if (curr_time > current_events[i][1]){
+          current_events[i] = null;
+          console.log(current_events);
+        }
+      }
+
+    }
 
   }, 1000);
 }
@@ -559,8 +619,7 @@ function stop_time_display(){
 //
 // }
 
-
-//old wiper clicked
+// old wiper clicked
 // function wiper_clicked(){
 //
 //   stop_time_display();
@@ -627,34 +686,7 @@ function stop_time_display(){
 
 
 
-//****** update track on/off according to checkboxes
-// NEEDS AUDIO STUFF!
-function update_track_activation(){
 
-  var curr_check;
-  var curr_canvas;
-
-  //iterate through all tracks
-  setTimeout(function(){
-    for(var i = 0; i < track_canvi.length; i++){
-      curr_check = checks[i];
-      curr_canvas = track_canvi[i];
-
-      //if track is CHECKED
-      if (curr_check.checked){
-        //turn track opacity on
-        curr_canvas.style.setProperty('opacity', 1);
-
-        //turn audio on
-      }
-      else{
-        //turn track opacity off
-        curr_canvas.style.setProperty('opacity', 0);
-        //turn audio off
-      }
-    }
-  }, 200);
-}
 
 
 
@@ -667,13 +699,14 @@ function update_track_activation(){
 function wiper_clicked(){
 
   stop_time_display();
-  time_display.innerHTML = sec_to_minsec(Math.round(wiper.value));
+  curr_time = Math.round(wiper.value);
+  time_display.innerHTML = sec_to_minsec(curr_time);
   curr_speaker_sound.pause();
 
   //find elapsed time
   var i = 0;
   elapsed_time = 0;
-  while(wiper.value > elapsed_time + durations_speaker[i]){
+  while(curr_time > elapsed_time + durations_speaker[i]){
     elapsed_time += durations_speaker[i];
     i+= 1;
   }
@@ -682,7 +715,7 @@ function wiper_clicked(){
   if (i%2 == 0){
     //get speaker 1 file
     speaker_sound1_fileno = i+1;
-    new_speaker1_howl(wiper.value - elapsed_time);
+    new_speaker1_howl(Math.round(curr_time - elapsed_time));
 
     //get speaker 2 file
     if (i+2 <= 12){
@@ -693,11 +726,10 @@ function wiper_clicked(){
     //set current sound
     curr_speaker_sound = speaker_sound1;
   }
-
   else{
     //get speaker 2 file
     speaker_sound2_fileno = i+1;
-    new_speaker2_howl(wiper.value - elapsed_time);
+    new_speaker2_howl(Math.round(curr_time - elapsed_time));
 
     //get speaker 1 file
     if (i+2 <= 11){
@@ -709,36 +741,15 @@ function wiper_clicked(){
     curr_speaker_sound = speaker_sound2;
   }
 
+  //find next events
+  get_events();
+
+  //play, if playing
   if(playing){
-    start_time_display();
+    curr_speaker_sound.once("play", start_time_display);
     curr_speaker_sound.play();
   }
-
-
-  //
-  //   //get current time of the playing audio
-  //   if (!isNaN(curr_speaker_audio.duration)) {
-  //     curr_speaker_audio.currentTime = wiper.value - elapsed_time;
-  //     console.log(curr_speaker_audio.currentTime);
-  //     console.log(wiper.value - elapsed_time);
-  //   }
-  //
-  //
-  //
-  //
-  //   //play, if it's playing
-  //   if (playing){
-  //       if (!isNaN(curr_speaker_audio.duration)) {
-  //         curr_speaker_audio.play();
-  //         console.log(curr_speaker_audio.src);
-  //         console.log(curr_speaker_audio.currentTime);
-  //       }
-  //     start_time_display();
-  //   }
-  // }
-
 }
-
 
 var speaker_sound1 = new Howl({
   src: ["assets/audio/45' for a Speaker/45' - 1.wav"],
@@ -778,7 +789,6 @@ function speaker1_ended(){
     new_speaker1_howl(0);
   }
 }
-
 function speaker2_ended(){
   //if it's not the last one
   if (speaker_sound2_fileno != 12){
@@ -809,7 +819,6 @@ function new_speaker1_howl(seek){
   })
   old_howl.unload();
 }
-
 function new_speaker2_howl(seek){
   var old_howl = speaker_sound2;
   speaker_sound2 = new Howl({
@@ -853,7 +862,34 @@ function new_speaker2_howl(seek){
 
 
 
+//****** update track on/off according to checkboxes
+// NEEDS AUDIO STUFF!
+function update_track_activation(){
 
+  var curr_check;
+  var curr_canvas;
+
+  //iterate through all tracks
+  setTimeout(function(){
+    for(var i = 0; i < track_canvi.length; i++){
+      curr_check = checks[i];
+      curr_canvas = track_canvi[i];
+
+      //if track is CHECKED
+      if (curr_check.checked){
+        //turn track opacity on
+        curr_canvas.style.setProperty('opacity', 1);
+
+        //turn audio on
+      }
+      else{
+        //turn track opacity off
+        curr_canvas.style.setProperty('opacity', 0);
+        //turn audio off
+      }
+    }
+  }, 200);
+}
 
 //testing audio levels with volume slider
 const root = document.querySelector(':root');
@@ -878,6 +914,7 @@ function draw_colored_tracks(){
   var durs;
   var num_segs;
   var seg_locs;
+  var order;
 
   var xpos;
   var width;
@@ -889,6 +926,7 @@ function draw_colored_tracks(){
     durs = all_durations[i]; //durations of each segment
     num_segs = all_num_segs[i]; //number of segments
     seg_locs = all_seg_locs[i]; //segment locations on timeline
+    order = all_orders[i];
 
     //clear canvas
     ctx.clearRect(0, 0, 1204, 100);
@@ -896,17 +934,25 @@ function draw_colored_tracks(){
     //for special case of string + perc, draw string segs slightly shorter for visuaal effect
     if (longest == 2){
       for(var j = 0; j < num_segs; j++){
-        xpos = Math.round(seg_locs[j] / (lengths[longest] * 60.) * 1204);
-        width = Math.round((durs[j] - 5) / (lengths[longest] * 60.) * 1204);
-        ctx.fillRect(xpos, 0, width, 100);
+        xpos = Math.round(seg_locs[j] / (lengths[longest] * 60.) * 1198) + 3;
+        width = Math.round((durs[order[j]] - 5) / (lengths[longest] * 60.) * 1198) + 3;
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.rect(xpos, 0, width, 100);
+        ctx.stroke();
+        ctx.fill();
       }
     }
     //otherwise draw at normal size
     else{
       for(var j = 0; j < num_segs; j++){
-        xpos = Math.round(seg_locs[j] / (lengths[longest] * 60.) * 1204);
-        width = Math.round(durs[j] / (lengths[longest] * 60.) * 1204);
-        ctx.fillRect(xpos, 0, width, 100);
+        xpos = Math.round(seg_locs[j] / (lengths[longest] * 60.) * 1198) + 3;
+        width = Math.round((durs[order[j]] - 10) / (lengths[longest] * 60.) * 1198) + 3;
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.rect(xpos, 0, width, 100);
+        ctx.stroke();
+        ctx.fill();
       }
     }
   }
@@ -917,6 +963,7 @@ function draw_colored_tracks(){
     ctx.clearRect(0, 0, 1204, 100);
     ctx.fillRect(0, 0, 1204, 100);
   }
+
 }
 
 //randomize colored track segment positions
@@ -927,6 +974,7 @@ function randomize_track_segments(){
   var total_dur;
   var num_segs;
   var seg_locs;
+  var order;
 
   var point_interval = 0;
   var point_loc;
@@ -944,6 +992,7 @@ function randomize_track_segments(){
     total_dur = all_total_durs[i]; //total duration of all segments combined
     num_segs = all_num_segs[i]; //number of segments
     seg_locs = all_seg_locs[i]; //segment locations on timeline
+    order = all_orders[i]; //order of segments
 
     //first, get total length of blank space...
     point_interval = lengths[longest]*60. - total_dur;
@@ -952,12 +1001,16 @@ function randomize_track_segments(){
     //and pick a random point in that interval for each segment
     for (var j = 0; j < num_segs; j++){
       point_loc = Math.random() * ((j+1)*point_interval/num_segs - prev_point) + prev_point;
+      if (j == 0 && point_loc == 0){
+        point_loc = 2;
+      }
       point_locs.push(point_loc);
       prev_point = point_locs[point_locs.length-1];
     }
 
-    //and shuffle durations (shuffle segment order)
-    durs = shuffle(durs);
+    //then shuffle segment order
+    order = shuffle(order);
+
 
 
     //get distance between points
@@ -972,12 +1025,49 @@ function randomize_track_segments(){
     //then, find actual segment locations by expanding segment points to their actual durations
     prev_loc = 0;
     for (var j = 0; j < num_segs; j++){
-      seg_locs[j] = prev_loc + point_dists[j];
-      prev_loc += point_dists[j] + durs[j];
+      var seg_dur = durs[order[j]];
+      seg_locs[j] = Math.round(prev_loc + point_dists[j]);
+      prev_loc += point_dists[j] + seg_dur;
     }
 
   }
 
+  //lastly, get next relevant sound events
+  get_events();
+
+}
+
+//find times at which next sound events will occur
+//and find whether or not an event is happening
+function get_events(){
+
+  //next events
+  for (var i = 0; i < all_seg_locs.length; i++){
+    seg_locs = all_seg_locs[i];
+    var j = 0;
+    while(curr_time > seg_locs[j]){
+      j+=1;
+    }
+    next_events[i] = j;
+    if (next_events[i] != 0){
+      //check to see if we're in the middle of the past event
+      var prev_event_index = next_events[i] - 1;
+      var prev_event_start = all_seg_locs[i][prev_event_index]; //current instrument's (next-1) segment location --> prev event start
+      var prev_event_order = all_orders[i][prev_event_index];
+      var prev_event_dur = all_durations[i][prev_event_order];
+      var prev_event_end = prev_event_start + prev_event_dur;
+      console.log(j, prev_event_index, prev_event_start, prev_event_end);
+      if (curr_time < prev_event_end){
+        current_events[i] = [prev_event_index, prev_event_end]; //save index of event & ending time of event, for checking
+      }
+
+    }
+  }
+
+  console.log(next_events);
+
+
+  console.log(current_events);
 }
 
 //***** update title
