@@ -9,11 +9,18 @@
 
 var sound = new Howl({
   src: ["assets/audio/45' for a speaker/45' - 1.wav"],
-  html5: true
+
 });
 
 document.addEventListener("mousedown", function(){
+
+  // sound.once("play", () => {
+  //   sound.seek(4000);
+  // });
+  sound.seek(100);
   sound.play();
+
+
 })
 
 
@@ -23,31 +30,31 @@ const piano1_audios = [];
 const piano2_audios = [];
 const speaker_audios = [];
 
-setTimeout(function(){
-for (var i = 0; i < 22; i++){
-  string_audios.push(document.getElementById("string-audio-" + (i+1).toString()));
-}
-
-for (var i = 0; i < 28; i++){
-  perc_audios.push(document.getElementById("perc-audio-" + (i+1).toString()));
-}
-
-for (var i = 0; i < 22; i++){
-  piano1_audios.push(document.getElementById("piano1-audio-" + (i+1).toString()));
-}
-
-for (var i = 0; i < 24; i++){
-  piano2_audios.push(document.getElementById("piano2-audio-" + (i+1).toString()));
-}
-
-for (var i = 0; i < 12; i++){
-  speaker_audio = document.getElementById("speaker-audio-" + (i+1).toString());
-  speaker_audios.push(speaker_audio);
-  console.log(speaker_audio.duration);
-  speaker_audio.currentTime = 10;
-  console.log(speaker_audio.currentTime);
-}
-}, 2000);
+// setTimeout(function(){
+// for (var i = 0; i < 22; i++){
+//   string_audios.push(document.getElementById("string-audio-" + (i+1).toString()));
+// }
+//
+// for (var i = 0; i < 28; i++){
+//   perc_audios.push(document.getElementById("perc-audio-" + (i+1).toString()));
+// }
+//
+// for (var i = 0; i < 22; i++){
+//   piano1_audios.push(document.getElementById("piano1-audio-" + (i+1).toString()));
+// }
+//
+// for (var i = 0; i < 24; i++){
+//   piano2_audios.push(document.getElementById("piano2-audio-" + (i+1).toString()));
+// }
+//
+// for (var i = 0; i < 12; i++){
+//   speaker_audio = document.getElementById("speaker-audio-" + (i+1).toString());
+//   speaker_audios.push(speaker_audio);
+//   console.log(speaker_audio.duration);
+//   speaker_audio.currentTime = 10;
+//   console.log(speaker_audio.currentTime);
+// }
+// }, 2000);
 
   const speaker_audio1 = document.getElementById("speaker-audio-1");
   const speaker_audio2 = document.getElementById("speaker-audio-2");
