@@ -1,51 +1,51 @@
 
 //build audio structure first
-var audioCtx;
-var gotContext = false;
-
-var master_gain;
-const master_slider = document.getElementById("master-slider");
-
-const speaker_audio1 = document.getElementById("speaker-audio-1");
-const speaker_audio2 = document.getElementById("speaker-audio-2");
-var speaker_node1;
-var speaker_node2;
-var speaker_gain;
-
-//create audio context & nodes on first mousepress
-document.addEventListener("mousedown", mousedown);
-
-function mousedown(){
-
-  if (!gotContext){
-    audioCtx = new AudioContext();
-    gotContext = true;
-    console.log('gotContext');
-    if (audioCtx.state === "suspended"){
-      audioCtx.resume();
-    }
-    document.removeEventListener('mousedown', mousedown);
-  }
-
-  //make all audio things
-
-  //make master gain & connect to destination
-  master_gain = audioCtx.createGain();
-  master_gain.connect(audioCtx.destination);
-  master_slider.oninput = function(){
-    master_gain.gain.value = master_slider.value;
-  };
-
-  //speaker things
-  speaker_node1 = audioCtx.createMediaElementSource(speaker_audio1);
-  speaker_node2 = audioCtx.createMediaElementSource(speaker_audio2);
-  speaker_gain = audioCtx.createGain();
-  //connect speaker things
-  speaker_node1.connect(speaker_gain);
-  speaker_node2.connect(speaker_gain);
-  speaker_gain.connect(master_gain);
-
-}
+// var audioCtx;
+// var gotContext = false;
+//
+// var master_gain;
+// const master_slider = document.getElementById("master-slider");
+//
+ const speaker_audio1 = document.getElementById("speaker-audio-1");
+ const speaker_audio2 = document.getElementById("speaker-audio-2");
+// var speaker_node1;
+// var speaker_node2;
+// var speaker_gain;
+//
+// //create audio context & nodes on first mousepress
+// document.addEventListener("mousedown", mousedown);
+//
+// function mousedown(){
+//
+//   if (!gotContext){
+//     audioCtx = new AudioContext();
+//     gotContext = true;
+//     console.log('gotContext');
+//     if (audioCtx.state === "suspended"){
+//       audioCtx.resume();
+//     }
+//     document.removeEventListener('mousedown', mousedown);
+//   }
+//
+//   //make all audio things
+//
+//   //make master gain & connect to destination
+//   master_gain = audioCtx.createGain();
+//   master_gain.connect(audioCtx.destination);
+//   master_slider.oninput = function(){
+//     master_gain.gain.value = master_slider.value;
+//   };
+//
+//   //speaker things
+//   speaker_node1 = audioCtx.createMediaElementSource(speaker_audio1);
+//   speaker_node2 = audioCtx.createMediaElementSource(speaker_audio2);
+//   speaker_gain = audioCtx.createGain();
+//   //connect speaker things
+//   speaker_node1.connect(speaker_gain);
+//   speaker_node2.connect(speaker_gain);
+//   speaker_gain.connect(master_gain);
+//
+// }
 
 //other audio variables
 var curr_speaker_audio = speaker_audio1;
@@ -413,18 +413,15 @@ function wiper_clicked(){
   }
 
   //get current time of the playing audio
-  curr_speaker_audio.oncanplay = function(){
-    curr_speaker_audio.currentTime = wiper.value - elapsed_time;
-    console.log(curr_speaker_audio.currentTime);
-  }
+  curr_speaker_audio.currentTime = wiper.value - elapsed_time;
+  console.log(curr_speaker_audio.currentTime);
+
 
   //play, if it's playing
   if (playing){
-    curr_speaker_audio.oncanplay = function(){
       curr_speaker_audio.play();
       console.log(curr_speaker_audio.src);
       console.log(curr_speaker_audio.currentTime);
-    }
 
     start_time_display();
   }
