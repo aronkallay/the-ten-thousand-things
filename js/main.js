@@ -415,13 +415,17 @@ function wiper_clicked(){
   //get current time of the playing audio
   curr_speaker_audio.oncanplay = function(){
     curr_speaker_audio.currentTime = wiper.value - elapsed_time;
+    console.log(curr_speaker_audio.currentTime);
   }
-  console.log(curr_speaker_audio.currentTime);
+
   //play, if it's playing
   if (playing){
-    curr_speaker_audio.play();
-    console.log(curr_speaker_audio.src);
-    console.log(curr_speaker_audio.currentTime);
+    curr_speaker_audio.oncanplay = function(){
+      curr_speaker_audio.play();
+      console.log(curr_speaker_audio.src);
+      console.log(curr_speaker_audio.currentTime);
+    }
+
     start_time_display();
   }
 }
