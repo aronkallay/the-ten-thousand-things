@@ -15,6 +15,12 @@ const piano1_sounds = [];
 const piano2_sounds = [];
 const speaker_sounds = [];
 
+var string_soundno = 0;
+var perc_soundno = 0;
+var piano1_soundno = 0;
+var piano2_soundno = 0;
+var speaker_soundno = 0;
+
 for (var i = 0; i < 22; i++){
   var sound = new Howl({
     src: ["assets/audio/26'/26' - " + (i+1).toString() + ".wav"],
@@ -49,16 +55,15 @@ for (var i = 0; i < 24; i++){
 
 for (var i = 0; i < 12; i++){
 
-  if (i == 0){
+  if (i == 11){
     var sound = new Howl({
       src: ["assets/audio/45' for a Speaker/45' - " + (i+1).toString() + ".wav"],
-      onload: firstLoaded()
+      onload: lastLoaded(),
     })
   }
   else{
     var sound = new Howl({
       src: ["assets/audio/45' for a Speaker/45' - " + (i+1).toString() + ".wav"],
-      onload: loaded("speaker" + (i+1).toString())
     })
   }
 
@@ -69,13 +74,41 @@ function loaded(x){
   console.log(x);
 }
 
-function firstLoaded(){
-  console.log('firstloaded');
-  document.addEventListener("mousedown", function(){
-    //speaker_sounds[0].seek(10);
-    speaker_sounds[0].play();
-  })
+function lastLoaded(){
+  setTimeout(function(){
+    for (var i = 0; i < 12; i++){
+      speaker_sounds[i].on("end", function(){
+        sound_ended(speaker_sounds, 12);
+      });
+    }
+    speaker_sounds[0].seek(180);
+  }, 1000);
+
+
 }
+
+function sound_ended(sounds, max){
+
+  //if there's a next sound to play
+  if(speaker_soundno< max-1){
+    //increment current sound number
+    speaker_soundno += 1;
+    //play that sound
+    sounds[speaker_soundno].seek(sounds[speaker_soundno].duration() - 10);
+    sounds[speaker_soundno].play();
+    console.log('playing', speaker_soundno);
+  }
+}
+
+// function firstLoaded(){
+//   console.log('firstloaded');
+//   document.addEventListener("mousedown", function(){
+//
+//     console.log('pressed');
+//     speaker_sounds[0].seek(10);
+//     speaker_sounds[0].play();
+//   })
+// }
 
 
 // setTimeout(function(){
@@ -150,11 +183,11 @@ function firstLoaded(){
 // }
 
 //other audio variables
-var curr_speaker_audio = speaker_audio1;
-var speaker_audio1_fileno = 1;
-var speaker_audio2_fileno = 2;
-var elapsed_time = 0.;
-var curr_time = 0.;
+// var curr_speaker_audio = speaker_audio1;
+// var speaker_audio1_fileno = 1;
+// var speaker_audio2_fileno = 2;
+// var elapsed_time = 0.;
+// var curr_time = 0.;
 
 //console.log(curr_speaker_audio.currentTime);
 
@@ -395,6 +428,9 @@ function play_single_click(){
   if (playing == false){
     playing = true;
     console.log("playing");
+
+    speaker_sounds[speaker_soundno].play();
+
     //start longest audio
     // console.log(speaker_audio1.currentTime);
     // speaker_audio1.currentTime = 180;
