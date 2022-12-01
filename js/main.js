@@ -385,8 +385,12 @@ play_button.addEventListener("click", play_single_click);
 pause_button.addEventListener("click", pause);
 
 
+var play_timeout;
 //***** play button double click function
 function play_dbl_click(){
+
+  console.log("double");
+
   //randomize track segments
   randomize_track_segments();
 
@@ -395,6 +399,7 @@ function play_dbl_click(){
     load_tracks();
     draw_colored_tracks();
   }, 200);
+
 }
 
 
@@ -406,6 +411,12 @@ function pause(){
     stop_time_display();
     curr_speaker_sound.pause();
 
+    if(string_on[0]){
+      string_sound1.pause();
+    }
+    if(string_on[1]){
+      string_sound2.pause();
+    }
 
     //stop_time_display();
     //speaker_sounds[speaker_soundno].pause();
@@ -426,17 +437,18 @@ function play_single_click(){
 
   //if longest changed, randomize track segments to match
   if (longest_changed){
-    randomize_track_segments();
-  }
-
-  //if checks changed, re-update everything
-  if (checks_changed){
     //update timeline
     draw_timeline();
 
+    //randomize tracks and get audio
+    randomize_track_segments();
+  }
+
+  //if checks changed, update title * track activation
+  if (checks_changed){
+
     //update title
     update_title();
-
     //update track on/off according to checkboxes
     update_track_activation();
 
@@ -450,11 +462,22 @@ function play_single_click(){
   //pause/play functionality
   //do nothing if you press play while playing
   if (playing == false){
-    playing = true;
-    console.log("playing");
-    console.log(curr_speaker_sound.seek());
-    start_time_display();
-    curr_speaker_sound.play();
+      console.log("playing");
+      playing = true;
+      start_time_display();
+      curr_speaker_sound.play();
+
+      if(string_on[0]){
+        string_sound1.play();
+      }
+      if(string_on[1]){
+        string_sound2.play();
+      }
+
+
+
+
+
     //start_time_display();
     //speaker_sounds[speaker_soundno].play();
 
@@ -526,6 +549,25 @@ function string_event(){
   //play and load string sounds etc. etc.
   current_events[0] = [next_events[0], string_seg_locs[next_events[0]]+durations_string[string_order[next_events[0]]]];
   next_events[0] += 1;
+
+  curr_string_sound.play();
+  if (curr_string_sound == string_sound1){
+    string_on = [true, false];
+    console.log("load string event ", next_events[0], " into sound 2");
+    //load next string sound into string_sound2
+    if(next_events[0] < durations_string.length){
+      new_string2_howl(next_events[0]+1, 0, false);
+    }
+  }
+  else{
+    string_on = [false, true];
+    console.log("load string event ", next_events[0], " into sound 1");
+    //load next string sound into string_sound1
+    if(next_events[0] < durations_string.length){
+      new_string1_howl(next_events[0] + 1, 0, false, false);
+    }
+  }
+
 }
 
 function perc_event(){
@@ -691,10 +733,8 @@ function stop_time_display(){
 
 
 
-
-
-
-
+var elapsed_time = 0.0;
+var curr_time = 0.0;
 
 function wiper_clicked(){
 
@@ -744,6 +784,9 @@ function wiper_clicked(){
   //find next events
   get_events();
 
+  //load non_longest files
+  load_non_longest_files();
+
   //play, if playing
   if(playing){
     curr_speaker_sound.once("play", start_time_display);
@@ -753,17 +796,11 @@ function wiper_clicked(){
 
 var speaker_sound1 = new Howl({
   src: ["assets/audio/45' for a Speaker/45' - 1.wav"],
-  onend: speaker1_ended,
-  // onload: function(){
-  //   this.seek(this.duration() - 10);
-  // }
+  onend: speaker1_ended
 })
 var speaker_sound2 = new Howl({
   src: ["assets/audio/45' for a Speaker/45' - 2.wav"],
-  onend: speaker2_ended,
-  // onload: function(){
-  //   this.seek(this.duration() - 10);
-  // }
+  onend: speaker2_ended
 })
 
 var speaker_sound1_fileno = 1;
@@ -771,17 +808,15 @@ var speaker_sound2_fileno = 2;
 
 var curr_speaker_sound = speaker_sound1;
 
-var elapsed_time = 0.0;
-var curr_time = 0.0;
-
 function speaker1_ended(){
   //switch to second audio object
+  //add audio time to elapsed time
+  elapsed_time += speaker_sound1.duration();
   curr_speaker_sound = speaker_sound2;
   curr_speaker_sound.play();
   console.log(speaker_sound2_fileno);
 
-  //add audio time to elapsed time
-  elapsed_time += speaker_sound1.duration();
+
 
   //load next audio file
   if (speaker_sound1_fileno != 11){
@@ -831,17 +866,60 @@ function new_speaker2_howl(seek){
   old_howl.unload();
 }
 
+var piano2_sound1;
+var piano2_sound2;
+var piano2_sound1_fileno;
+var piano2_sound2_fileno;
+var curr_piano2_sound;
+var piano2_on = [false, false];
+
+var piano1_sound1;
+var piano1_sound2;
+var piano1_sound1_fileno;
+var piano1_sound2_fileno;
+var curr_piano1_sound;
+var piano1_on = [false, false];
+
+var perc_sound1;
+var perc_sound2;
+var perc_sound1_fileno;
+var perc_sound2_fileno;
+var curr_perc_sound;
+var perc_on = [false, false];
+
+var string_sound1;
+var string_sound2;
+var string_sound1_fileno;
+var string_sound2_fileno;
+var curr_string_sound;
+var string_on = [false, false];
+
+var all_sounds = [[string_sound1, string_sound2],
+                  [perc_sound1, perc_sound2],
+                  [piano1_sound1, piano1_sound2],
+                  [piano2_sound1, piano2_sound2],
+                  [speaker_sound1, speaker_sound2]];
+var all_filenos = [[string_sound1_fileno, string_sound2_fileno],
+                    [perc_sound1_fileno, perc_sound2_fileno],
+                    [piano1_sound1_fileno, piano1_sound2_fileno],
+                    [piano2_sound1_fileno, piano2_sound2_fileno],
+                    [speaker_sound1_fileno, speaker_sound2_fileno]];
+
+var audio_file_locations = ["assets/audio/26'/26' - ",
+                      "assets/audio/27'/27' - ",
+                      "assets/audio/31'/31' - ",
+                      "assets/audio/34'/34' - "];
+
+var all_curr_sounds = [curr_string_sound, curr_perc_sound, curr_piano1_sound, curr_piano2_sound];
 
 
 
 
 
-
-
-
-
-
-
+var all_new_howl_funcs = [[new_string1_howl, new_string2_howl],
+                          [new_perc1_howl, new_perc2_howl],
+                          [new_piano11_howl, new_piano12_howl],
+                          [new_piano21_howl, new_piano22_howl]];
 
 
 
@@ -938,9 +1016,9 @@ function draw_colored_tracks(){
         width = Math.round((durs[order[j]] - 5) / (lengths[longest] * 60.) * 1198) + 3;
         ctx.strokeStyle = "black";
         ctx.lineWidth = 2;
-        ctx.rect(xpos, 0, width, 100);
+        ctx.fillRect(xpos, 0, width, 100);
         ctx.stroke();
-        ctx.fill();
+        //ctx.fill();
       }
     }
     //otherwise draw at normal size
@@ -950,9 +1028,8 @@ function draw_colored_tracks(){
         width = Math.round((durs[order[j]] - 10) / (lengths[longest] * 60.) * 1198) + 3;
         ctx.strokeStyle = "black";
         ctx.lineWidth = 2;
-        ctx.rect(xpos, 0, width, 100);
+        ctx.fillRect(xpos, 0, width, 100);
         ctx.stroke();
-        ctx.fill();
       }
     }
   }
@@ -1034,6 +1111,8 @@ function randomize_track_segments(){
 
   //lastly, get next relevant sound events
   get_events();
+  //and load up sound files
+  load_sound_files();
 
 }
 
@@ -1045,7 +1124,7 @@ function get_events(){
   for (var i = 0; i < all_seg_locs.length; i++){
     seg_locs = all_seg_locs[i];
     var j = 0;
-    while(curr_time > seg_locs[j]){
+    while( j < seg_locs.length && curr_time > seg_locs[j]){
       j+=1;
     }
     next_events[i] = j;
@@ -1056,19 +1135,211 @@ function get_events(){
       var prev_event_order = all_orders[i][prev_event_index];
       var prev_event_dur = all_durations[i][prev_event_order];
       var prev_event_end = prev_event_start + prev_event_dur;
-      console.log(j, prev_event_index, prev_event_start, prev_event_end);
+
       if (curr_time < prev_event_end){
         current_events[i] = [prev_event_index, prev_event_end]; //save index of event & ending time of event, for checking
+      }
+      else{
+        current_events[i] = null;
       }
 
     }
   }
 
   console.log(next_events);
-
-
   console.log(current_events);
 }
+
+function load_sound_files(){
+
+  //deal with longest....
+  if(!longest_changed){
+    console.log("keep longest at same place");
+    //so do nothing, basically, let this sit
+  }
+  else{
+    console.log("change longest & have them play through");
+    //do nothing for longest == 5, since that's always playing through
+    if(longest == 5){
+
+    }
+  }
+
+  load_non_longest_files();
+
+  console.log(curr_time);
+}
+
+
+function load_non_longest_files(){
+
+  string_on = [false, false];
+  perc_on = [false, false];
+  piano1_on = [false, false];
+  piano2_on = [false, false];
+
+  console.log("load adjacent non-longest files");
+  for (var i = 0; i < longest - 1; i++){
+    var sound1_seek;
+
+    var order = all_orders[i];
+    var filenos = all_filenos[i];
+    var sounds = all_sounds[i];
+    var file_locs = audio_file_locations[i];
+    var curr_sound = all_curr_sounds[i];
+    var howl_funcs = all_new_howl_funcs[i];
+
+    var current;
+    //figure out what to load....
+    //first, load current event, if applicable
+    if (current_events[i] != null){
+      console.log(i, " load curr", current_events[i], " sound 1");
+      filenos[0] = order[current_events[i][0]] + 1;
+      sound1_seek = curr_time - all_seg_locs[i][current_events[i][0]];
+      console.log(i, "file", filenos[0], "seek", sound1_seek);
+      console.log(all_durations[i][order[current_events[i][0]]]);
+      current = true;
+    }
+    //then, load next event, if applicable (i.e. next event number is not the max)
+    if (next_events[i] < all_durations[i].length){
+      if (current_events[i] == null){
+        console.log(i, " load next", next_events[i], " sound 1");
+        filenos[0] = order[next_events[i]] + 1;
+        sound1_seek = 0;
+      }
+      else{
+        console.log(i, " load next", next_events[i], " sound 2");
+        filenos[1] = order[next_events[i]] + 1;
+      }
+    }
+    //then, if current event was not loaded AND there's an event after the next event, load the next-next event
+    if (current_events[i] == null && next_events[i] + 1 < all_durations[i].length){
+      console.log(i, " load next next", next_events[i] + 1, " sound 2");
+      filenos[1] = order[next_events[i] + 1] + 1;
+      current = false;
+    }
+
+    howl_funcs[0](filenos[0], sound1_seek, false, current);
+    howl_funcs[1](filenos[1], 0, false);
+
+    console.log(i, "filenos", filenos);
+
+  }
+
+}
+
+function new_string1_howl(fileno, seek, isLongest, isCurrent){
+  console.log("string 1", fileno, seek, isCurrent);
+
+  if (string_sound1!= null){
+    var old_howl = string_sound1;
+    old_howl.unload();
+  }
+
+  if (!isLongest){
+
+    if (!isCurrent){
+      string_sound1 = new Howl({
+        src: ["assets/audio/26'/26' - " + fileno.toString() + ".wav"],
+        onend: function(){
+          string_on[0] = false;
+          console.log("string 1 ended");
+          curr_string_sound = string_sound2;
+        },
+        onplay: function(){
+          console.log("string 1 playing from ", this.seek());
+        }
+      })
+    }
+
+
+    else{
+      string_sound1 = new Howl({
+        src: ["assets/audio/26'/26' - " + fileno.toString() + ".wav"],
+        onload: function(){
+          this.seek(seek);
+          if(playing){
+            this.play();
+          }
+          console.log("string 1 loaded at", this.seek());
+        },
+        onend: function(){
+          console.log("string 1 ended");
+          string_on[0] = false; //turn off play/pause indicator
+          curr_string_sound = string_sound2; //pass the buck to sound 2
+        },
+        onplay: function(){
+          console.log("string 1 playing from ", this.seek());
+        }
+      })
+
+      //
+      string_on = [true, false];
+
+    }
+  }
+  curr_string_sound = string_sound1;
+}
+
+function new_string2_howl(fileno, seek, isLongest){
+  console.log("string 2", fileno, seek, isLongest);
+
+  if (string_sound2!= null){
+    var old_howl = string_sound2;
+    old_howl.unload();
+  }
+
+  if (!isLongest){
+    string_sound2 = new Howl({
+      src: ["assets/audio/26'/26' - " + fileno.toString() + ".wav"],
+      onend: function(){
+        string_on[1] = false;
+        console.log("string 2 ended");
+        curr_string_sound = string_sound1;
+      },
+      onplay: function(){
+        console.log("string 2 playing from ", this.seek());
+      }
+    })
+  }
+}
+
+function new_perc1_howl(fileno, seek, isLongest, isCurrent){
+  console.log("perc 1", fileno, seek, isLongest);
+
+}
+function new_perc2_howl(fileno, seek, isLongest){
+  console.log("perc 2", fileno, seek, isLongest);
+}
+function new_piano11_howl(fileno, seek, isLongest, isCurrent){
+  console.log("piano1 1", fileno, seek, isLongest);
+}
+function new_piano12_howl(fileno, seek, isLongest){
+  console.log("piano1 2 ", fileno, seek, isLongest);
+}
+function new_piano21_howl(fileno, seek, isLongest, isCurrent){
+  console.log("piano2 1", fileno, seek, isLongest);
+}
+function new_piano22_howl(fileno, seek, isLongest){
+  console.log("piano2 2", fileno, seek, isLongest);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //***** update title
 var title_len_options = ["", "26\' 1.1499\"", "27\' 10.554\"", "31\' 57.9864\"", "34\' 46.776\"", "45\'"];
@@ -1216,7 +1487,12 @@ function draw_timeline(){
     forty_mark.style.left = "calc(70/" + length + "*40*15 / 1296 * var(--main-width))";
   }
 
+  //updates wiper size
+  //keep wiper at same place?
+  var place = wiper.value / wiper.max;
   wiper.max = lengths[longest] * 60.;
+  wiper.value = wiper.max * place;
+  wiper_clicked();
 }
 
 //get the longest checked track
