@@ -504,27 +504,27 @@ body{
   position: relative;
   transform: translate(-50%, -50%);
   display: inline;
-  left: calc(70/45*10*15 / 1296 * var(--main-width));
+  left: calc(70/45.28*10*15 / 1296 * var(--main-width));
 }
 
 .twenty-mark{
   position: relative;
   display: inline;
-  left: calc(70/45*20*15 / 1296 * var(--main-width));
+  left: calc(70/45.28*20*15 / 1296 * var(--main-width));
 }
 
 .thirty-mark{
   position: relative;
   transform: translate(-50%, -50%);
   display: inline;
-  left: calc(70/45*30*15 / 1296 * var(--main-width));
+  left: calc(70/45.28*30*15 / 1296 * var(--main-width));
 }
 
 .forty-mark{
   position: relative;
   transform: translate(-50%, -50%);
   display: inline;
-  left: calc(70/45*40*15 / 1296 * var(--main-width));
+  left: calc(70/45.28*40*15 / 1296 * var(--main-width));
 }
 
 
