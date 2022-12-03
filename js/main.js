@@ -1,3 +1,4 @@
+//spacebar pause/play
 document.addEventListener('keyup', event => {
   if (event.code === 'Space') {
     if(playing){
@@ -10,6 +11,62 @@ document.addEventListener('keyup', event => {
 })
 
 
+
+
+//testing audio levels with volume slider
+const root = document.querySelector(':root');
+
+// set css variable
+
+// master_slider.oninput = function() {
+//     root.style.setProperty('--string-level', master_slider.value);
+//     root.style.setProperty('--perc-level', master_slider.value);
+//     root.style.setProperty('--piano1-level', master_slider.value);
+//     root.style.setProperty('--piano2-level', master_slider.value);
+//     root.style.setProperty('--speaker-level', master_slider.value);
+// }
+
+// var test_sound = new Howl({
+//   src: ["assets/audio/Intro to 45'-CD (16bit 44.1).wav"],
+//   html5: true,
+//   preload: true
+// })
+//
+// var audioCtx = Howler.ctx;
+//
+// var gain = audioCtx.createGain();
+//
+// var analyzer = audioCtx.createAnalyser();
+//
+// var mediaElement = audioCtx.createMediaElementSource(test_sound._sounds[0]._node);
+// mediaElement.connect(gain.connect(analyzer));
+//
+// var test_inc = 0;
+// var up = true;
+// function loop(){
+//   if(up && test_inc < 100){
+//     test_inc += 1;
+//   }
+//   else if (up && test_inc >= 100){
+//     up = false;
+//     test_inc -= 1;
+//   }
+//   else if (!up && test_inc > 0){
+//     test_inc -= 1;
+//   }
+//   else if (!up && test_inc <= 0){
+//     up = true;
+//     test_inc += 1;
+//   }
+//   root.style.setProperty('--string-level', test_inc);
+//   root.style.setProperty('--perc-level', test_inc);
+//   root.style.setProperty('--piano1-level', test_inc);
+//   root.style.setProperty('--piano2-level', test_inc);
+//   root.style.setProperty('--speaker-level', test_inc);
+//   console.log(test_inc);
+//   window.requestAnimationFrame(loop);
+// }
+//loop();
 
 //get html elements....
 var cover_img = document.getElementById("cover-image");
@@ -174,10 +231,10 @@ var at_end = false;
 //**** auto fade when opening the page
 setTimeout(() => {
    fadeout(cover_img, 50);
- }, 500);
+ }, 1000);
  setTimeout(() => {
    fadein(player);
- }, 500);
+ }, 2500);
 
 //***** opening popup windows
 let instr_params = `status=no,location=no,toolbar=no,menubar=no,
@@ -613,6 +670,13 @@ function wiper_clicked(){
   time_display.innerHTML = sec_to_minsec(curr_time);
   curr_speaker_sound.pause();
 
+  if(wiper.value == wiper.max){
+    at_end = true;
+  }
+  else{
+    at_end = false;
+  }
+
   if(longest != 5){
     make_longest_funcs[longest-1]();
   }
@@ -677,16 +741,22 @@ function wiper_clicked(){
 var speaker_sound1 = new Howl({
   src: ["assets/audio/45' for a Speaker/45' - 1.wav"],
   onend: speaker1_ended,
-  volume: 0.75,
+  volume: 0.9,
   html5: true,
-  preload: true
+  preload: true,
+  onpause: function(){
+    console.log("speaker 1 paused");
+  }
 })
 var speaker_sound2 = new Howl({
   src: ["assets/audio/45' for a Speaker/45' - 2.wav"],
   onend: speaker2_ended,
-  volume: 0.75,
+  volume: 0.9,
   html5: true,
-  preload: true
+  preload: true,
+  onpause: function(){
+    console.log("speaker 2 paused");
+  }
 })
 
 var speaker_sound1_fileno = 1;
@@ -743,9 +813,12 @@ function new_speaker1_howl(seek){
       console.log("speaker 1 loaded file ", speaker_sound1_fileno);
     },
     mute: !check5.checked || !speaker_mute.checked,
-    volume: 0.75,
+    volume: 0.9,
     html5: true,
-    preload: true
+    preload: true,
+    onpause: function(){
+      console.log("speaaker 1 paused");
+    }
   })
   old_howl.unload();
 }
@@ -759,9 +832,12 @@ function new_speaker2_howl(seek){
       console.log("speaker 2 loaded file ", speaker_sound2_fileno);
     },
     mute: !check5.checked || !speaker_mute.checked,
-    volume: 0.75,
+    volume: 0.9,
     html5: true,
-    preload: true
+    preload: true,
+    onpause: function(){
+      console.log("speaker 2 paused");
+    }
   })
   old_howl.unload();
 }
@@ -934,8 +1010,6 @@ function update_track_activation(){
   }, 200);
 }
 
-//testing audio levels with volume slider
-const root = document.querySelector(':root');
 
 // set css variable
 
@@ -1158,10 +1232,25 @@ function load_sound_files(){
 function load_non_longest_files(){
   console.log("load non longest files");
 
+
+  if(string_on[0] || string_on[1]){
+    curr_string_sound.pause();
+  }
+  if(perc_on[0] || perc_on[1]){
+    curr_perc_sound.pause();
+  }
+  if(piano1_on[0] || piano1_on[1]){
+    curr_piano1_sound.pause();
+  }
+  if(piano2_on[0] || piano2_on[1]){
+    curr_piano2_sound.pause();
+  }
+
   string_on = [false, false];
   perc_on = [false, false];
   piano1_on = [false, false];
   piano2_on = [false, false];
+
 
   //console.log("load adjacent non-longest files");
 
@@ -1295,7 +1384,10 @@ function new_string1_howl(fileno, seek, isLongest, isCurrent){
         mute: !check1.checked || !string_mute.checked,
         volume: 0.75,
         html5: true,
-        preload: true
+        preload: true,
+        onpause: function(){
+          console.log("string 1 paused");
+        }
       })
     }
 
@@ -1322,7 +1414,10 @@ function new_string1_howl(fileno, seek, isLongest, isCurrent){
         mute: (!check1.checked || !string_mute.checked),
         volume: 0.75,
         html5: true,
-        preload: true
+        preload: true,
+        onpause: function(){
+          console.log("string 1 paused");
+        }
       })
 
       //
@@ -1347,7 +1442,10 @@ function new_string1_howl(fileno, seek, isLongest, isCurrent){
       mute: (!string_mute.checked),
       volume: 0.75,
       html5: true,
-      preload: true
+      preload: true,
+      onpause: function(){
+        console.log("string 1 paused");
+      }
     })
   }
  }
@@ -1377,7 +1475,10 @@ function new_string2_howl(fileno, seek, isLongest){
       mute: !check1.checked || !string_mute.checked,
       volume: 0.75,
       html5: true,
-      preload: true
+      preload: true,
+      onpause: function(){
+        console.log("string 2 paused");
+      }
     })
   }
 
@@ -1395,7 +1496,10 @@ function new_string2_howl(fileno, seek, isLongest){
       mute: !string_mute.checked,
       volume: 0.75,
       html5: true,
-      preload: true
+      preload: true,
+      onpause: function(){
+        console.log("string 2 paused");
+      }
     })
   }
  }
@@ -1500,7 +1604,10 @@ function new_perc1_howl(fileno, seek, isLongest, isCurrent){
         mute: !check2.checked || !perc_mute.checked,
         volume: 0.75,
         html5: true,
-        preload: true
+        preload: true,
+        onpause: function(){
+          console.log("perc 1 paused");
+        }
       })
     }
 
@@ -1526,7 +1633,10 @@ function new_perc1_howl(fileno, seek, isLongest, isCurrent){
         mute: !check2.checked || !perc_mute.checked,
         volume: 0.75,
         html5: true,
-        preload: true
+        preload: true,
+        onpause: function(){
+          console.log("perc 1 paused");
+        }
       })
 
       //
@@ -1551,7 +1661,10 @@ function new_perc1_howl(fileno, seek, isLongest, isCurrent){
       mute: !perc_mute.checked,
       volume: 0.75,
       html5: true,
-      preload: true
+      preload: true,
+      onpause: function(){
+        console.log("perc 1 paused");
+      }
     })
   }
 
@@ -1582,7 +1695,10 @@ function new_perc2_howl(fileno, seek, isLongest){
       mute: !check2.checked || !perc_mute.checked,
       volume: 0.75,
       html5: true,
-      preload: true
+      preload: true,
+      onpause: function(){
+        console.log("perc 2 paused");
+      }
     })
   }
 
@@ -1600,7 +1716,10 @@ function new_perc2_howl(fileno, seek, isLongest){
       mute: !perc_mute.checked,
       volume: 0.75,
       html5: true,
-      preload: true
+      preload: true,
+      onpause: function(){
+        console.log("perc 2 paused");
+      }
     })
   }
 }
@@ -1704,7 +1823,10 @@ function new_piano11_howl(fileno, seek, isLongest, isCurrent){
         mute: !check3.checked || !piano1_mute.checked,
         volume: 0.75,
         html5: true,
-        preload: true
+        preload: true,
+        onpause: function(){
+          console.log("piano1 1 paused");
+        }
       })
     }
 
@@ -1730,7 +1852,10 @@ function new_piano11_howl(fileno, seek, isLongest, isCurrent){
         mute: !check3.checked || !piano1_mute.checked,
         volume: 0.75,
         html5: true,
-        preload: true
+        preload: true,
+        onpause: function(){
+          console.log("piano1 1 paused");
+        }
       })
 
       //
@@ -1755,7 +1880,10 @@ function new_piano11_howl(fileno, seek, isLongest, isCurrent){
       mute: !piano1_mute.checked,
       volume: 0.75,
       html5: true,
-      preload: true
+      preload: true,
+      onpause: function(){
+        console.log("piano1 1 paused");
+      }
     })
   }
 }
@@ -1785,7 +1913,10 @@ function new_piano12_howl(fileno, seek, isLongest){
       mute: !check3.checked || !piano1_mute.checked,
       volume: 0.75,
       html5: true,
-      preload: true
+      preload: true,
+      onpause: function(){
+        console.log("piano1 2 paused");
+      }
     })
   }
 
@@ -1803,7 +1934,10 @@ function new_piano12_howl(fileno, seek, isLongest){
       mute: !piano1_mute.checked,
       volume: 0.75,
       html5: true,
-      preload: true
+      preload: true,
+      onpause: function(){
+        console.log("piano1 2 paused");
+      }
     })
   }
 }
@@ -1905,7 +2039,10 @@ function new_piano21_howl(fileno, seek, isLongest, isCurrent){
         mute: !check4.checked || !piano2_mute.checked,
         volume: 0.75,
         html5: true,
-        preload: true
+        preload: true,
+        onpause: function(){
+          console.log("piano2 1 paused");
+        }
       })
     }
 
@@ -1931,7 +2068,10 @@ function new_piano21_howl(fileno, seek, isLongest, isCurrent){
         mute: !check4.checked || !piano2_mute.checked,
         volume: 0.75,
         html5: true,
-        preload: true
+        preload: true,
+        onpause: function(){
+          console.log("piano2 1 paused");
+        }
       })
 
       //
@@ -1956,7 +2096,10 @@ function new_piano21_howl(fileno, seek, isLongest, isCurrent){
       mute: !piano2_mute.checked,
       volume: 0.75,
       html5: true,
-      preload: true
+      preload: true,
+      onpause: function(){
+        console.log("piano2 1 paused");
+      }
     })
   }
 }
@@ -1986,7 +2129,10 @@ function new_piano22_howl(fileno, seek, isLongest){
       mute: !check4.checked || !piano2_mute.checked,
       volume: 0.75,
       html5: true,
-      preload: true
+      preload: true,
+      onpause: function(){
+        console.log("piano2 2 paused");
+      }
     })
   }
 
@@ -2004,7 +2150,10 @@ function new_piano22_howl(fileno, seek, isLongest){
       mute: !piano2_mute.checked,
       volume: 0.75,
       html5: true,
-      preload: true
+      preload: true,
+      onpause: function(){
+        console.log("piano2 2 paused");
+      }
     })
   }
 }
@@ -2174,7 +2323,7 @@ function load_tracks(){
   track_container.style.transition = "none";
   track_container.style.width = "0px";
   setTimeout(() => {
-    track_container.style.transition = "1000ms linear";
+    track_container.style.transition = "2000ms linear";
     track_container.style.width = "calc(1204/1296 * var(--main-width))";
   }, 2);
   setTimeout(() => {
