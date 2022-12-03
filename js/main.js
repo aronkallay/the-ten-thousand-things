@@ -677,12 +677,16 @@ function wiper_clicked(){
 var speaker_sound1 = new Howl({
   src: ["assets/audio/45' for a Speaker/45' - 1.wav"],
   onend: speaker1_ended,
-  volume: 0.75
+  volume: 0.75,
+  html5: true,
+  preload: true
 })
 var speaker_sound2 = new Howl({
   src: ["assets/audio/45' for a Speaker/45' - 2.wav"],
   onend: speaker2_ended,
-  volume: 0.75
+  volume: 0.75,
+  html5: true,
+  preload: true
 })
 
 var speaker_sound1_fileno = 1;
@@ -739,7 +743,9 @@ function new_speaker1_howl(seek){
       console.log("speaker 1 loaded file ", speaker_sound1_fileno);
     },
     mute: !check5.checked || !speaker_mute.checked,
-    volume: 0.75
+    volume: 0.75,
+    html5: true,
+    preload: true
   })
   old_howl.unload();
 }
@@ -753,7 +759,9 @@ function new_speaker2_howl(seek){
       console.log("speaker 2 loaded file ", speaker_sound2_fileno);
     },
     mute: !check5.checked || !speaker_mute.checked,
-    volume: 0.75
+    volume: 0.75,
+    html5: true,
+    preload: true
   })
   old_howl.unload();
 }
@@ -1285,7 +1293,9 @@ function new_string1_howl(fileno, seek, isLongest, isCurrent){
           console.log("string 1 file ", fileno, " playing from ", this.seek());
         },
         mute: !check1.checked || !string_mute.checked,
-        volume: 0.75
+        volume: 0.75,
+        html5: true,
+        preload: true
       })
     }
 
@@ -1310,7 +1320,9 @@ function new_string1_howl(fileno, seek, isLongest, isCurrent){
           console.log("string 1 file", fileno, " playing from ", this.seek());
         },
         mute: (!check1.checked || !string_mute.checked),
-        volume: 0.75
+        volume: 0.75,
+        html5: true,
+        preload: true
       })
 
       //
@@ -1333,7 +1345,9 @@ function new_string1_howl(fileno, seek, isLongest, isCurrent){
         console.log("string 1 file ", fileno, " playing from ", this.seek());
       },
       mute: (!string_mute.checked),
-      volume: 0.75
+      volume: 0.75,
+      html5: true,
+      preload: true
     })
   }
  }
@@ -1361,7 +1375,9 @@ function new_string2_howl(fileno, seek, isLongest){
         console.log("string 2 file ", fileno, " playing from ", this.seek());
       },
       mute: !check1.checked || !string_mute.checked,
-      volume: 0.75
+      volume: 0.75,
+      html5: true,
+      preload: true
     })
   }
 
@@ -1377,7 +1393,9 @@ function new_string2_howl(fileno, seek, isLongest){
         console.log("string 2 file ", fileno, " playing from ", this.seek());
       },
       mute: !string_mute.checked,
-      volume: 0.75
+      volume: 0.75,
+      html5: true,
+      preload: true
     })
   }
  }
@@ -1480,7 +1498,9 @@ function new_perc1_howl(fileno, seek, isLongest, isCurrent){
           console.log("perc 1 file ", fileno, " playing from ", this.seek());
         },
         mute: !check2.checked || !perc_mute.checked,
-        volume: 0.75
+        volume: 0.75,
+        html5: true,
+        preload: true
       })
     }
 
@@ -1504,7 +1524,9 @@ function new_perc1_howl(fileno, seek, isLongest, isCurrent){
           console.log("perc 1 file ", fileno, " playing from ", this.seek());
         },
         mute: !check2.checked || !perc_mute.checked,
-        volume: 0.75
+        volume: 0.75,
+        html5: true,
+        preload: true
       })
 
       //
@@ -1527,7 +1549,9 @@ function new_perc1_howl(fileno, seek, isLongest, isCurrent){
         console.log("perc 1 file ", fileno, " playing from ", this.seek());
       },
       mute: !perc_mute.checked,
-      volume: 0.75
+      volume: 0.75,
+      html5: true,
+      preload: true
     })
   }
 
@@ -1556,7 +1580,9 @@ function new_perc2_howl(fileno, seek, isLongest){
         console.log("perc 2 file ", fileno, " playing from ", this.seek());
       },
       mute: !check2.checked || !perc_mute.checked,
-      volume: 0.75
+      volume: 0.75,
+      html5: true,
+      preload: true
     })
   }
 
@@ -1572,7 +1598,9 @@ function new_perc2_howl(fileno, seek, isLongest){
         console.log("perc 2 file ", fileno, " playing from ", this.seek());
       },
       mute: !perc_mute.checked,
-      volume: 0.75
+      volume: 0.75,
+      html5: true,
+      preload: true
     })
   }
 }
@@ -1674,7 +1702,9 @@ function new_piano11_howl(fileno, seek, isLongest, isCurrent){
           console.log("piano1 1 file ", fileno, " playing from ", this.seek());
         },
         mute: !check3.checked || !piano1_mute.checked,
-        volume: 0.75
+        volume: 0.75,
+        html5: true,
+        preload: true
       })
     }
 
@@ -1698,7 +1728,9 @@ function new_piano11_howl(fileno, seek, isLongest, isCurrent){
           console.log("piano1 1 file, ", fileno, " playing from ", this.seek());
         },
         mute: !check3.checked || !piano1_mute.checked,
-        volume: 0.75
+        volume: 0.75,
+        html5: true,
+        preload: true
       })
 
       //
@@ -1721,7 +1753,9 @@ function new_piano11_howl(fileno, seek, isLongest, isCurrent){
         console.log("piano1 1 file ", fileno, " playing from ", this.seek());
       },
       mute: !piano1_mute.checked,
-      volume: 0.75
+      volume: 0.75,
+      html5: true,
+      preload: true
     })
   }
 }
@@ -1749,7 +1783,9 @@ function new_piano12_howl(fileno, seek, isLongest){
         console.log("piano1 2 file ", fileno, " playing from ", this.seek());
       },
       mute: !check3.checked || !piano1_mute.checked,
-      volume: 0.75
+      volume: 0.75,
+      html5: true,
+      preload: true
     })
   }
 
@@ -1765,7 +1801,9 @@ function new_piano12_howl(fileno, seek, isLongest){
         console.log("piano1 2 file ", fileno, " playing from ", this.seek());
       },
       mute: !piano1_mute.checked,
-      volume: 0.75
+      volume: 0.75,
+      html5: true,
+      preload: true
     })
   }
 }
@@ -1865,7 +1903,9 @@ function new_piano21_howl(fileno, seek, isLongest, isCurrent){
           console.log("piano2 1 file ", fileno, " playing from ", this.seek());
         },
         mute: !check4.checked || !piano2_mute.checked,
-        volume: 0.75
+        volume: 0.75,
+        html5: true,
+        preload: true
       })
     }
 
@@ -1889,7 +1929,9 @@ function new_piano21_howl(fileno, seek, isLongest, isCurrent){
           console.log("piano2 1 file ", fileno, " playing from ", this.seek());
         },
         mute: !check4.checked || !piano2_mute.checked,
-        volume: 0.75
+        volume: 0.75,
+        html5: true,
+        preload: true
       })
 
       //
@@ -1912,7 +1954,9 @@ function new_piano21_howl(fileno, seek, isLongest, isCurrent){
         console.log("piano2 1 file ", fileno, " playing from ", this.seek());
       },
       mute: !piano2_mute.checked,
-      volume: 0.75
+      volume: 0.75,
+      html5: true,
+      preload: true
     })
   }
 }
@@ -1940,7 +1984,9 @@ function new_piano22_howl(fileno, seek, isLongest){
         console.log("piano2 2 file ", fileno, " playing from ", this.seek());
       },
       mute: !check4.checked || !piano2_mute.checked,
-      volume: 0.75
+      volume: 0.75,
+      html5: true,
+      preload: true
     })
   }
 
@@ -1956,7 +2002,9 @@ function new_piano22_howl(fileno, seek, isLongest){
         console.log("piano2 2 file ", fileno, " playing from ", this.seek());
       },
       mute: !piano2_mute.checked,
-      volume: 0.75
+      volume: 0.75,
+      html5: true,
+      preload: true
     })
   }
 }
