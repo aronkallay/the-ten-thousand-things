@@ -705,8 +705,11 @@ function wiper_clicked(){
   //play, if playing
   if(playing){
     if (longest == 5){
-      curr_speaker_sound.addEventListener("play", start_time_display, {once: true});
-      curr_speaker_sound.play();
+      curr_speaker_sound.addEventListener("seeked", function(){
+        console.log("playing from wiper");
+        curr_speaker_sound.play();
+        start_time_display;
+      }, {once: true});
     }
   }
 }
@@ -787,7 +790,7 @@ function new_speaker1_sound(seek){
 
   speaker_sound1.src = "assets/audio/45' for a Speaker/45' - " + speaker_sound1_fileno.toString() + ".wav";
   speaker_sound1.load();
-  speaker_sound1.addEventListener("canplay", function(){
+  speaker_sound1.addEventListener("loadedmetadata", function(){
     speaker_sound1.currentTime = seek;
     console.log("speaker 1 loaded file ", speaker_sound1_fileno, " at ", speaker_sound1.currentTime);
   }, {once: true});
@@ -797,7 +800,7 @@ function new_speaker2_sound(seek){
 
   speaker_sound2.src = "assets/audio/45' for a Speaker/45' - " + speaker_sound2_fileno.toString() + ".wav";
   speaker_sound2.load();
-  speaker_sound2.addEventListener("canplay", function(){
+  speaker_sound2.addEventListener("loadedmetadata", function(){
     speaker_sound2.currentTime = seek;
     console.log("speaker 2 loaded file ", speaker_sound2_fileno, " at ", speaker_sound2.currentTime);
   }, {once: true});
