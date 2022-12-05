@@ -305,12 +305,12 @@ piano2_mute.addEventListener("change", function(){
 })
 speaker_mute.addEventListener("change", function(){
   if(this.checked){
-    speaker_sound1.mute(false);
-    speaker_sound2.mute(false);
+    speaker_sound1.muted = false;
+    speaker_sound2.muted = false;
   }
   else{
-    speaker_sound1.mute(true);
-    speaker_sound2.mute(true);
+    speaker_sound1.muted = true;
+    speaker_sound2.muted = true;
   }
 })
 
@@ -487,7 +487,7 @@ function start_time_display(){
   time_poller = setInterval(function(){
 
     //set current time
-    curr_time = Math.round(elapsed_time + curr_speaker_sound.seek());
+    curr_time = Math.round(elapsed_time + curr_speaker_sound.currentTime);
     time_display.innerHTML = sec_to_minsec(curr_time);
     wiper.value = curr_time;
 
@@ -666,13 +666,13 @@ function wiper_clicked(){
     //get speaker 1 file
     //console.log("assign speaker 1");
     speaker_sound1_fileno = i+1;
-    new_speaker1_howl(Math.round(curr_time - elapsed_time));
+    new_speaker1_sound(Math.round(curr_time - elapsed_time));
 
     //get speaker 2 file
     if (i+2 <= 12){
       //console.log("assign speaker 2");
       speaker_sound2_fileno = i+2;
-      new_speaker2_howl(0);
+      new_speaker2_sound(0);
     }
 
     //set current sound
@@ -682,14 +682,14 @@ function wiper_clicked(){
     //console.log("assign speaker 2");
     //get speaker 2 file
     speaker_sound2_fileno = i+1;
-    new_speaker2_howl(Math.round(curr_time - elapsed_time));
+    new_speaker2_sound(Math.round(curr_time - elapsed_time));
 
     //get speaker 1 file
     if (i+2 <= 11){
 
       //console.log("assign speaker 1")
       speaker_sound1_fileno = i+2;
-      new_speaker1_howl(0);
+      new_speaker1_sound(0);
     }
 
     //set current speaker
@@ -705,7 +705,7 @@ function wiper_clicked(){
   //play, if playing
   if(playing){
     if (longest == 5){
-      curr_speaker_sound.once("play", start_time_display);
+      curr_speaker_sound.addEventListener("play", start_time_display, {once: true});
       curr_speaker_sound.play();
     }
   }
@@ -718,53 +718,54 @@ function wiper_clicked(){
 
 
 //speaker sound stuff
-var speaker_sound1 = new Howl({
-  src: ["assets/audio/45' for a Speaker/45' - 1.wav"],
-  onend: speaker1_ended,
-  volume: 0.9,
-  html5: true,
-  preload: true,
-  onpause: function(){
-    console.log("speaker 1 paused");
-  }
+var speaker_sound1 = new Audio();
+speaker_sound1.preload = "auto";
+speaker_sound1.addEventListener("ended", speaker1_ended);
+speaker_sound1.addEventListener("pause", function(){
+  console.log("speaker 1 paused");
 })
-var speaker_sound2 = new Howl({
-  src: ["assets/audio/45' for a Speaker/45' - 2.wav"],
-  onend: speaker2_ended,
-  volume: 0.9,
-  html5: true,
-  preload: true,
-  onpause: function(){
-    console.log("speaker 2 paused");
-  }
+speaker_sound1.addEventListener("play", function(){
+  console.log("speaker 1 playing file ", speaker_sound1_fileno, " from ", speaker_sound1.currentTime);
 })
-
+speaker_sound1.volume = 0.9;
+speaker_sound1.muted = !check5.checked || !speaker_mute.checked;
 var speaker_sound1_fileno = 1;
+speaker_sound1.src = "assets/audio/45' for a Speaker/45' - 1.wav";
+
+var speaker_sound2 = new Audio();
+speaker_sound2.preload = "auto";
+speaker_sound2.addEventListener("ended", speaker2_ended);
+speaker_sound2.addEventListener("pause", function(){
+  console.log("speaker 2 paused");
+})
+speaker_sound2.addEventListener("play", function(){
+  console.log("speaker 2 playing ", speaker_sound2_fileno, " from ", speaker_sound2.currentTime);
+})
+speaker_sound2.volume = 0.9;
+speaker_sound2.muted = !check5.checked || !speaker_mute.checked;
 var speaker_sound2_fileno = 2;
+speaker_sound2.src = "assets/audio/45' for a Speaker/45' - 2.wav";
 
 var curr_speaker_sound = speaker_sound1;
 
 function speaker1_ended(){
   //switch to second audio object
   //add audio time to elapsed time
-  elapsed_time += speaker_sound1.duration();
+  elapsed_time += speaker_sound1.duration;
   curr_speaker_sound = speaker_sound2;
   curr_speaker_sound.play();
-  console.log("playing speaker 2 file ", speaker_sound2_fileno);
-
-
 
   //load next audio file
   if (speaker_sound1_fileno < 11){
     speaker_sound1_fileno += 2;
-    new_speaker1_howl(0);
+    new_speaker1_sound(0);
   }
 }
 
 function speaker2_ended(){
   //if it's not the last one
   //console.log(sec_to_minsec(Math.round(elapsed_time)));
-  elapsed_time += speaker_sound2.duration();
+  elapsed_time += speaker_sound2.duration;
   //console.log(sec_to_minsec(Math.round(elapsed_time)));
   if (speaker_sound2_fileno < 12){
     //add audio time to elapsed time
@@ -772,54 +773,35 @@ function speaker2_ended(){
     //switch to first audio object
     curr_speaker_sound = speaker_sound1;
     curr_speaker_sound.play();
-    console.log("playing speaker 1 file ", speaker_sound1_fileno);
 
     //load next audio file
     speaker_sound2_fileno += 2;
-    new_speaker2_howl(0);
+    new_speaker2_sound(0);
   }
-  else{
-    playing = false;
-  }
+  // else{
+  //   playing = false;
+  // }
 }
 
-function new_speaker1_howl(seek){
-  var old_howl = speaker_sound1;
-  speaker_sound1 = new Howl({
-    src: ["assets/audio/45' for a Speaker/45' - " + speaker_sound1_fileno.toString() + ".wav"],
-    onend: speaker1_ended,
-    onload: function(){
-      this.seek(seek);
-      console.log("speaker 1 loaded file ", speaker_sound1_fileno);
-    },
-    mute: !check5.checked || !speaker_mute.checked,
-    volume: 0.9,
-    html5: true,
-    preload: true,
-    onpause: function(){
-      console.log("speaaker 1 paused");
-    }
-  })
-  old_howl.unload();
+function new_speaker1_sound(seek){
+
+  speaker_sound1.src = "assets/audio/45' for a Speaker/45' - " + speaker_sound1_fileno.toString() + ".wav";
+  speaker_sound1.load();
+  speaker_sound1.addEventListener("canplaythrough", function(){
+    speaker_sound1.currentTime = seek;
+    console.log("speaker 1 loaded file ", speaker_sound1_fileno, " at ", speaker_sound1.currentTime);
+  }, {once: true});
+
 }
-function new_speaker2_howl(seek){
-  var old_howl = speaker_sound2;
-  speaker_sound2 = new Howl({
-    src: ["assets/audio/45' for a Speaker/45' - " + speaker_sound2_fileno.toString() + ".wav"],
-    onend: speaker2_ended,
-    onload: function(){
-      this.seek(seek);
-      console.log("speaker 2 loaded file ", speaker_sound2_fileno);
-    },
-    mute: !check5.checked || !speaker_mute.checked,
-    volume: 0.9,
-    html5: true,
-    preload: true,
-    onpause: function(){
-      console.log("speaker 2 paused");
-    }
-  })
-  old_howl.unload();
+function new_speaker2_sound(seek){
+
+  speaker_sound2.src = "assets/audio/45' for a Speaker/45' - " + speaker_sound2_fileno.toString() + ".wav";
+  speaker_sound2.load();
+  speaker_sound2.addEventListener("canplaythrough", function(){
+    speaker_sound2.currentTime = seek;
+    console.log("speaker 2 loaded file ", speaker_sound2_fileno, " at ", speaker_sound2.currentTime);
+  }, {once: true});
+
 }
 
 
@@ -926,8 +908,8 @@ function update_track_activation(){
         }
 
         if (i==4){
-          speaker_sound1.mute(!speaker_mute.checked);
-          speaker_sound2.mute(!speaker_mute.checked);
+          speaker_sound1.muted = !speaker_mute.checked;
+          speaker_sound2.muted = !speaker_mute.checked;
           console.log("speaker muted ", !speaker_mute.checked);
         }
 
@@ -965,8 +947,8 @@ function update_track_activation(){
         }
 
         if (i==4){
-          speaker_sound1.mute(true);
-          speaker_sound2.mute(true);
+          speaker_sound1.muted = true;
+          speaker_sound2.muted = true;
           console.log("speaker off");
         }
 
