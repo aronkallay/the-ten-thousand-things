@@ -10,63 +10,19 @@ document.addEventListener('keyup', event => {
   }
 })
 
-
-
-
 //testing audio levels with volume slider
 const root = document.querySelector(':root');
 
-// set css variable
 
-// master_slider.oninput = function() {
-//     root.style.setProperty('--string-level', master_slider.value);
-//     root.style.setProperty('--perc-level', master_slider.value);
-//     root.style.setProperty('--piano1-level', master_slider.value);
-//     root.style.setProperty('--piano2-level', master_slider.value);
-//     root.style.setProperty('--speaker-level', master_slider.value);
-// }
 
-// var test_sound = new Howl({
-//   src: ["assets/audio/Intro to 45'-CD (16bit 44.1).wav"],
-//   html5: true,
-//   preload: true
-// })
-//
-// var audioCtx = Howler.ctx;
-//
-// var gain = audioCtx.createGain();
-//
-// var analyzer = audioCtx.createAnalyser();
-//
-// var mediaElement = audioCtx.createMediaElementSource(test_sound._sounds[0]._node);
-// mediaElement.connect(gain.connect(analyzer));
-//
-// var test_inc = 0;
-// var up = true;
-// function loop(){
-//   if(up && test_inc < 100){
-//     test_inc += 1;
-//   }
-//   else if (up && test_inc >= 100){
-//     up = false;
-//     test_inc -= 1;
-//   }
-//   else if (!up && test_inc > 0){
-//     test_inc -= 1;
-//   }
-//   else if (!up && test_inc <= 0){
-//     up = true;
-//     test_inc += 1;
-//   }
-//   root.style.setProperty('--string-level', test_inc);
-//   root.style.setProperty('--perc-level', test_inc);
-//   root.style.setProperty('--piano1-level', test_inc);
-//   root.style.setProperty('--piano2-level', test_inc);
-//   root.style.setProperty('--speaker-level', test_inc);
-//   console.log(test_inc);
-//   window.requestAnimationFrame(loop);
-// }
-//loop();
+
+// //   root.style.setProperty('--string-level', test_inc);
+// //   root.style.setProperty('--perc-level', test_inc);
+// //   root.style.setProperty('--piano1-level', test_inc);
+// //   root.style.setProperty('--piano2-level', test_inc);
+// //   root.style.setProperty('--speaker-level', test_inc);
+// //   console.log(test_inc);
+// //   window.requestAnimationFrame(loop);
 
 //get html elements....
 var cover_img = document.getElementById("cover-image");
@@ -148,6 +104,10 @@ piano2_ctx.fillStyle = "#b5cb99";
 
 
 
+//***********************************************************************************
+// AUDIO STUFF
+//***********************************************************************************
+
 
 //durations of audio files
 const durations_string = [54.73034013605442, 65.07165532879819, 27.380997732426305, 86.49034013605443,
@@ -156,12 +116,13 @@ const durations_string = [54.73034013605442, 65.07165532879819, 27.3809977324263
                     68.9009977324263, 43.82367346938776, 41.775668934240365, 64.34632653061225,
                     55.54632653061225, 55.007664399092974, 64.8209977324263, 61.94632653061225,
                     52.03700680272109, 69.31700680272108];
-
 const num_string_segs = durations_string.length;
 var string_total_dur = 0;
-for (var i = 0; i < num_string_segs; i++){ string_total_dur += durations_string[i]; }
-var string_seg_locs = [...Array(num_string_segs).keys()];
-var string_order = [...Array(num_string_segs).keys()];
+for (var i = 0; i < num_string_segs; i++){ string_total_dur += durations_string[i]; } //get total length of all string files
+var string_seg_locs = [...Array(num_string_segs).keys()]; //time locations of string segments
+var string_order = [...Array(num_string_segs).keys()]; //order of string segments
+
+
 
 const durations_perc = [137.6209977324263, 38.92233560090703, 44.10632653061224, 41.14099773242631,
                   90.79433106575964, 76.0690022675737, 60.500997732426306, 36.57566893424036,
@@ -170,12 +131,14 @@ const durations_perc = [137.6209977324263, 38.92233560090703, 44.10632653061224,
                   52.85299319727891, 50.46900226757369, 48.29299319727891, 35.919659863945576,
                   55.2690022675737, 38.218321995464855, 52.191655328798184, 51.73832199546485,
                   47.9090022675737, 41.690340136054424, 45.32233560090703, 88.91700680272109];
-
 const num_perc_segs = durations_perc.length;
 var perc_total_dur = 0;
 for (var i = 0; i < num_perc_segs; i++){ perc_total_dur += durations_perc[i]; }
 var perc_seg_locs = [...Array(num_perc_segs).keys()];
 var perc_order = [...Array(num_perc_segs).keys()];
+
+
+
 
 const durations_piano1 = [54.9809977324263, 81.8290022675737, 102.12766439909296, 50.69832199546485,
                     47.16233560090703, 75.77566893424036, 132.39433106575964, 54.83700680272109,
@@ -183,12 +146,15 @@ const durations_piano1 = [54.9809977324263, 81.8290022675737, 102.12766439909296
                     85.09832199546486, 83.51965986394558, 75.45566893424036, 144.12766439909296,
                     200.71965986394557, 59.71165532879819, 71.17832199546486, 52.81034013605442,
                     22.43700680272109, 63.97832199546485];
-
 const num_piano1_segs = durations_piano1.length;
 var piano1_total_dur = 0;
 for (var i = 0; i < num_piano1_segs; i++){ piano1_total_dur += durations_piano1[i]; }
 var piano1_seg_locs = [...Array(num_piano1_segs).keys()];
 var piano1_order = [...Array(num_piano1_segs).keys()];
+
+
+
+
 
 const durations_piano2 = [73.17299319727891, 212.04233560090702, 86.22367346938775, 41.044988662131516,
                     147.9409977324263, 68.00498866213152, 107.99433106575964, 91.83433106575964,
@@ -196,12 +162,15 @@ const durations_piano2 = [73.17299319727891, 212.04233560090702, 86.223673469387
                     72.40498866213152, 97.50367346938775, 83.38632653061225, 79.9890022675737,
                     115.4609977324263, 48.96498866213152, 117.09299319727891, 52.91700680272109,
                     89.19965986394558, 81.88766439909297, 52.12233560090703, 43.706326530612245];
-
 const num_piano2_segs = durations_piano2.length;
 var piano2_total_dur = 0;
 for (var i = 0; i < num_piano2_segs; i++){ piano2_total_dur += durations_piano2[i]; }
 var piano2_seg_locs = [...Array(num_piano2_segs).keys()];
 var piano2_order = [...Array(num_piano2_segs).keys()];
+
+
+
+
 
 const durations_speaker = [190.65049886621316, 175.34950113378684, 167.45727891156463,
                             344.04272108843537, 184.75, 273.75, 159.5, 298.5,
@@ -211,22 +180,48 @@ const num_speaker_segs = durations_speaker.length;
 var speaker_total_dur = 0;
 for (var i = 0; i < num_speaker_segs; i++){ speaker_total_dur += durations_speaker[i]; };
 
+
+
+
+
+
+//arrays holding all this info ......
 var all_durations = [durations_string, durations_perc, durations_piano1, durations_piano2];
 var all_num_segs = [num_string_segs, num_perc_segs, num_piano1_segs, num_piano2_segs];
 var all_total_durs = [string_total_dur, perc_total_dur, piano1_total_dur, piano2_total_dur];
 var all_seg_locs = [string_seg_locs, perc_seg_locs, piano1_seg_locs, piano2_seg_locs];
 var all_orders = [string_order, perc_order, piano1_order, piano2_order];
 
+
+
+//timestamps of when next audio files should be played
 var next_events = [string_seg_locs[0], perc_seg_locs[0], piano1_seg_locs[0], piano2_seg_locs[0]];
+
+//what's currently happening
 var current_events = [null, null, null, null];
 
 
+
+//some variables to keep track of what's happening...
 var playing = false;
-var longest_changed = true;
+var at_end = false;
+var first_clicked = false;
+var need_rewind = false;
+
+var elapsed_time = 0.0;
+var curr_time = 0.0;
+
+
+var longest_changed = true; //start by changing longest
+//checking to see if checkmarks have been changed
 var curr_track_status = [false, false, false, false, false];
 var checks_changed = false;
 
-var at_end = false;
+
+
+//***********************************************************************************
+// ACTUAL RUNNING CODE
+//***********************************************************************************
 
 //**** auto fade when opening the page
 setTimeout(() => {
@@ -235,6 +230,7 @@ setTimeout(() => {
  setTimeout(() => {
    fadein(player);
  }, 2500);
+
 
 //***** opening popup windows
 let instr_params = `status=no,location=no,toolbar=no,menubar=no,
@@ -249,10 +245,14 @@ about_button.onclick = () => {
   window.open('pages/about.html', "about", about_params);
 };
 
+
+
+//control master volume
 master_slider.oninput = function(){
   Howler.volume(this.value);
 }
 
+//control master mute
 master_mute.addEventListener("change", function(){
   if (this.checked){
     Howler.mute(false);
@@ -262,6 +262,7 @@ master_mute.addEventListener("change", function(){
   }
 })
 
+//control track mutes
 string_mute.addEventListener("change", function(){
   if(this.checked){
     string_sound1.mute(false);
@@ -272,7 +273,6 @@ string_mute.addEventListener("change", function(){
     string_sound2.mute(true);
   }
 })
-
 perc_mute.addEventListener("change", function(){
   if(this.checked){
     perc_sound1.mute(false);
@@ -283,7 +283,6 @@ perc_mute.addEventListener("change", function(){
     perc_sound2.mute(true);
   }
 })
-
 piano1_mute.addEventListener("change", function(){
   if(this.checked){
     piano1_sound1.mute(false);
@@ -294,7 +293,6 @@ piano1_mute.addEventListener("change", function(){
     piano1_sound2.mute(true);
   }
 })
-
 piano2_mute.addEventListener("change", function(){
   if(this.checked){
     piano2_sound1.mute(false);
@@ -305,7 +303,6 @@ piano2_mute.addEventListener("change", function(){
     piano2_sound2.mute(true);
   }
 })
-
 speaker_mute.addEventListener("change", function(){
   if(this.checked){
     speaker_sound1.mute(false);
@@ -317,30 +314,27 @@ speaker_mute.addEventListener("change", function(){
   }
 })
 
-
-
+//rewind button
 return_button.addEventListener("click", rewind);
 
+//double-click and single-click shuffle button functions
+shuffle_button.addEventListener("dblclick", double_click);
+shuffle_button.addEventListener("click", single_click);
+
+//pause/play button function
+pause_button.addEventListener("click", pause);
+play_button.addEventListener("click", play);
+
+
+//rewind function
 function rewind(){
 
+  //just click the wiper at 0
   console.log(rewind);
   wiper.value = 0;
   wiper_clicked();
 }
-
-
-
-
-//***** double-click and single-click play button functions
-shuffle_button.addEventListener("dblclick", double_click);
-shuffle_button.addEventListener("click", single_click);
-
-//**** pause button function
-pause_button.addEventListener("click", pause);
-play_button.addEventListener("click", play);
-
-var play_timeout;
-//***** play button double click function
+//shuffle button double click function
 function double_click(){
 
   console.log("double");
@@ -355,7 +349,7 @@ function double_click(){
   }, 200);
 
 }
-
+//shuffle button single click function
 function single_click(){
   //get the longest checked track
   get_longest();
@@ -392,8 +386,7 @@ function single_click(){
     need_rewind = false;
   }
 }
-
-//***** pause button function
+//pause button function
 function pause(){
   if (playing){
     playing = false;
@@ -412,10 +405,7 @@ function pause(){
 
   }
 }
-
-var first_clicked = false;
-
-//***** play button single click function
+//play button function
 function play(){
 
   //on first click, shuffle
@@ -489,112 +479,7 @@ function play(){
 }
 
 
-
-
-var sound_event_functions = [string_event, perc_event, piano1_event, piano2_event];
-
-function string_event(){
-  console.log("string event");
-  //play and load string sounds etc. etc.
-  current_events[0] = [next_events[0], string_seg_locs[next_events[0]]+durations_string[string_order[next_events[0]]]];
-  next_events[0] += 1;
-
-  curr_string_sound.play();
-  if (curr_string_sound == string_sound1){
-    string_on = [true, false];
-    //console.log("load string event ", next_events[0], " into sound 2");
-    //load next string sound into string_sound2
-    if(next_events[0] < durations_string.length){
-      new_string2_howl(next_events[0]+1, 0, false);
-    }
-  }
-  else{
-    string_on = [false, true];
-    //console.log("load string event ", next_events[0], " into sound 1");
-    //load next string sound into string_sound1
-    if(next_events[0] < durations_string.length){
-      new_string1_howl(next_events[0] + 1, 0, false, false);
-    }
-  }
-
-}
-
-function perc_event(){
-  console.log("perc event");
-  //play and load string sounds etc. etc.
-  current_events[1] = [next_events[1], perc_seg_locs[next_events[1]]+durations_perc[perc_order[next_events[1]]]];
-  next_events[1] += 1;
-
-  curr_perc_sound.play();
-  if (curr_perc_sound == perc_sound1){
-    perc_on = [true, false];
-    //console.log("load perc event ", next_events[0], " into perc 2");
-    //load next string sound into string_sound2
-    if(next_events[1] < durations_perc.length){
-      new_perc2_howl(next_events[1]+1, 0, false);
-    }
-  }
-  else{
-    perc_on = [false, true];
-    //console.log("load perc event ", next_events[1], " into perc 1");
-    //load next string sound into string_sound1
-    if(next_events[1] < durations_perc.length){
-      new_perc1_howl(next_events[1] + 1, 0, false, false);
-    }
-  }
-}
-
-function piano1_event(){
-  console.log("piano1 event");
-  //play and load string sounds etc. etc.
-  current_events[2] = [next_events[2], piano1_seg_locs[next_events[2]]+durations_piano1[piano1_order[next_events[2]]]];
-  next_events[2] += 1;
-
-  curr_piano1_sound.play();
-  if (curr_piano1_sound == piano1_sound1){
-    piano1_on = [true, false];
-    //console.log("load piano1 event ", next_events[2], " into piano1 2");
-    //load next string sound into string_sound2
-    if(next_events[2] < durations_piano1.length){
-      new_piano12_howl(next_events[2]+1, 0, false);
-    }
-  }
-  else{
-    piano1_on = [false, true];
-    //console.log("load piano1 event ", next_events[2], " into piano1 1");
-    //load next string sound into string_sound1
-    if(next_events[2] < durations_piano1.length){
-      new_piano11_howl(next_events[2] + 1, 0, false, false);
-    }
-  }
-}
-
-function piano2_event(){
-  console.log("piano2 event");
-  //play and load string sounds etc. etc.
-  current_events[3] = [next_events[3], piano2_seg_locs[next_events[3]]+durations_piano2[piano2_order[next_events[3]]]];
-  next_events[3] += 1;
-
-  curr_piano2_sound.play();
-  if (curr_piano2_sound == piano2_sound1){
-    piano2_on = [true, false];
-    //console.log("load piano2 event ", next_events[3], " into piano2 2");
-    //load next string sound into string_sound2
-    if(next_events[3] < durations_piano2.length){
-      new_piano22_howl(next_events[3]+1, 0, false);
-    }
-  }
-  else{
-    piano2_on = [false, true];
-    //console.log("load piano2 event ", next_events[3], " into piano2 1");
-    //load next string sound into string_sound1
-    if(next_events[3] < durations_piano2.length){
-      new_piano21_howl(next_events[3] + 1, 0, false, false);
-    }
-  }
-}
-
-// //function to start time display
+//functions to start/stop time display
 var time_poller;
 function start_time_display(){
   stop_time_display();
@@ -648,19 +533,107 @@ function stop_time_display(){
   clearInterval(time_poller);
 }
 
+//functions for triggering sound events
+var sound_event_functions = [string_event, perc_event, piano1_event, piano2_event];
+function string_event(){
+  console.log("string event");
+  //play and load string sounds etc. etc.
+  current_events[0] = [next_events[0], string_seg_locs[next_events[0]]+durations_string[string_order[next_events[0]]]];
+  next_events[0] += 1;
 
+  curr_string_sound.play();
+  if (curr_string_sound == string_sound1){
+    string_on = [true, false];
+    //console.log("load string event ", next_events[0], " into sound 2");
+    //load next string sound into string_sound2
+    if(next_events[0] < durations_string.length){
+      new_string2_howl(next_events[0]+1, 0, false);
+    }
+  }
+  else{
+    string_on = [false, true];
+    //console.log("load string event ", next_events[0], " into sound 1");
+    //load next string sound into string_sound1
+    if(next_events[0] < durations_string.length){
+      new_string1_howl(next_events[0] + 1, 0, false, false);
+    }
+  }
 
+}
+function perc_event(){
+  console.log("perc event");
+  //play and load string sounds etc. etc.
+  current_events[1] = [next_events[1], perc_seg_locs[next_events[1]]+durations_perc[perc_order[next_events[1]]]];
+  next_events[1] += 1;
 
-var need_rewind = false;
+  curr_perc_sound.play();
+  if (curr_perc_sound == perc_sound1){
+    perc_on = [true, false];
+    //console.log("load perc event ", next_events[0], " into perc 2");
+    //load next string sound into string_sound2
+    if(next_events[1] < durations_perc.length){
+      new_perc2_howl(next_events[1]+1, 0, false);
+    }
+  }
+  else{
+    perc_on = [false, true];
+    //console.log("load perc event ", next_events[1], " into perc 1");
+    //load next string sound into string_sound1
+    if(next_events[1] < durations_perc.length){
+      new_perc1_howl(next_events[1] + 1, 0, false, false);
+    }
+  }
+}
+function piano1_event(){
+  console.log("piano1 event");
+  //play and load string sounds etc. etc.
+  current_events[2] = [next_events[2], piano1_seg_locs[next_events[2]]+durations_piano1[piano1_order[next_events[2]]]];
+  next_events[2] += 1;
 
+  curr_piano1_sound.play();
+  if (curr_piano1_sound == piano1_sound1){
+    piano1_on = [true, false];
+    //console.log("load piano1 event ", next_events[2], " into piano1 2");
+    //load next string sound into string_sound2
+    if(next_events[2] < durations_piano1.length){
+      new_piano12_howl(next_events[2]+1, 0, false);
+    }
+  }
+  else{
+    piano1_on = [false, true];
+    //console.log("load piano1 event ", next_events[2], " into piano1 1");
+    //load next string sound into string_sound1
+    if(next_events[2] < durations_piano1.length){
+      new_piano11_howl(next_events[2] + 1, 0, false, false);
+    }
+  }
+}
+function piano2_event(){
+  console.log("piano2 event");
+  //play and load string sounds etc. etc.
+  current_events[3] = [next_events[3], piano2_seg_locs[next_events[3]]+durations_piano2[piano2_order[next_events[3]]]];
+  next_events[3] += 1;
 
+  curr_piano2_sound.play();
+  if (curr_piano2_sound == piano2_sound1){
+    piano2_on = [true, false];
+    //console.log("load piano2 event ", next_events[3], " into piano2 2");
+    //load next string sound into string_sound2
+    if(next_events[3] < durations_piano2.length){
+      new_piano22_howl(next_events[3]+1, 0, false);
+    }
+  }
+  else{
+    piano2_on = [false, true];
+    //console.log("load piano2 event ", next_events[3], " into piano2 1");
+    //load next string sound into string_sound1
+    if(next_events[3] < durations_piano2.length){
+      new_piano21_howl(next_events[3] + 1, 0, false, false);
+    }
+  }
+}
 
-
-
-
-var elapsed_time = 0.0;
-var curr_time = 0.0;
-
+//function for clicking wiper
 function wiper_clicked(){
 
   console.log("wiper clicked");
@@ -738,6 +711,13 @@ function wiper_clicked(){
   }
 }
 
+
+
+
+
+
+
+//speaker sound stuff
 var speaker_sound1 = new Howl({
   src: ["assets/audio/45' for a Speaker/45' - 1.wav"],
   onend: speaker1_ended,
@@ -842,6 +822,12 @@ function new_speaker2_howl(seek){
   old_howl.unload();
 }
 
+
+
+
+
+
+
 var piano2_sound1;
 var piano2_sound2;
 var piano2_sound1_fileno;
@@ -870,11 +856,6 @@ var string_sound2_fileno;
 var curr_string_sound;
 var string_on = [false, false];
 
-var all_sounds = [[string_sound1, string_sound2],
-                  [perc_sound1, perc_sound2],
-                  [piano1_sound1, piano1_sound2],
-                  [piano2_sound1, piano2_sound2],
-                  [speaker_sound1, speaker_sound2]];
 var all_filenos = [[string_sound1_fileno, string_sound2_fileno],
                     [perc_sound1_fileno, perc_sound2_fileno],
                     [piano1_sound1_fileno, piano1_sound2_fileno],
@@ -885,11 +866,6 @@ var audio_file_locations = ["assets/audio/26'/26' - ",
                       "assets/audio/27'/27' - ",
                       "assets/audio/31'/31' - ",
                       "assets/audio/34'/34' - "];
-
-var all_curr_sounds = [curr_string_sound, curr_perc_sound, curr_piano1_sound, curr_piano2_sound];
-
-
-
 
 
 var all_new_howl_funcs = [[new_string1_howl, new_string2_howl],
@@ -906,18 +882,7 @@ var all_new_howl_funcs = [[new_string1_howl, new_string2_howl],
 
 
 
-
-
-
-
-
-
-
-
-
-
-//****** update track on/off according to checkboxes
-// NEEDS AUDIO STUFF!
+//update track on/off according to checkboxes
 function update_track_activation(){
 
   var curr_check;
@@ -1009,18 +974,6 @@ function update_track_activation(){
     }
   }, 200);
 }
-
-
-// set css variable
-
-// master_slider.oninput = function() {
-//     root.style.setProperty('--string-level', master_slider.value);
-//     root.style.setProperty('--perc-level', master_slider.value);
-//     root.style.setProperty('--piano1-level', master_slider.value);
-//     root.style.setProperty('--piano2-level', master_slider.value);
-//     root.style.setProperty('--speaker-level', master_slider.value);
-// }
-
 
 
 //**************FUNCTIONS************************************************
