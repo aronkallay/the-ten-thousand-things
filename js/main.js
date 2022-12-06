@@ -13,6 +13,9 @@ document.addEventListener('keyup', event => {
 //testing audio levels with volume slider
 const root = document.querySelector(':root');
 
+const audioCtx = new AudioContext();
+
+var ctx_started = false;
 
 
 
@@ -245,20 +248,32 @@ about_button.onclick = () => {
   window.open('pages/about.html', "about", about_params);
 };
 
-
+var curr_master_vol = 0.75;
 
 //control master volume
 master_slider.oninput = function(){
   Howler.volume(this.value);
+  if (master_mute.checked){
+    master_gain.gain.setValueAtTime(curr_master_vol, audioCtx.currentTime);
+    master_gain.gain.exponentialRampToValueAtTime(this.value, audioCtx.currentTime + 0.015);
+  }
+  curr_master_vol = this.value;
 }
 
 //control master mute
 master_mute.addEventListener("change", function(){
   if (this.checked){
     Howler.mute(false);
+    console.log(curr_master_vol);
+    master_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+    master_gain.gain.exponentialRampToValueAtTime(curr_master_vol, audioCtx.currentTime + 0.015);
   }
   else{
     Howler.mute(true);
+    console.log(audioCtx.currentTime);
+    master_gain.gain.setValueAtTime(curr_master_vol, audioCtx.currentTime);
+    master_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+    console.log(curr_master_vol);
   }
 })
 
@@ -303,14 +318,26 @@ piano2_mute.addEventListener("change", function(){
     piano2_sound2.mute(true);
   }
 })
+
 speaker_mute.addEventListener("change", function(){
-  if(this.checked){
-    speaker_sound1.muted = false;
-    speaker_sound2.muted = false;
-  }
-  else{
-    speaker_sound1.muted = true;
-    speaker_sound2.muted = true;
+  if (check5.checked){
+    if(this.checked){
+      speaker_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      speaker_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+
+      speaker_sound1.muted = false;
+      speaker_sound2.muted = false;
+    }
+    else if (!this.checked){
+      speaker_gain.gain.setValueAtTime(1, audioCtx.currentTime);
+      speaker_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+
+      setTimeout(function(){
+        speaker_sound1.muted = true;
+        speaker_sound2.muted = true;
+      }, 20);
+
+    }
   }
 })
 
@@ -392,8 +419,11 @@ function pause(){
     playing = false;
     console.log("paused");
     stop_time_display();
-    curr_speaker_sound.pause();
 
+    speaker_gain.gain.setValueAtTime(1, audioCtx.currentTime);
+    speaker_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+    setTimeout(function(){
+      curr_speaker_sound.pause();
       string_sound1.pause();
       string_sound2.pause();
       perc_sound1.pause();
@@ -402,6 +432,9 @@ function pause(){
       piano1_sound2.pause();
       piano2_sound1.pause();
       piano2_sound2.pause();
+    }, 20);
+
+
 
   }
 }
@@ -410,6 +443,7 @@ function play(){
 
   //on first click, shuffle
   if (!first_clicked){
+    audioCtx.resume();
     single_click();
     first_clicked = true;
   }
@@ -418,10 +452,13 @@ function play(){
     rewind();
     at_end = false;
   }
-    if (playing == false){
-        console.log("playing");
-        playing = true;
-        start_time_display();
+  if (playing == false){
+      console.log("playing");
+      playing = true;
+      start_time_display();
+      speaker_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      speaker_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+
         curr_speaker_sound.play();
 
         if(longest == 1){
@@ -471,7 +508,8 @@ function play(){
             piano2_sound2.play();
           }
         }
-    }
+
+  }
   //pause/play functionality
   //do nothing if you press play while playing
 
@@ -638,102 +676,127 @@ function wiper_clicked(){
 
   console.log("wiper clicked");
 
-  stop_time_display();
+  if(playing){
+    pause();
+    playing = true;
+  }
+  //stop_time_display();
   curr_time = Math.round(wiper.value);
   time_display.innerHTML = sec_to_minsec(curr_time);
-  curr_speaker_sound.pause();
 
-  if(wiper.value == wiper.max){
-    at_end = true;
-  }
-  else{
-    at_end = false;
-  }
+  //curr_speaker_sound.pause();
+  setTimeout(function(){
+    if(wiper.value == wiper.max){
+      at_end = true;
+    }
+    else{
+      at_end = false;
+    }
 
-  if(longest != 5){
-    make_longest_funcs[longest-1]();
-  }
-  //find elapsed time
-  var i = 0;
-  elapsed_time = 0;
-  while(curr_time > elapsed_time + durations_speaker[i]){
-    elapsed_time += durations_speaker[i];
-    i+= 1;
-  }
+    if(longest != 5){
+      make_longest_funcs[longest-1]();
+    }
+    //find elapsed time
+    var i = 0;
+    elapsed_time = 0;
+    while(curr_time > elapsed_time + durations_speaker[i]){
+      elapsed_time += durations_speaker[i];
+      i+= 1;
+    }
 
-  //load files into sound1/sound2 depending on even/odd
-  if (i%2 == 0){
-    //get speaker 1 file
-    //console.log("assign speaker 1");
-    speaker_sound1_fileno = i+1;
-    new_speaker1_sound(Math.round(curr_time - elapsed_time));
+    //load files into sound1/sound2 depending on even/odd
+    if (i%2 == 0){
+      //get speaker 1 file
+      //console.log("assign speaker 1");
+      speaker_sound1_fileno = i+1;
+      new_speaker1_sound(Math.round(curr_time - elapsed_time));
 
-    //get speaker 2 file
-    if (i+2 <= 12){
+      //get speaker 2 file
+      if (i+2 <= 12){
+        //console.log("assign speaker 2");
+        speaker_sound2_fileno = i+2;
+        new_speaker2_sound(0);
+      }
+
+      //set current sound
+      curr_speaker_sound = speaker_sound1;
+    }
+    else{
       //console.log("assign speaker 2");
-      speaker_sound2_fileno = i+2;
-      new_speaker2_sound(0);
+      //get speaker 2 file
+      speaker_sound2_fileno = i+1;
+      new_speaker2_sound(Math.round(curr_time - elapsed_time));
+
+      //get speaker 1 file
+      if (i+2 <= 11){
+
+        //console.log("assign speaker 1")
+        speaker_sound1_fileno = i+2;
+        new_speaker1_sound(0);
+      }
+
+      //set current speaker
+      curr_speaker_sound = speaker_sound2;
     }
 
-    //set current sound
-    curr_speaker_sound = speaker_sound1;
-  }
-  else{
-    //console.log("assign speaker 2");
-    //get speaker 2 file
-    speaker_sound2_fileno = i+1;
-    new_speaker2_sound(Math.round(curr_time - elapsed_time));
+    //find next events
+    get_events();
 
-    //get speaker 1 file
-    if (i+2 <= 11){
+    //load non_longest files
+    load_non_longest_files();
 
-      //console.log("assign speaker 1")
-      speaker_sound1_fileno = i+2;
-      new_speaker1_sound(0);
+    //play, if playing
+    if(playing){
+      if (longest == 5){
+        //once it's been seeked...
+        curr_speaker_sound.addEventListener("seeked", function(){
+          console.log("playing from wiper");
+          speaker_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+          speaker_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.15);
+          setTimeout(function(){
+            curr_speaker_sound.play();
+            start_time_display();
+          }, 20);
+        }, {once: true});
+      }
     }
+  }, 20);
 
-    //set current speaker
-    curr_speaker_sound = speaker_sound2;
-  }
-
-  //find next events
-  get_events();
-
-  //load non_longest files
-  load_non_longest_files();
-
-  //play, if playing
-  if(playing){
-    if (longest == 5){
-      curr_speaker_sound.addEventListener("seeked", function(){
-        console.log("playing from wiper");
-        curr_speaker_sound.play();
-        start_time_display;
-      }, {once: true});
-    }
-  }
 }
 
 
-
-
+//master gain node
+var master_gain = audioCtx.createGain();
+master_gain.connect(audioCtx.destination);
 
 
 
 //speaker sound stuff
+var speaker_gain = audioCtx.createGain();
+var speaker_analyser = audioCtx.createAnalyser();
+speaker_gain.connect(master_gain);
+
 var speaker_sound1 = new Audio();
 speaker_sound1.preload = "auto";
+speaker_sound1.crossOrigin = "anonymous";
 speaker_sound1.addEventListener("ended", speaker1_ended);
 speaker_sound1.addEventListener("pause", function(){
+
   console.log("speaker 1 paused");
 })
 speaker_sound1.addEventListener("play", function(){
   console.log("speaker 1 playing file ", speaker_sound1_fileno, " from ", speaker_sound1.currentTime);
 })
-speaker_sound1.volume = 0.9;
+speaker_sound1.volume = 1;
 speaker_sound1.muted = !check5.checked || !speaker_mute.checked;
 var speaker_sound1_fileno = 1;
 speaker_sound1.src = "assets/audio/45' for a Speaker/45' - 1.wav";
+//connect webaudio stuff
+var speaker_sound1_node = audioCtx.createMediaElementSource(speaker_sound1);
+speaker_sound1_node.connect(speaker_gain);
+speaker_sound1_node.connect(speaker_analyser);
+speaker_gain.gain.value = 1;
+
 
 var speaker_sound2 = new Audio();
 speaker_sound2.preload = "auto";
@@ -748,6 +811,10 @@ speaker_sound2.volume = 0.9;
 speaker_sound2.muted = !check5.checked || !speaker_mute.checked;
 var speaker_sound2_fileno = 2;
 speaker_sound2.src = "assets/audio/45' for a Speaker/45' - 2.wav";
+//connect webaudio stuff
+var speaker_sound2_node = audioCtx.createMediaElementSource(speaker_sound2);
+speaker_sound2_node.connect(speaker_gain);
+speaker_sound2_node.connect(speaker_analyser);
 
 var curr_speaker_sound = speaker_sound1;
 
@@ -764,7 +831,6 @@ function speaker1_ended(){
     new_speaker1_sound(0);
   }
 }
-
 function speaker2_ended(){
   //if it's not the last one
   //console.log(sec_to_minsec(Math.round(elapsed_time)));
@@ -911,9 +977,17 @@ function update_track_activation(){
         }
 
         if (i==4){
-          speaker_sound1.muted = !speaker_mute.checked;
-          speaker_sound2.muted = !speaker_mute.checked;
-          console.log("speaker muted ", !speaker_mute.checked);
+          if(speaker_mute.checked){
+            speaker_sound1.muted = false;
+            speaker_sound2.muted = false;
+            speaker_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            speaker_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+            console.log("speaker track on and not muted");
+          }
+          else{
+            console.log("speaker track on but muted");
+          }
+
         }
 
 
@@ -950,9 +1024,13 @@ function update_track_activation(){
         }
 
         if (i==4){
-          speaker_sound1.muted = true;
-          speaker_sound2.muted = true;
-          console.log("speaker off");
+          speaker_gain.gain.setValueAtTime(speaker_gain.gain.value, audioCtx.currentTime);
+          speaker_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+          setTimeout(function(){
+            speaker_sound1.muted = true;
+            speaker_sound2.muted = true;
+            console.log("speaker track off");
+          }, 20);
         }
 
       }
