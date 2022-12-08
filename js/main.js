@@ -1,6 +1,7 @@
 //spacebar pause/play
 document.addEventListener('keyup', event => {
   if (event.code === 'Space') {
+    event.preventDefault();
     if(playing){
       pause();
     }
@@ -8,7 +9,8 @@ document.addEventListener('keyup', event => {
       play();
     }
   }
-})
+});
+
 
 //testing audio levels with volume slider
 const root = document.querySelector(':root');
@@ -222,9 +224,883 @@ var checks_changed = false;
 
 
 
+
+
+
+
+//***********************************************************************************
+// SETTING UP WEBAUDIO NODE CONNECTIONS & SOUND FILES
+//***********************************************************************************
+
+//for debugging
+function pauseLog(name){
+  console.log(name + " paused");
+}
+
+function endLog(name){
+  console.log(name + " ended");
+}
+
+//***********************************************************************************
+//webaudio nodes*********************************************************************
+
+//master gain node
+var master_gain = audioCtx.createGain();
+master_gain.connect(audioCtx.destination);
+
+//speaker nodes
+var speaker_gain = audioCtx.createGain();
+var speaker_analyser = audioCtx.createAnalyser();
+speaker_gain.connect(master_gain);
+
+//string nodes
+var string_gain = audioCtx.createGain();
+var string_analyser = audioCtx.createAnalyser();
+string_gain.connect(master_gain);
+
+//perc nodes
+var perc_gain = audioCtx.createGain();
+var perc_analyser = audioCtx.createAnalyser();
+perc_gain.connect(master_gain);
+
+//piano1 nodes
+var piano1_gain = audioCtx.createGain();
+var piano1_analyser = audioCtx.createAnalyser();
+piano1_gain.connect(master_gain);
+
+//piano2 nodes
+var piano2_gain = audioCtx.createGain();
+var piano2_analyser = audioCtx.createAnalyser();
+piano2_gain.connect(master_gain);
+
+//***********************************************************************************
+//speaker things*********************************************************************
+
+//speaker sound 1
+var speaker_sound1 = new Audio();
+speaker_sound1.preload = "auto";
+speaker_sound1.addEventListener("ended", speaker1_ended);
+speaker_sound1.addEventListener("pause", function(){ pauseLog("speaker 2") });
+speaker_sound1.addEventListener("play", function(){
+  console.log("speaker 1 playing file ", speaker_sound1_fileno, " from ", speaker_sound1.currentTime);
+})
+speaker_sound1.volume = 0.9;
+speaker_sound1.muted = !check5.checked || !speaker_mute.checked;
+
+//speaker sound 2
+var speaker_sound2 = new Audio();
+speaker_sound2.preload = "auto";
+speaker_sound2.addEventListener("ended", speaker2_ended);
+speaker_sound2.addEventListener("pause", function(){ pauseLog("speaker 2") });
+speaker_sound2.addEventListener("play", function(){
+  console.log("speaker 2 playing ", speaker_sound2_fileno, " from ", speaker_sound2.currentTime);
+})
+speaker_sound2.volume = 0.9;
+speaker_sound2.muted = !check5.checked || !speaker_mute.checked;
+
+
+//connect webaudio stuff
+var speaker_sound1_node = audioCtx.createMediaElementSource(speaker_sound1);
+speaker_sound1_node.connect(speaker_gain);
+speaker_sound1_node.connect(speaker_analyser);
+
+var speaker_sound2_node = audioCtx.createMediaElementSource(speaker_sound2);
+speaker_sound2_node.connect(speaker_gain);
+speaker_sound2_node.connect(speaker_analyser);
+
+
+//initialize first two files
+var speaker_sound1_fileno = 1;
+speaker_sound1.src = "assets/audio/45' for a Speaker/45' - 1.wav";
+speaker_sound1.load();
+
+var speaker_sound2_fileno = 2;
+speaker_sound2.src = "assets/audio/45' for a Speaker/45' - 2.wav";
+speaker_sound2.load();
+
+
+//keeping track of current sound
+var curr_speaker_sound = speaker_sound1;
+
+
+//speaker sound functions
+function speaker1_ended(){
+  //switch to second audio object
+  //add audio time to elapsed time
+  console.log("speaker 1 ended");
+  elapsed_time += speaker_sound1.duration;
+  curr_speaker_sound = speaker_sound2;
+  curr_speaker_sound.play();
+
+
+
+  //load next audio file
+  if (speaker_sound1_fileno < 11){
+    speaker_sound1_fileno += 2;
+    new_speaker1_sound(0);
+  }
+}
+function speaker2_ended(){
+  //if it's not the last one
+  //console.log(sec_to_minsec(Math.round(elapsed_time)));
+  console.log('speaker 2 ended');
+  elapsed_time += speaker_sound2.duration;
+
+  //console.log(sec_to_minsec(Math.round(elapsed_time)));
+  if (speaker_sound2_fileno < 12){
+    //add audio time to elapsed time
+    //elapsed_time += speaker_sound2.duration();
+    //switch to first audio object
+    curr_speaker_sound = speaker_sound1;
+    curr_speaker_sound.play();
+
+    //load next audio file
+    speaker_sound2_fileno += 2;
+    new_speaker2_sound(0);
+  }
+  // else{
+  //   playing = false;
+  // }
+}
+
+function new_speaker1_sound(seek){
+
+  speaker_sound1.src = "assets/audio/45' for a Speaker/45' - " + speaker_sound1_fileno.toString() + ".wav";
+  speaker_sound1.load();
+  speaker_sound1.addEventListener("loadedmetadata", function(){
+    speaker_sound1.currentTime = seek;
+    console.log("speaker 1 loaded file ", speaker_sound1_fileno, " at ", speaker_sound1.currentTime);
+  }, {once: true});
+
+}
+function new_speaker2_sound(seek){
+
+  speaker_sound2.src = "assets/audio/45' for a Speaker/45' - " + speaker_sound2_fileno.toString() + ".wav";
+  speaker_sound2.load();
+  speaker_sound2.addEventListener("loadedmetadata", function(){
+    speaker_sound2.currentTime = seek;
+    console.log("speaker 2 loaded file ", speaker_sound2_fileno, " at ", speaker_sound2.currentTime);
+  }, {once: true});
+
+}
+
+//***********************************************************************************
+//string things*********************************************************************
+
+//string sound 1
+var string_sound1 = new Audio();
+string_sound1.preload = "auto";
+string_sound1.addEventListener("play", function(){
+  console.log("string 1 playing file", string_sound1_fileno, " from ", string_sound1.currentTime);
+})
+string_sound1.addEventListener("pause", function(){ pauseLog("string 1") });
+string_sound1.addEventListener("ended", function(){ endLog("string 1") });
+string_sound1.volume = 0.75;
+string_sound1.muted = !check1.checked || !string_mute.checked;
+var string_sound1_fileno;
+
+//string sound 2
+var string_sound2 = new Audio();
+string_sound2.preload = "auto";
+string_sound2.addEventListener("play", function(){
+  console.log("string 2 playing file ", string_sound2_fileno, " at ", string_sound2.currentTime);
+});
+string_sound2.addEventListener("pause", function(){ pauseLog("string 2") });
+string_sound2.addEventListener("ended", function(){ endLog("string 2") });
+string_sound2.volume = 0.75;
+string_sound2.muted = !check1.checked || !string_mute.checked;
+var string_sound2_fileno;
+
+
+//connnect webaudio stuff
+var string_sound1_node = audioCtx.createMediaElementSource(string_sound1);
+string_sound1_node.connect(string_gain);
+string_sound1_node.connect(string_analyser);
+
+var string_sound2_node = audioCtx.createMediaElementSource(string_sound2);
+string_sound2_node.connect(string_gain);
+string_sound2_node.connect(string_analyser);
+
+
+//keeping track of current string sound
+var curr_string_sound;
+//keeping track of whether it's playing or not (when segmented)
+var string_on = [false, false];
+
+
+//string sound functions
+
+//set up string files for playing consecutively & play if playing
+function make_string_longest(){
+
+
+  console.log("make string longest");
+
+  //find elapsed time
+  var i = 0;
+  var string_elapsed_time = 0;
+  while(curr_time > string_elapsed_time + durations_string[i]){
+    string_elapsed_time += durations_string[i];
+    i+= 1;
+  }
+
+  string_sound1_fileno = i+1;
+  var seek = curr_time - string_elapsed_time;
+  if(string_sound1_fileno <= durations_string.length){
+    new_string1_sound(string_sound1_fileno, seek, true, false);
+
+    string_sound2_fileno = i+2;
+    if(string_sound2_fileno <= durations_string.length){
+      new_string2_sound(string_sound2_fileno, 0, true);
+    }
+
+    curr_string_sound = string_sound1;
+
+    if(playing){
+      //play once we've seeked to the proper position
+      curr_string_sound.addEventListener("seeked", function(){
+        string_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+        string_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.15);
+        curr_string_sound.play();
+        curr_speaker_sound.play();
+        start_time_display();
+      }, {once: true});
+    }
+  }
+
+}
+//when string is longest, makes new sounds if they exist upon ending
+function string1_longest_ended(){
+  //if this isn't the last one, switch to string 2
+  if(string_sound1_fileno < durations_string.length){
+    curr_string_sound = string_sound2;
+    curr_string_sound.play();
+    //if there's a next string sound 1
+    if(string_sound1_fileno + 2 <= durations_string.length){
+      string_sound1_fileno += 2;
+      new_string1_sound(string_sound1_fileno, 0, true, false);
+    }
+  }
+
+}
+function string2_longest_ended(){
+ //if this isn't the last one, switch to string 1
+ if(string_sound2_fileno < durations_string.length){
+   curr_string_sound = string_sound1;
+   curr_string_sound.play();
+
+   //if there's a next sound 2
+   if(string_sound2_fileno +2 <= durations_string.length){
+     string_sound2_fileno += 2;
+     new_string2_sound(string_sound2_fileno, 0, true);
+   }
+ }
+}
+
+//switch srcs and add diff event listeners as necessary
+function new_string1_sound(fileno, seek, isLongest, isCurrent){
+
+  string_sound1_fileno = fileno;
+
+  string_sound1.src = "assets/audio/26'/26' - " + string_sound1_fileno.toString() + ".wav";
+  string_sound1.load();
+  string_sound1.muted = !check1.checked || !string_mute.checked;
+
+
+
+  if (!isLongest){
+    string_sound1.addEventListener("ended", function(){
+      string_on[0] = false;
+      curr_string_sound = string_sound2;
+    }, {once: true});
+    if (!isCurrent){
+      string_sound1.addEventListener("loadedmetadata", function(){
+        console.log("string 1 loaded file ", string_sound1_fileno, " at ", string_sound1.currentTime);
+      }, {once: true});
+    }
+    else{
+      string_sound1.addEventListener("loadedmetadata", function(){
+        string_sound1.currentTime = seek;
+        if(playing){
+          string_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+          string_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+          string_sound1.play();
+        }
+        console.log("string 1 file ", string_sound1_fileno, " loaded at ", string_sound1.currentTime);
+      }, {once: true});
+      string_on = [true, false];
+    }
+    curr_string_sound = string_sound1;
+  }
+
+  else{
+    string_sound1.addEventListener("loadedmetadata", function(){
+      string_sound1.currentTime = seek;
+      console.log("string 1 loaded file ", string_sound1_fileno, " at ", string_sound1.currentTime);
+    }, {once: true});
+    string_sound1.addEventListener("ended", string1_longest_ended, {once: true});
+  }
+ }
+function new_string2_sound(fileno, seek, isLongest){
+  //console.log("string 2", fileno, seek, isLongest);
+  string_sound2_fileno = fileno;
+
+  string_sound2.src = "assets/audio/26'/26' - " + string_sound2_fileno.toString() + ".wav";
+  string_sound2.load();
+  string_sound2.muted = !check1.checked || !string_mute.checked;
+
+  if (!isLongest){
+    string_sound2.addEventListener("ended", function(){
+      string_on[1] = false;
+      curr_string_sound = string_sound1;
+    }, {once: true});
+    string_sound2.addEventListener("loadedmetadata", function(){
+      console.log("string 2 loaded file ", string_sound2_fileno, "at ", string_sound2.currentTime);
+    }, {once: true});
+  }
+
+  else{
+    string_sound2.addEventListener("ended", string2_longest_ended, {once: true});
+    string_sound2.addEventListener("loadedmetadata", function(){
+      string_sound2.currentTime = seek;
+      console.log("string 2 loaded file ", string_sound2_fileno, " at ", string_sound2.currentTime);
+    }, {once: true});
+  }
+ }
+
+//***********************************************************************************
+//perc things*********************************************************************
+
+//perc sound 1
+var perc_sound1 = new Audio();
+perc_sound1.preload = "auto";
+perc_sound1.addEventListener("play", function(){
+  console.log("perc 1 playing file ", perc_sound1_fileno, " at ", perc_sound1.currentTime);
+});
+perc_sound1.addEventListener("pause", function(){ pauseLog("perc 1") });
+perc_sound1.addEventListener("ended", function(){ endLog("perc 1") });
+perc_sound1.volume = 0.75;
+perc_sound1.muted = !check2.checked || !perc_mute.checked;
+var perc_sound1_fileno;
+
+//perc sound 2
+var perc_sound2 = new Audio();
+perc_sound2.preload = "auto";
+perc_sound2.addEventListener("play", function(){
+  console.log("perc 2 playing file ", perc_sound2_fileno, " at ", perc_sound2.currentTime);
+});
+perc_sound2.addEventListener("pause", function(){ pauseLog("perc 2") });
+perc_sound2.addEventListener("ended", function(){ endLog("perc 2") });
+perc_sound2.volume = 0.75;
+perc_sound2.muted = !check2.checked || !perc_mute.checked;
+var perc_sound2_fileno;
+
+
+//connect webaudio stuff
+var perc_sound1_node = audioCtx.createMediaElementSource(perc_sound1);
+perc_sound1_node.connect(perc_gain);
+perc_sound1_node.connect(perc_analyser);
+
+var perc_sound2_node = audioCtx.createMediaElementSource(perc_sound2);
+perc_sound2_node.connect(perc_gain);
+perc_sound2_node.connect(perc_analyser);
+
+//keeping track....
+var curr_perc_sound;
+var perc_on = [false, false];
+
+
+//perc sound functions
+function make_perc_longest(){
+  console.log("make perc longest");
+
+  //find elapsed time
+  var i = 0;
+  var perc_elapsed_time = 0;
+  while(curr_time > perc_elapsed_time + durations_perc[i]){
+    perc_elapsed_time += durations_perc[i];
+    i+= 1;
+  }
+
+  perc_sound1_fileno = i+1;
+  var seek = curr_time - perc_elapsed_time;
+  if(perc_sound1_fileno <= durations_perc.length){
+    new_perc1_sound(perc_sound1_fileno, seek, true, false);
+
+    perc_sound2_fileno = i+2;
+    if(perc_sound2_fileno <= durations_perc.length){
+      new_perc2_sound(perc_sound2_fileno, 0, true);
+    }
+
+    curr_perc_sound = perc_sound1;
+
+    if(playing){
+      curr_perc_sound.addEventListener("seeked", function(){
+        perc_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+        perc_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.15);
+        curr_perc_sound.play();
+        curr_speaker_sound.play();
+        start_time_display();
+      }, {once: true});
+    }
+  }
+
+}
+function perc1_longest_ended(){
+  //if this isn't the last one, switch to perc 2
+  if(perc_sound1_fileno < durations_perc.length){
+    curr_perc_sound = perc_sound2;
+    curr_perc_sound.play();
+    //if there's a next perc sound 1
+    if(perc_sound1_fileno + 2 <= durations_perc.length){
+      perc_sound1_fileno += 2;
+      new_perc1_sound(perc_sound1_fileno, 0, true, false);
+    }
+  }
+
+}
+function perc2_longest_ended(){
+ //if this isn't the last one, switch to perc 1
+ if(perc_sound2_fileno < durations_perc.length){
+   curr_perc_sound = perc_sound1;
+   curr_perc_sound.play();
+   //if there's a next sound 2
+   if(perc_sound2_fileno +2 <= durations_perc.length){
+     perc_sound2_fileno += 2;
+     new_perc2_sound(perc_sound2_fileno, 0, true);
+   }
+ }
+}
+
+function new_perc1_sound(fileno, seek, isLongest, isCurrent){
+  //console.log("perc 1", fileno, seek, isLongest);
+  perc_sound1_fileno = fileno;
+
+  perc_sound1.src = "assets/audio/27'/27' - " + perc_sound1_fileno.toString() + ".wav";
+  perc_sound1.load();
+  perc_sound1.muted = !check2.checked || !perc_mute.checked;
+  //for current or next event
+  if (!isLongest){
+    perc_sound1.addEventListener("ended", function(){
+      perc_on[0] = false;
+      curr_perc_sound = perc_sound2;
+    }, {once: true});
+    if (!isCurrent){
+      perc_sound1.addEventListener("loadedmetadata", function(){
+        console.log("perc 1 loaded file ", perc_sound1_fileno, " at ", perc_sound1.currentTime);
+      }, {once: true});
+    }
+    else{
+      perc_sound1.addEventListener("loadedmetadata", function(){
+        perc_sound1.currentTime = seek;
+        if(playing){
+          perc_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+          perc_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+          perc_sound1.play();
+        }
+        console.log("perc 1 loaded file ", perc_sound1_fileno, " at ", perc_sound1.currentTime);
+      }, {once: true});
+      perc_on = [true, false];
+    }
+    curr_perc_sound = perc_sound1;
+  }
+
+  //for longest
+  else{
+    perc_sound1.addEventListener("loadedmetadata", function(){
+      perc_sound1.currentTime = seek;
+      console.log("perc 1 loaded file ", perc_sound1_fileno, " at ", perc_sound1.currentTime);
+    }, {once: true});
+    perc_sound1.addEventListener("ended", perc1_longest_ended, {once: true});
+  }
+}
+function new_perc2_sound(fileno, seek, isLongest){
+  //console.log("perc 2", fileno, seek, isLongest);
+  perc_sound2_fileno = fileno;
+
+  perc_sound2.src = "assets/audio/27'/27' - " + perc_sound2_fileno.toString() + ".wav";
+  perc_sound2.load();
+  perc_sound2.muted = !check2.checked || !perc_mute.checked;
+
+  if (!isLongest){
+    perc_sound2.addEventListener("loadedmetadata", function(){
+      console.log("perc 2 loaded file ", perc_sound2_fileno, " at ", perc_sound2.currentTime);
+    }, {once: true});
+    perc_sound2.addEventListener("ended", function(){
+      perc_on[1] = false;
+      curr_perc_sound = perc_sound1;
+    }, {once: true});
+  }
+
+  else{
+    perc_sound2.addEventListener("loadedmetadata", function(){
+      perc_sound2.currentTime = seek;
+      console.log("perc 2 loaded file ", perc_sound2_fileno, " at ", perc_sound2.currentTime);
+    }, {once: true});
+    perc_sound2.addEventListener("ended", perc2_longest_ended, {once: true});
+  }
+}
+
+//***********************************************************************************
+//piano1 things*********************************************************************
+
+//sound 1
+var piano1_sound1 = new Audio();
+piano1_sound1.preload = "auto";
+piano1_sound1.addEventListener("play", function(){
+  console.log("piano1 1 playing file ", piano1_sound1_fileno, " at ", piano1_sound1.currentTime);
+});
+piano1_sound1.addEventListener("pause", function(){ pauseLog("piano1 1") });
+piano1_sound1.addEventListener("ended", function(){ endLog("piano1 1") });
+piano1_sound1.muted = !check3.checked || !piano1_mute.checked;
+piano1_sound1.volume = 0.75;
+var piano1_sound1_fileno;
+
+//sound 2
+var piano1_sound2 = new Audio();
+piano1_sound2.preload = "auto";
+piano1_sound2.addEventListener("play", function(){
+  console.log("piano1 2 playing file ", piano1_sound2_fileno, " at ", piano1_sound2.currentTime);
+});
+piano1_sound2.addEventListener("pause", function(){ pauseLog("piano1 2") });
+piano1_sound2.addEventListener("ended", function(){ endLog("piano1 2") });
+piano1_sound2.muted = !check3.checked || !piano1_mute.checked;
+piano1_sound2.volume = 0.75;
+var piano1_sound2_fileno;
+
+//connect webaudio stuff
+var piano1_sound1_node = audioCtx.createMediaElementSource(piano1_sound1);
+piano1_sound1_node.connect(piano1_gain);
+piano1_sound1_node.connect(piano1_analyser);
+
+var piano1_sound2_node = audioCtx.createMediaElementSource(piano1_sound2);
+piano1_sound2_node.connect(piano1_gain);
+piano1_sound2_node.connect(piano1_analyser);
+
+//keeping track
+var curr_piano1_sound;
+var piano1_on = [false, false];
+
+//piano1 sound functions
+function make_piano1_longest(){
+  console.log("make piano1 longest");
+
+  //find elapsed time
+  var i = 0;
+  var piano1_elapsed_time = 0;
+  while(curr_time > piano1_elapsed_time + durations_piano1[i]){
+    piano1_elapsed_time += durations_piano1[i];
+    i+= 1;
+  }
+
+  piano1_sound1_fileno = i+1;
+  var seek = curr_time - piano1_elapsed_time;
+  if(piano1_sound1_fileno <= durations_piano1.length){
+    new_piano11_sound(piano1_sound1_fileno, seek, true, false);
+
+    piano1_sound2_fileno = i+2;
+    if(piano1_sound2_fileno <= durations_piano1.length){
+      new_piano12_sound(piano1_sound2_fileno, 0, true);
+    }
+
+    curr_piano1_sound = piano1_sound1;
+
+    if(playing){
+      curr_piano1_sound.addEventListener("seeked", function(){
+        piano1_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+        piano1_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+        curr_piano1_sound.play();
+        curr_speaker_sound.play();
+        start_time_display();
+      }, {once: true});
+    }
+  }
+
+}
+
+function new_piano11_sound(fileno, seek, isLongest, isCurrent){
+  //console.log("piano1 1", fileno, seek, isLongest);
+  piano1_sound1_fileno = fileno;
+
+  piano1_sound1.src = "assets/audio/31'/31' - " + piano1_sound1_fileno.toString() + ".wav";
+  piano1_sound1.load();
+  piano1_sound1.muted = !check3.checked || !piano1_mute.checked;
+
+
+
+  if (!isLongest){
+    piano1_sound1.addEventListener("ended", function(){
+      piano1_on[0] = false;
+      curr_piano1_sound = piano1_sound2;
+    }, {once: true});
+    if (!isCurrent){
+      piano1_sound1.addEventListener("loadedmetadata", function(){
+        console.log("piano1 1 loaded file ", piano1_sound1_fileno, " at ", piano1_sound1.currentTime);
+      }, {once: true});
+    }
+    else{
+      piano1_sound1.addEventListener("loadedmetadata", function(){
+        piano1_sound1.currentTime = seek;
+        if(playing){
+          piano1_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+          piano1_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+          piano1_sound1.play();
+        }
+        console.log("piano1 1 loaded file ", piano1_sound1_fileno, " at ", piano1_sound1.currentTime);
+      }, {once: true});
+      piano1_on = [true, false];
+    }
+    curr_piano1_sound = piano1_sound1;
+  }
+
+
+  else{
+    piano1_sound1.addEventListener("loadedmetadata", function(){
+      piano1_sound1.currentTime = seek;
+      console.log("piano1 1 loaded file ", piano1_sound1_fileno, " at ", piano1_sound1.currentTime);
+    }, {once: true});
+    piano1_sound1.addEventListener("ended", piano11_longest_ended, {once: true});
+  }
+}
+
+function new_piano12_sound(fileno, seek, isLongest){
+  //console.log("piano1 2 ", fileno, seek, isLongest);
+  piano1_sound2_fileno = fileno;
+
+  piano1_sound2.src = "assets/audio/31'/31' - " + piano1_sound2_fileno.toString() + ".wav";
+  piano1_sound2.load();
+  piano1_sound2.muted = !check3.checked || !piano1_mute.checked;
+
+
+  if (!isLongest){
+    piano1_sound2.addEventListener("loadedmetadata", function(){
+      console.log("piano1 2 loaded file ", piano1_sound2_fileno, " at ", piano1_sound2.currentTime);
+    })
+    piano1_sound2.addEventListener("ended", function(){
+      piano1_on[1] = false;
+      curr_piano1_sound = piano1_sound1;
+    })
+  }
+
+  else{
+    piano1_sound2.addEventListener("loadedmetadata", function(){
+      piano1_sound2.currentTime = seek;
+      console.log("piano1 2 loaded file ", piano1_sound2_fileno, " at ", piano1_sound2.currentTime);
+    })
+    piano1_sound2.addEventListener("ended", piano12_longest_ended, {once: true});
+  }
+}
+
+function piano11_longest_ended(){
+  //if this isn't the last one, switch to piano1 2
+  if(piano1_sound1_fileno < durations_piano1.length){
+    curr_piano1_sound = piano1_sound2;
+    curr_piano1_sound.play();
+
+    //if there's a next piano1 sound 1
+    if(piano1_sound1_fileno + 2 <= durations_piano1.length){
+      piano1_sound1_fileno += 2;
+      new_piano11_sound(piano1_sound1_fileno, 0, true, false);
+    }
+  }
+}
+
+function piano12_longest_ended(){
+ //if this isn't the last one, switch to piano1 1
+ if(piano1_sound2_fileno < durations_piano1.length){
+   curr_piano1_sound = piano1_sound1;
+   curr_piano1_sound.play();
+
+   //if there's a next sound 2
+   if(piano1_sound2_fileno +2 <= durations_piano1.length){
+     piano1_sound2_fileno += 2;
+     new_piano12_sound(piano1_sound2_fileno, 0, true);
+   }
+ }
+}
+
+//***********************************************************************************
+//piano2 things*********************************************************************
+
+var piano2_sound1 = new Audio();
+piano2_sound1.preload = "auto";
+piano2_sound1.addEventListener("play", function(){
+  console.log("piano2 2 playing file ", piano2_sound1_fileno, " at ", piano2_sound1.currentTime);
+});
+piano2_sound1.addEventListener("pause", function(){ pauseLog("piano2 1") });
+piano2_sound1.addEventListener("ended", function(){ endLog("piano2 1") });
+piano2_sound1.muted = !check4.checked || !piano2_mute.checked;
+piano2_sound1.volume = 0.75;
+var piano2_sound1_fileno;
+
+var piano2_sound2 = new Audio();
+piano2_sound2.preload = "auto";
+piano2_sound2.addEventListener("play", function(){
+  console.log("piano2 2 playing file ", piano2_sound2_fileno, " at ", piano2_sound2.currentTime);
+});
+piano2_sound2.addEventListener("pause", function(){ pauseLog("piano2 2") });
+piano2_sound2.addEventListener("ended", function(){ endLog("piano2 2") });
+piano2_sound2.muted = !check4.checked || !piano2_mute.checked;
+piano2_sound2.volume = 0.75;
+var piano2_sound2_fileno;
+
+
+//webaudio stuff
+var piano2_sound1_node = audioCtx.createMediaElementSource(piano2_sound1);
+piano2_sound1_node.connect(piano2_gain);
+piano2_sound1_node.connect(piano2_analyser);
+
+var piano2_sound2_node = audioCtx.createMediaElementSource(piano2_sound2);
+piano2_sound2_node.connect(piano2_gain);
+piano2_sound2_node.connect(piano2_analyser);
+
+
+//keeping traack
+var curr_piano2_sound;
+var piano2_on = [false, false];
+
+
+function make_piano2_longest(){
+
+  //find elapsed time
+  var i = 0;
+  var piano2_elapsed_time = 0;
+  while(curr_time > piano2_elapsed_time + durations_piano2[i]){
+    piano2_elapsed_time += durations_piano2[i];
+    i+= 1;
+  }
+
+  piano2_sound1_fileno = i+1;
+  var seek = curr_time - piano2_elapsed_time;
+  if(piano2_sound1_fileno <= durations_piano2.length){
+    new_piano21_sound(piano2_sound1_fileno, seek, true, false);
+
+    piano2_sound2_fileno = i+2;
+    if(piano2_sound2_fileno <= durations_piano2.length){
+      new_piano22_sound(piano2_sound2_fileno, 0, true);
+    }
+
+    curr_piano2_sound = piano2_sound1;
+
+    if(playing){
+      curr_piano2_sound.addEventListener("seeked", function(){
+        piano2_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+        piano2_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+        curr_piano2_sound.play();
+        curr_speaker_sound.play();
+        start_time_display();
+      }, {once: true});
+    }
+  }
+
+}
+
+function new_piano21_sound(fileno, seek, isLongest, isCurrent){
+  //console.log("piano2 1", fileno, seek, isLongest);
+  piano2_sound1_fileno = fileno;
+
+  piano2_sound1.src = "assets/audio/34'/34' - " + piano2_sound1_fileno.toString() + ".wav";
+  piano2_sound1.load();
+  piano2_sound1.muted = !check4.checked || !piano2_mute.checked;
+
+  if (!isLongest){
+    piano2_sound1.addEventListener("ended", function(){
+      piano2_on[0] = false;
+      curr_piano2_sound = piano2_sound2;
+    }, {once: true});
+    if (!isCurrent){
+      piano2_sound1.addEventListener("loadedmetadata", function(){
+        console.log("piano2 1 loaded file ", piano2_sound1_fileno, " at ", piano2_sound1.currentTime);
+      }, {once: true});
+    }
+    else{
+      piano2_sound1.addEventListener("loadedmetadata", function(){
+        piano2_sound1.currentTime = seek;
+        if(playing){
+          piano2_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+          piano2_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+          piano2_sound1.play();
+          console.log("piano2 1 loaded file ", piano2_sound1_fileno, " at ", piano2_sound1.currentTime);
+        }
+      }, {once: true});
+      piano2_on = [true, false];
+    }
+    curr_piano2_sound = piano2_sound1;
+  }
+
+
+  else{
+    piano2_sound1.addEventListener("loadedmetadata", function(){
+      piano2_sound1.currentTime = seek;
+      console.log("piano2 1 loaded file ", piano2_sound1_fileno, " at ", piano2_sound1.currentTime);
+    }, {once: true});
+    piano2_sound1.addEventListener("ended", piano21_longest_ended, {once: true});
+  }
+}
+
+function new_piano22_sound(fileno, seek, isLongest){
+  //console.log("piano2 2", fileno, seek, isLongest);
+  piano2_sound2_fileno = fileno;
+
+  piano2_sound2.src = "assets/audio/34'/34' - " + piano2_sound2_fileno.toString() + ".wav";
+  piano2_sound2.load();
+  piano2_sound2.muted = !check4.checked || !piano2_mute.checked;
+
+
+  if (!isLongest){
+    piano2_sound2.addEventListener("loadedmetadata", function(){
+      console.log("piano2 2 loaded file ", piano2_sound2_fileno, " at ", piano2_sound2.currentTime);
+    }, {once: true});
+    piano2_sound2.addEventListener("ended", function(){
+      piano2_on[1] = false;
+      curr_piano2_sound = piano2_sound1;
+    }, {once: true});
+  }
+
+  else{
+    piano2_sound2.addEventListener("loadedmetadata", function(){
+      piano2_sound2.currentTime = seek;
+      console.log("piano2 2 loaded file ", piano2_sound2_fileno, " at ", piano2_sound2.currentTime);
+    }, {once: true});
+    piano2_sound2.addEventListener("ended", piano22_longest_ended, {once: true});
+  }
+}
+
+function piano21_longest_ended(){
+  //if this isn't the last one, switch to piano2 2
+  if(piano2_sound1_fileno < durations_piano2.length){
+    curr_piano2_sound = piano2_sound2;
+    curr_piano2_sound.play();
+
+    //if there's a next piano2 sound 1
+    if(piano2_sound1_fileno + 2 <= durations_piano2.length){
+      piano2_sound1_fileno += 2;
+      new_piano21_sound(piano2_sound1_fileno, 0, true, false);
+    }
+  }
+
+}
+
+function piano22_longest_ended(){
+ //if this isn't the last one, switch to piano2 1
+ if(piano2_sound2_fileno < durations_piano2.length){
+   curr_piano2_sound = piano2_sound1;
+   curr_piano2_sound.play();
+
+   //if there's a next sound 2
+   if(piano2_sound2_fileno +2 <= durations_piano2.length){
+     piano2_sound2_fileno += 2;
+     new_piano22_sound(piano2_sound2_fileno, 0, true);
+   }
+ }
+}
+
 //***********************************************************************************
 // ACTUAL RUNNING CODE
 //***********************************************************************************
+
+
+
 
 //**** auto fade when opening the page
 setTimeout(() => {
@@ -240,19 +1116,20 @@ let instr_params = `status=no,location=no,toolbar=no,menubar=no,
 width=650,height=700,left=100,top=100`;
 instr_button.onclick = () => {
   window.open('pages/instructions.html', "instructions", instr_params);
+  instr_button.blur();
 };
 
 let about_params = `status=no,location=no,toolbar=no,menubar=no,
 width=750,height=420,left=700,top=100`;
 about_button.onclick = () => {
   window.open('pages/about.html', "about", about_params);
+  about_button.blur();
 };
 
 var curr_master_vol = 0.75;
 
 //control master volume
 master_slider.oninput = function(){
-  Howler.volume(this.value);
   if (master_mute.checked){
     master_gain.gain.setValueAtTime(curr_master_vol, audioCtx.currentTime);
     master_gain.gain.exponentialRampToValueAtTime(this.value, audioCtx.currentTime + 0.015);
@@ -263,13 +1140,11 @@ master_slider.oninput = function(){
 //control master mute
 master_mute.addEventListener("change", function(){
   if (this.checked){
-    Howler.mute(false);
     console.log(curr_master_vol);
     master_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
     master_gain.gain.exponentialRampToValueAtTime(curr_master_vol, audioCtx.currentTime + 0.015);
   }
   else{
-    Howler.mute(true);
     console.log(audioCtx.currentTime);
     master_gain.gain.setValueAtTime(curr_master_vol, audioCtx.currentTime);
     master_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
@@ -288,7 +1163,7 @@ string_mute.addEventListener("change", function(){
       string_sound2.muted = false;
     }
     else if (!this.checked){
-      string_gain.gain.setValueAtTime(1, audioCtx.currentTime);
+      string_gain.gain.setValueAtTime(string_gain.gain.value, audioCtx.currentTime);
       string_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
 
       setTimeout(function(){
@@ -302,36 +1177,69 @@ string_mute.addEventListener("change", function(){
 
 })
 perc_mute.addEventListener("change", function(){
-  if(this.checked){
-    perc_sound1.mute(false);
-    perc_sound2.mute(false);
+  if(check2.checked){
+    if(this.checked){
+      perc_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      perc_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+
+      perc_sound1.muted = false;
+      perc_sound2.muted = false;
+    }
+    else if (!this.checked){
+      perc_gain.gain.setValueAtTime(perc_gain.gain.value, audioCtx.currentTime);
+      perc_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+
+      setTimeout(function(){
+        perc_sound1.muted = true;
+        perc_sound2.muted = true;
+      }, 20);
+    }
   }
-  else{
-    perc_sound1.mute(true);
-    perc_sound2.mute(true);
-  }
+
 })
 piano1_mute.addEventListener("change", function(){
-  if(this.checked){
-    piano1_sound1.mute(false);
-    piano1_sound2.mute(false);
+  if(check3.checked){
+    if(this.checked){
+      piano1_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      piano1_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+
+      piano1_sound1.muted = false;
+      piano1_sound2.muted = false;
+    }
+    else if (!this.checked){
+      piano1_gain.gain.setValueAtTime(piano1_gain.gain.value, audioCtx.currentTime);
+      piano1_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+
+      setTimeout(function(){
+        piano1_sound1.muted = true;
+        piano1_sound2.muted = true;
+      }, 20);
+    }
   }
-  else{
-    piano1_sound1.mute(true);
-    piano1_sound2.mute(true);
-  }
+
 })
 piano2_mute.addEventListener("change", function(){
-  if(this.checked){
-    piano2_sound1.mute(false);
-    piano2_sound2.mute(false);
-  }
-  else{
-    piano2_sound1.mute(true);
-    piano2_sound2.mute(true);
-  }
-})
+  if(check4.checked){
+    if(this.checked){
+      piano2_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      piano2_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
 
+      piano2_sound1.muted = false;
+      piano2_sound2.muted = false;
+    }
+    else{
+      piano2_gain.gain.setValueAtTime(piano2_gain.gain.value, audioCtx.currentTime);
+      piano2_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+
+      setTimeout(function(){
+        piano2_sound1.muted = true;
+        piano2_sound2.muted = true;
+      }, 20);
+
+    }
+  }
+
+})
 speaker_mute.addEventListener("change", function(){
   if (check5.checked){
     if(this.checked){
@@ -342,7 +1250,7 @@ speaker_mute.addEventListener("change", function(){
       speaker_sound2.muted = false;
     }
     else if (!this.checked){
-      speaker_gain.gain.setValueAtTime(1, audioCtx.currentTime);
+      speaker_gain.gain.setValueAtTime(speaker_gain.gain.value, audioCtx.currentTime);
       speaker_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
 
       setTimeout(function(){
@@ -355,15 +1263,30 @@ speaker_mute.addEventListener("change", function(){
 })
 
 //rewind button
-return_button.addEventListener("click", rewind);
+return_button.addEventListener("click", function(){
+  rewind();
+  this.blur();
+});
 
 //double-click and single-click shuffle button functions
-shuffle_button.addEventListener("dblclick", double_click);
-shuffle_button.addEventListener("click", single_click);
+shuffle_button.addEventListener("dblclick", function(){
+  double_click();
+  this.blur();
+});
+shuffle_button.addEventListener("click", function(){
+  single_click();
+  this.blur();
+});
 
 //pause/play button function
-pause_button.addEventListener("click", pause);
-play_button.addEventListener("click", play);
+pause_button.addEventListener("click", function(){
+  pause();
+  this.blur();
+});
+play_button.addEventListener("click", function(){
+  play();
+  this.blur();
+});
 
 
 //rewind function
@@ -437,10 +1360,18 @@ function pause(){
     console.log("paused");
     stop_time_display();
 
-    speaker_gain.gain.setValueAtTime(1, audioCtx.currentTime);
-    string_gain.gain.setValueAtTime(1, audioCtx.currentTime);
+    speaker_gain.gain.setValueAtTime(speaker_gain.gain.value, audioCtx.currentTime);
+    string_gain.gain.setValueAtTime(string_gain.gain.value, audioCtx.currentTime);
+    perc_gain.gain.setValueAtTime(perc_gain.gain.value, audioCtx.currentTime);
+    piano1_gain.gain.setValueAtTime(piano1_gain.gain.value, audioCtx.currentTime);
+    piano2_gain.gain.setValueAtTime(piano2_gain.gain.value, audioCtx.currentTime);
+
     speaker_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
     string_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+    perc_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+    piano1_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+    piano2_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+
     setTimeout(function(){
       curr_speaker_sound.pause();
       string_sound1.pause();
@@ -452,9 +1383,6 @@ function pause(){
       piano2_sound1.pause();
       piano2_sound2.pause();
     }, 20);
-
-
-
   }
 }
 //play button function
@@ -466,21 +1394,28 @@ function play(){
     single_click();
     first_clicked = true;
   }
-
   if (at_end){
     if(curr_time >= wiper.max){
       rewind();
     }
     at_end = false;
   }
+
   if (playing == false){
       console.log("playing");
       playing = true;
       start_time_display();
       speaker_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
       string_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      perc_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      piano1_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      piano2_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+
       speaker_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
       string_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+      perc_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+      piano1_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+      piano2_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
 
       curr_speaker_sound.play();
 
@@ -531,12 +1466,7 @@ function play(){
             piano2_sound2.play();
           }
         }
-
   }
-  //pause/play functionality
-  //do nothing if you press play while playing
-
-
 }
 
 
@@ -631,13 +1561,16 @@ function perc_event(){
   current_events[1] = [next_events[1], perc_seg_locs[next_events[1]]+durations_perc[perc_order[next_events[1]]]];
   next_events[1] += 1;
 
+  perc_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+  perc_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
   curr_perc_sound.play();
   if (curr_perc_sound == perc_sound1){
     perc_on = [true, false];
     //console.log("load perc event ", next_events[0], " into perc 2");
     //load next string sound into string_sound2
     if(next_events[1] < durations_perc.length){
-      new_perc2_howl(next_events[1]+1, 0, false);
+      perc_sound2_fileno = next_events[1] + 1;
+      new_perc2_sound(perc_sound2_fileno, 0, false);
     }
   }
   else{
@@ -645,7 +1578,8 @@ function perc_event(){
     //console.log("load perc event ", next_events[1], " into perc 1");
     //load next string sound into string_sound1
     if(next_events[1] < durations_perc.length){
-      new_perc1_howl(next_events[1] + 1, 0, false, false);
+      perc_sound1_fileno = next_events[1] + 1;
+      new_perc1_sound(perc_sound1_fileno, 0, false, false);
     }
   }
 }
@@ -655,13 +1589,17 @@ function piano1_event(){
   current_events[2] = [next_events[2], piano1_seg_locs[next_events[2]]+durations_piano1[piano1_order[next_events[2]]]];
   next_events[2] += 1;
 
+  piano1_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+  piano1_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
   curr_piano1_sound.play();
+
   if (curr_piano1_sound == piano1_sound1){
     piano1_on = [true, false];
     //console.log("load piano1 event ", next_events[2], " into piano1 2");
     //load next string sound into string_sound2
     if(next_events[2] < durations_piano1.length){
-      new_piano12_howl(next_events[2]+1, 0, false);
+      piano1_sound2_fileno = next_events[2] + 1;
+      new_piano12_sound(piano1_sound2_fileno, 0, false);
     }
   }
   else{
@@ -669,7 +1607,8 @@ function piano1_event(){
     //console.log("load piano1 event ", next_events[2], " into piano1 1");
     //load next string sound into string_sound1
     if(next_events[2] < durations_piano1.length){
-      new_piano11_howl(next_events[2] + 1, 0, false, false);
+      piano1_sound1_fileno = next_events[2] + 1;
+      new_piano11_sound(piano1_sound1_fileno, 0, false, false);
     }
   }
 }
@@ -679,13 +1618,16 @@ function piano2_event(){
   current_events[3] = [next_events[3], piano2_seg_locs[next_events[3]]+durations_piano2[piano2_order[next_events[3]]]];
   next_events[3] += 1;
 
+  piano2_gain.gain.setValueAtTime(piano2_gain.gain.value, audioCtx.currentTime);
+  piano2_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
   curr_piano2_sound.play();
   if (curr_piano2_sound == piano2_sound1){
     piano2_on = [true, false];
     //console.log("load piano2 event ", next_events[3], " into piano2 2");
     //load next string sound into string_sound2
     if(next_events[3] < durations_piano2.length){
-      new_piano22_howl(next_events[3]+1, 0, false);
+      piano2_sound2_fileno = next_events[3]+1;
+      new_piano22_sound(piano2_sound2_fileno, 0, false);
     }
   }
   else{
@@ -693,7 +1635,8 @@ function piano2_event(){
     //console.log("load piano2 event ", next_events[3], " into piano2 1");
     //load next string sound into string_sound1
     if(next_events[3] < durations_piano2.length){
-      new_piano21_howl(next_events[3] + 1, 0, false, false);
+      piano2_sound1_fileno = next_events[3] + 1;
+      new_piano21_sound(piano2_sound1_fileno, 0, false, false);
     }
   }
 }
@@ -792,183 +1735,11 @@ function wiper_clicked(){
 }
 
 
-//master gain node
-var master_gain = audioCtx.createGain();
-master_gain.connect(audioCtx.destination);
 
 
 
-//speaker sound stuff
-var speaker_gain = audioCtx.createGain();
-var speaker_analyser = audioCtx.createAnalyser();
-speaker_gain.connect(master_gain);
-
-var speaker_sound1 = new Audio();
-speaker_sound1.preload = "auto";
-speaker_sound1.crossOrigin = "anonymous";
-speaker_sound1.addEventListener("ended", speaker1_ended);
-speaker_sound1.addEventListener("pause", function(){
-
-  console.log("speaker 1 paused");
-})
-speaker_sound1.addEventListener("play", function(){
-  console.log("speaker 1 playing file ", speaker_sound1_fileno, " from ", speaker_sound1.currentTime);
-})
-speaker_sound1.volume = 1;
-speaker_sound1.muted = !check5.checked || !speaker_mute.checked;
-var speaker_sound1_fileno = 1;
-speaker_sound1.src = "assets/audio/45' for a Speaker/45' - 1.wav";
-//connect webaudio stuff
-var speaker_sound1_node = audioCtx.createMediaElementSource(speaker_sound1);
-speaker_sound1_node.connect(speaker_gain);
-speaker_sound1_node.connect(speaker_analyser);
-speaker_gain.gain.value = 1;
 
 
-var speaker_sound2 = new Audio();
-speaker_sound2.preload = "auto";
-speaker_sound2.addEventListener("ended", speaker2_ended);
-speaker_sound2.addEventListener("pause", function(){
-  console.log("speaker 2 paused");
-})
-speaker_sound2.addEventListener("play", function(){
-  console.log("speaker 2 playing ", speaker_sound2_fileno, " from ", speaker_sound2.currentTime);
-})
-speaker_sound2.volume = 0.9;
-speaker_sound2.muted = !check5.checked || !speaker_mute.checked;
-var speaker_sound2_fileno = 2;
-speaker_sound2.src = "assets/audio/45' for a Speaker/45' - 2.wav";
-//connect webaudio stuff
-var speaker_sound2_node = audioCtx.createMediaElementSource(speaker_sound2);
-speaker_sound2_node.connect(speaker_gain);
-speaker_sound2_node.connect(speaker_analyser);
-
-var curr_speaker_sound = speaker_sound1;
-
-function speaker1_ended(){
-  //switch to second audio object
-  //add audio time to elapsed time
-  elapsed_time += speaker_sound1.duration;
-  curr_speaker_sound = speaker_sound2;
-  curr_speaker_sound.play();
-
-  //load next audio file
-  if (speaker_sound1_fileno < 11){
-    speaker_sound1_fileno += 2;
-    new_speaker1_sound(0);
-  }
-}
-function speaker2_ended(){
-  //if it's not the last one
-  //console.log(sec_to_minsec(Math.round(elapsed_time)));
-  elapsed_time += speaker_sound2.duration;
-  //console.log(sec_to_minsec(Math.round(elapsed_time)));
-  if (speaker_sound2_fileno < 12){
-    //add audio time to elapsed time
-    //elapsed_time += speaker_sound2.duration();
-    //switch to first audio object
-    curr_speaker_sound = speaker_sound1;
-    curr_speaker_sound.play();
-
-    //load next audio file
-    speaker_sound2_fileno += 2;
-    new_speaker2_sound(0);
-  }
-  // else{
-  //   playing = false;
-  // }
-}
-
-function new_speaker1_sound(seek){
-
-  speaker_sound1.src = "assets/audio/45' for a Speaker/45' - " + speaker_sound1_fileno.toString() + ".wav";
-  speaker_sound1.load();
-  speaker_sound1.addEventListener("loadedmetadata", function(){
-    speaker_sound1.currentTime = seek;
-    console.log("speaker 1 loaded file ", speaker_sound1_fileno, " at ", speaker_sound1.currentTime);
-  }, {once: true});
-
-}
-function new_speaker2_sound(seek){
-
-  speaker_sound2.src = "assets/audio/45' for a Speaker/45' - " + speaker_sound2_fileno.toString() + ".wav";
-  speaker_sound2.load();
-  speaker_sound2.addEventListener("loadedmetadata", function(){
-    speaker_sound2.currentTime = seek;
-    console.log("speaker 2 loaded file ", speaker_sound2_fileno, " at ", speaker_sound2.currentTime);
-  }, {once: true});
-
-}
-
-
-
-var string_gain = audioCtx.createGain();
-var string_analyser = audioCtx.createAnalyser();
-string_gain.connect(master_gain);
-
-var string_sound1 = new Audio();
-string_sound1.preload = "auto";
-string_sound1.addEventListener("play", function(){
-  console.log("string 1 playing file", string_sound1_fileno, " from ", string_sound1.currentTime);
-})
-string_sound1.addEventListener("pause", function(){
-  console.log("string 1 paused");
-})
-string_sound1.addEventListener("ended", function(){
-  console.log("string 1 ended");
-})
-string_sound1.volume = 0.75;
-string_sound1.muted = !check1.checked || !string_mute.checked;
-var string_sound1_fileno = 0;
-//connnect webaudio stuff
-var string_sound1_node = audioCtx.createMediaElementSource(string_sound1);
-string_sound1_node.connect(string_gain);
-string_sound1_node.connect(string_analyser);
-
-var string_sound2 = new Audio();
-string_sound2.preload = "auto";
-string_sound2.addEventListener("play", function(){
-  console.log("string 2 playing file ", string_sound2_fileno, " at ", string_sound2.currentTime);
-})
-string_sound2.addEventListener("pause", function(){
-  console.log("string 2 paused");
-})
-string_sound2.addEventListener("ended", function(){
-  console.log("string 2 ended");
-})
-string_sound2.volume = 0.75;
-string_sound2.muted = !check1.checked || !string_mute.checked;
-var string_sound2_fileno = 1;
-//connect webaudio stuff
-var string_sound2_node = audioCtx.createMediaElementSource(string_sound2);
-string_sound2_node.connect(string_gain);
-string_sound2_node.connect(string_analyser);
-
-var curr_string_sound = string_sound1;
-var string_on = [false, false];
-
-
-
-var piano2_sound1;
-var piano2_sound2;
-var piano2_sound1_fileno;
-var piano2_sound2_fileno;
-var curr_piano2_sound;
-var piano2_on = [false, false];
-
-var piano1_sound1;
-var piano1_sound2;
-var piano1_sound1_fileno;
-var piano1_sound2_fileno;
-var curr_piano1_sound;
-var piano1_on = [false, false];
-
-var perc_sound1;
-var perc_sound2;
-var perc_sound1_fileno;
-var perc_sound2_fileno;
-var curr_perc_sound;
-var perc_on = [false, false];
 
 
 
@@ -984,11 +1755,10 @@ var audio_file_locations = ["assets/audio/26'/26' - ",
                       "assets/audio/34'/34' - "];
 
 
-var all_new_howl_funcs = [[new_string1_sound, new_string2_sound],
-                          [new_perc1_howl, new_perc2_howl],
-                          [new_piano11_howl, new_piano12_howl],
-                          [new_piano21_howl, new_piano22_howl]];
-
+var all_new_sound_funcs = [[new_string1_sound, new_string2_sound],
+                          [new_perc1_sound, new_perc2_sound],
+                          [new_piano11_sound, new_piano12_sound],
+                          [new_piano21_sound, new_piano22_sound]];
 
 
 
@@ -1031,25 +1801,45 @@ function update_track_activation(){
           }
 
         }
-
-        if (i==1){
-          perc_sound1.mute(!perc_mute.checked);
-          perc_sound2.mute(!perc_mute.checked);
-          console.log("perc muted ", !perc_mute.checked);
+        else if(i==1){
+          if(perc_mute.checked){
+            perc_sound1.muted = false;
+            perc_sound2.muted = false;
+            perc_gain.gain.setValueAtTime(perc_gain.gain.value, audioCtx.currentTime);
+            perc_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+            console.log("perc track on and not muted");
+          }
+          else{
+            console.log("perc track on but muted");
+          }
         }
-        if (i==2){
-          piano1_sound1.mute(!piano1_mute.checked);
-          piano1_sound2.mute(!piano1_mute.checked);
-          console.log("piano1 muted ", !piano1_mute.checked);
-        }
+        else if(i==2){
+          if(piano1_mute.checked){
+            piano1_sound1.muted = false;
+            piano1_sound2.muted = false;
+            piano1_gain.gain.setValueAtTime(piano1_gain.gain.value, audioCtx.currentTime);
+            piano1_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+            console.log("piano1 track on and not muted");
+          }
+          else{
+            console.log("piano1 track on but muted");
+          }
 
-        if (i==3){
-          piano2_sound1.mute(!piano2_mute.checked);
-          piano2_sound2.mute(!piano2_mute.checked);
-          console.log("piano2 muted ", !piano2_mute.checked);
         }
+        else if(i==3){
+          if(piano2_mute.checked){
+            piano2_sound1.muted = false;
+            piano2_sound2.muted = false;
+            piano2_gain.gain.setValueAtTime(piano2_gain.gain.value, audioCtx.currentTime);
+            piano2_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+            console.log("piano2 track on and not muted");
+          }
+          else{
+            console.log("piano2 track on but muted");
+          }
 
-        if (i==4){
+        }
+        else if(i==4){
           if(speaker_mute.checked){
             speaker_sound1.muted = false;
             speaker_sound2.muted = false;
@@ -1060,7 +1850,6 @@ function update_track_activation(){
           else{
             console.log("speaker track on but muted");
           }
-
         }
 
 
@@ -1071,8 +1860,7 @@ function update_track_activation(){
         curr_canvas.style.setProperty('opacity', 0);
         //turn audio off
 
-
-        if(i == 0){
+        if(i==0){
           string_gain.gain.setValueAtTime(string_gain.gain.value, audioCtx.currentTime);
           string_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
           setTimeout(function(){
@@ -1081,26 +1869,37 @@ function update_track_activation(){
             console.log("string track off");
           }, 20);
         }
-
-        if (i==1){
-          perc_sound1.mute(true);
-          perc_sound2.mute(true);
-          console.log("perc off");
+        else if(i==1){
+          perc_gain.gain.setValueAtTime(perc_gain.gain.value, audioCtx.currentTime);
+          perc_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+          setTimeout(function(){
+            perc_sound1.muted = true;
+            perc_sound2.muted = true;
+            console.log("perc off");
+          }, 20);
         }
+        else if(i==2){
+          piano1_gain.gain.setValueAtTime(piano1_gain.gain.value, audioCtx.currentTime);
+          piano1_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
 
-        if (i==2){
-          piano1_sound1.mute(true);
-          piano1_sound2.mute(true);
-          console.log("piano1 off");
+          setTimeout(function(){
+            piano1_sound1.muted = true;
+            piano1_sound2.muted = true;
+            console.log("piano1 off");
+          })
         }
+        else if(i==3){
+          piano2_gain.gain.setValueAtTime(piano2_gain.gain.value, audioCtx.currentTime);
+          piano2_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
 
-        if (i==3){
-          piano2_sound1.mute(true);
-          piano2_sound2.mute(true);
-          console.log("piano2 off");
+          setTimeout(function(){
+            piano2_sound1.muted = true;
+            piano2_sound2.muted = true;
+            console.log("piano2 off");
+          }, 20);
+
         }
-
-        if (i==4){
+        else if(i==4){
           speaker_gain.gain.setValueAtTime(speaker_gain.gain.value, audioCtx.currentTime);
           speaker_gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
           setTimeout(function(){
@@ -1109,7 +1908,6 @@ function update_track_activation(){
             console.log("speaker track off");
           }, 20);
         }
-
       }
     }
   }, 200);
@@ -1301,10 +2099,12 @@ function load_sound_files(){
 
   //first, pause EVERYTHING .....
   if(playing){
+    console.log("pausing from load sound files");
     pause();
     playing = true;
   }
 
+  //wait until pause has taken effect....
   setTimeout(function(){
     //deal with longest....
     if (longest_changed){
@@ -1327,6 +2127,59 @@ function load_sound_files(){
     }
     //then load non-longest files
     load_non_longest_files();
+
+    //then restart longest, if longest wasn't changed
+    if(playing){
+      console.log("restarting longest");
+      if(!longest_changed){
+        if(longest == 1){
+          if(string_mute.checked){
+            string_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            string_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+          }
+          curr_string_sound.play();
+          curr_speaker_sound.play();
+          start_time_display();
+        }
+        else if (longest == 2){
+          if(perc_mute.checked){
+            perc_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            perc_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+          }
+          curr_perc_sound.play();
+          curr_speaker_sound.play();
+          start_time_display();
+        }
+        else if (longest == 3){
+          if(piano1_mute.checked){
+            piano1_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            piano1_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+          }
+          curr_piano1_sound.play();
+          curr_speaker_sound.play();
+          start_time_display();
+        }
+        else if (longest == 4){
+          if(piano2_mute.checked){
+            piano2_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            piano2_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+          }
+          curr_piano2_sound.play();
+          curr_speaker_sound.play();
+          start_time_display();
+        }
+        else if (longest == 5){
+          if(speaker_mute.checked){
+            speaker_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            speaker_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+          }
+          curr_speaker_sound.play();
+          start_time_display();
+        }
+      }
+    }
+
+
   }, 20);
 
 
@@ -1336,27 +2189,10 @@ function load_sound_files(){
 function load_non_longest_files(){
   console.log("load non longest files");
 
-
-  // if(string_on[0] || string_on[1]){
-  //   curr_string_sound.pause();
-  // }
-  // if(perc_on[0] || perc_on[1]){
-  //   curr_perc_sound.pause();
-  // }
-  // if(piano1_on[0] || piano1_on[1]){
-  //   curr_piano1_sound.pause();
-  // }
-  // if(piano2_on[0] || piano2_on[1]){
-  //   curr_piano2_sound.pause();
-  // }
-
   string_on = [false, false];
   perc_on = [false, false];
   piano1_on = [false, false];
   piano2_on = [false, false];
-
-
-  //console.log("load adjacent non-longest files");
 
   //load current events first
   for (var i = 0; i < longest - 1; i++){
@@ -1365,7 +2201,7 @@ function load_non_longest_files(){
     var order = all_orders[i];
     var filenos = all_filenos[i];
     var file_locs = audio_file_locations[i];
-    var howl_funcs = all_new_howl_funcs[i];
+    var sound_funcs = all_new_sound_funcs[i];
 
     var current;
     //figure out what to load....
@@ -1377,7 +2213,7 @@ function load_non_longest_files(){
       //console.log(i, "file", filenos[0], "seek", sound1_seek);
       //console.log(all_durations[i][order[current_events[i][0]]]);
       current = true;
-      howl_funcs[0](filenos[0], sound1_seek, false, current);
+      sound_funcs[0](filenos[0], sound1_seek, false, current);
     }
   }
 
@@ -1387,839 +2223,30 @@ function load_non_longest_files(){
     var order = all_orders[i];
     var filenos = all_filenos[i];
     var file_locs = audio_file_locations[i];
-    var howl_funcs = all_new_howl_funcs[i];
+    var sound_funcs = all_new_sound_funcs[i];
 
     //then, load next event, if applicable (i.e. next event number is not the max)
     if (next_events[i] < all_durations[i].length){
       if (current_events[i] == null){
         console.log(i, " load next", next_events[i], " sound 1");
         filenos[0] = order[next_events[i]] + 1;
-        howl_funcs[0](filenos[0], 0, false, false);
+        sound_funcs[0](filenos[0], 0, false, false);
       }
       else{
         console.log(i, " load next", next_events[i], " sound 2");
         filenos[1] = order[next_events[i]] + 1;
-        howl_funcs[1](filenos[1], 0, false);
+        sound_funcs[1](filenos[1], 0, false);
       }
     }
     //then, if current event was not loaded AND there's an event after the next event, load the next-next event
     if (current_events[i] == null && next_events[i] + 1 < all_durations[i].length){
       console.log(i, " load next next", next_events[i] + 1, " sound 2");
       filenos[1] = order[next_events[i] + 1] + 1;
-      howl_funcs[1](filenos[1], 0, false);
-    }
-  }
-
-
-
-
-    //console.log(i, "filenos", filenos);
-
-}
-
-
-
-
-function make_string_longest(){
-
-  //stop_time_display();
-  console.log("make string longest");
-  //curr_string_sound.pause();
-  //curr_speaker_sound.pause();
-
-  //find elapsed time
-  var i = 0;
-  var string_elapsed_time = 0;
-  while(curr_time > string_elapsed_time + durations_string[i]){
-    string_elapsed_time += durations_string[i];
-    i+= 1;
-  }
-
-  string_sound1_fileno = i+1;
-  var seek = curr_time - string_elapsed_time;
-  if(string_sound1_fileno <= durations_string.length){
-    new_string1_sound(string_sound1_fileno, seek, true, false);
-
-    string_sound2_fileno = i+2;
-    if(string_sound2_fileno <= durations_string.length){
-      new_string2_sound(string_sound2_fileno, 0, true);
-    }
-
-    curr_string_sound = string_sound1;
-
-    if(playing){
-      //play once we've seeked to the proper position
-      curr_string_sound.addEventListener("seeked", function(){
-        string_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-        string_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.15);
-        curr_string_sound.play();
-        curr_speaker_sound.play();
-        start_time_display();
-      }, {once: true});
+      sound_funcs[1](filenos[1], 0, false);
     }
   }
 
 }
-
-function new_string1_sound(fileno, seek, isLongest, isCurrent){
-  string_sound1_fileno = fileno;
-  //console.log("string 1", fileno, seek, isCurrent);
-  string_sound1.src = "assets/audio/26'/26' - " + string_sound1_fileno.toString() + ".wav";
-  string_sound1.load();
-  string_sound1.muted = !check1.checked || !string_mute.checked;
-  if (!isLongest){
-    string_sound1.addEventListener("ended", function(){
-      string_on[0] = false;
-      curr_string_sound = string_sound2;
-    }, {once: true});
-    if (!isCurrent){
-      string_sound1.addEventListener("loadedmetadata", function(){
-        console.log("string 1 loaded file ", string_sound1_fileno, " at ", string_sound1.currentTime);
-      }, {once: true});
-    }
-    else{
-      string_sound1.addEventListener("loadedmetadata", function(){
-        string_sound1.currentTime = seek;
-        if(playing){
-          string_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-          string_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
-          string_sound1.play();
-        }
-        console.log("string 1 file ", string_sound1_fileno, " loaded at ", string_sound1.currentTime);
-      }, {once: true});
-      string_on = [true, false];
-    }
-    curr_string_sound = string_sound1;
-  }
-
-  else{
-    string_sound1.addEventListener("loadedmetadata", function(){
-      string_sound1.currentTime = seek;
-      console.log("string 1 loaded file ", string_sound1_fileno, " at ", string_sound1.currentTime);
-    }, {once: true});
-    string_sound1.addEventListener("ended", string1_longest_ended, {once: true});
-  }
- }
-
-function new_string2_sound(fileno, seek, isLongest){
-  //console.log("string 2", fileno, seek, isLongest);
-  string_sound2_fileno = fileno;
-
-  string_sound2.src = "assets/audio/26'/26' - " + string_sound2_fileno.toString() + ".wav";
-  string_sound2.load();
-  string_sound2.muted = !check1.checked || !string_mute.checked;
-
-  if (!isLongest){
-    string_sound2.addEventListener("ended", function(){
-      string_on[1] = false;
-      curr_string_sound = string_sound1;
-    }, {once: true});
-    string_sound2.addEventListener("loadedmetadata", function(){
-      console.log("string 2 loaded file ", string_sound2_fileno, "at ", string_sound2.currentTime);
-    }, {once: true});
-  }
-
-  else{
-    string_sound2.addEventListener("ended", string2_longest_ended, {once: true});
-    string_sound2.addEventListener("loadedmetadata", function(){
-      string_sound2.currentTime = seek;
-      console.log("string 2 loaded file ", string_sound2_fileno, " at ", string_sound2.currentTime);
-    }, {once: true});
-  }
- }
-
-function string1_longest_ended(){
-  //if this isn't the last one, switch to string 2
-  if(string_sound1_fileno < durations_string.length){
-    curr_string_sound = string_sound2;
-    curr_string_sound.play();
-    //if there's a next string sound 1
-    if(string_sound1_fileno + 2 <= durations_string.length){
-      string_sound1_fileno += 2;
-      new_string1_sound(string_sound1_fileno, 0, true, false);
-    }
-  }
-
-}
-
-function string2_longest_ended(){
- //if this isn't the last one, switch to string 1
- if(string_sound2_fileno < durations_string.length){
-   curr_string_sound = string_sound1;
-   curr_string_sound.play();
-
-   //if there's a next sound 2
-   if(string_sound2_fileno +2 <= durations_string.length){
-     string_sound2_fileno += 2;
-     new_string2_sound(string_sound2_fileno, 0, true);
-   }
- }
-}
-
-
-
-function make_perc_longest(){
-  console.log("make perc longest");
-
-  curr_perc_sound.pause();
-  curr_speaker_sound.pause();
-
-  //find elapsed time
-  var i = 0;
-  var perc_elapsed_time = 0;
-  while(curr_time > perc_elapsed_time + durations_perc[i]){
-    perc_elapsed_time += durations_perc[i];
-    i+= 1;
-  }
-
-  perc_sound1_fileno = i+1;
-  var seek = curr_time - perc_elapsed_time;
-  if(perc_sound1_fileno <= durations_perc.length){
-    new_perc1_howl(perc_sound1_fileno, seek, true, false);
-
-    perc_sound2_fileno = i+2;
-    if(perc_sound2_fileno <= durations_perc.length){
-      new_perc2_howl(perc_sound2_fileno, 0, true);
-    }
-
-    curr_perc_sound = perc_sound1;
-
-    if(playing){
-      curr_perc_sound.once("play", function(){
-        start_time_display();
-        curr_speaker_sound.play();
-      })
-      curr_perc_sound.play();
-
-    }
-  }
-
-}
-
-function new_perc1_howl(fileno, seek, isLongest, isCurrent){
-  //console.log("perc 1", fileno, seek, isLongest);
-
-  //remove prev file
-  if (perc_sound1!= null){
-    var old_howl = perc_sound1;
-    old_howl.unload();
-  }
-
-  //for current or next event
-  if (!isLongest){
-
-    if (!isCurrent){
-      perc_sound1 = new Howl({
-        src: ["assets/audio/27'/27' - " + fileno.toString() + ".wav"],
-        onload: function(){
-          console.log("perc 1 loaded file ", fileno);
-        },
-        onend: function(){
-          perc_on[0] = false;
-          console.log("perc 1 ended");
-          curr_perc_sound = perc_sound2;
-        },
-        onplay: function(){
-          console.log("perc 1 file ", fileno, " playing from ", this.seek());
-        },
-        mute: !check2.checked || !perc_mute.checked,
-        volume: 0.75,
-        html5: true,
-        preload: true,
-        onpause: function(){
-          console.log("perc 1 paused");
-        }
-      })
-    }
-
-
-    else{
-      perc_sound1 = new Howl({
-        src: ["assets/audio/27'/27' - " + fileno.toString() + ".wav"],
-        onload: function(){
-          this.seek(seek);
-          if(playing){
-            this.play();
-          }
-          console.log("perc 1 file ", fileno, " loaded at", this.seek());
-        },
-        onend: function(){
-          console.log("perc 1 ended");
-          perc_on[0] = false; //turn off play/pause indicator
-          curr_perc_sound = perc_sound2; //pass the buck to sound 2
-        },
-        onplay: function(){
-          console.log("perc 1 file ", fileno, " playing from ", this.seek());
-        },
-        mute: !check2.checked || !perc_mute.checked,
-        volume: 0.75,
-        html5: true,
-        preload: true,
-        onpause: function(){
-          console.log("perc 1 paused");
-        }
-      })
-
-      //
-      perc_on = [true, false];
-
-    }
-    curr_perc_sound = perc_sound1;
-  }
-
-  //for longest
-  else{
-    perc_sound1 = new Howl({
-      src: ["assets/audio/27'/27' - " + fileno.toString() + ".wav"],
-      onload: function(){
-        this.seek(seek);
-        console.log("perc 1 loaded file ", fileno);
-      },
-      onend: perc1_longest_ended,
-      onplay: function(){
-        console.log("perc 1 file ", fileno, " playing from ", this.seek());
-      },
-      mute: !perc_mute.checked,
-      volume: 0.75,
-      html5: true,
-      preload: true,
-      onpause: function(){
-        console.log("perc 1 paused");
-      }
-    })
-  }
-
-}
-
-function new_perc2_howl(fileno, seek, isLongest){
-  //console.log("perc 2", fileno, seek, isLongest);
-
-  if (perc_sound2!= null){
-    var old_howl = perc_sound2;
-    old_howl.unload();
-  }
-
-  if (!isLongest){
-    perc_sound2 = new Howl({
-      src: ["assets/audio/27'/27' - " + fileno.toString() + ".wav"],
-      onload: function(){
-        console.log("perc 2 loaded file ", fileno);
-      },
-      onend: function(){
-        perc_on[1] = false;
-        console.log("perc 2 ended");
-        curr_perc_sound = perc_sound1;
-      },
-      onplay: function(){
-        console.log("perc 2 file ", fileno, " playing from ", this.seek());
-      },
-      mute: !check2.checked || !perc_mute.checked,
-      volume: 0.75,
-      html5: true,
-      preload: true,
-      onpause: function(){
-        console.log("perc 2 paused");
-      }
-    })
-  }
-
-  else{
-    perc_sound2 = new Howl({
-      src: ["assets/audio/27'/27' - " + fileno.toString() + ".wav"],
-      onload: function(){
-        this.seek(seek);
-        console.log("perc 2 loaded file ", fileno);
-      },
-      onend: perc2_longest_ended,
-      onplay: function(){
-        console.log("perc 2 file ", fileno, " playing from ", this.seek());
-      },
-      mute: !perc_mute.checked,
-      volume: 0.75,
-      html5: true,
-      preload: true,
-      onpause: function(){
-        console.log("perc 2 paused");
-      }
-    })
-  }
-}
-
-function perc1_longest_ended(){
-  //if this isn't the last one, switch to perc 2
-  if(perc_sound1_fileno < durations_perc.length){
-    curr_perc_sound = perc_sound2;
-    curr_perc_sound.play();
-    console.log("playing perc sound 2 file ", perc_sound2_fileno);
-
-    //if there's a next perc sound 1
-    if(perc_sound1_fileno + 2 <= durations_perc.length){
-      perc_sound1_fileno += 2;
-      new_perc1_howl(perc_sound1_fileno, 0, true, false);
-    }
-  }
-
-}
-
-function perc2_longest_ended(){
- //if this isn't the last one, switch to perc 1
- if(perc_sound2_fileno < durations_perc.length){
-   curr_perc_sound = perc_sound1;
-   curr_perc_sound.play();
-   console.log("playing perc sound 1 file ", perc_sound1_fileno);
-
-   //if there's a next sound 2
-   if(perc_sound2_fileno +2 <= durations_perc.length){
-     perc_sound2_fileno += 2;
-     new_perc2_howl(perc_sound2_fileno, 0, true);
-   }
- }
-}
-
-
-
-
-function make_piano1_longest(){
-  console.log("make piano1 longest");
-
-  curr_piano1_sound.pause();
-  curr_speaker_sound.pause();
-
-  //find elapsed time
-  var i = 0;
-  var piano1_elapsed_time = 0;
-  while(curr_time > piano1_elapsed_time + durations_piano1[i]){
-    piano1_elapsed_time += durations_piano1[i];
-    i+= 1;
-  }
-
-  piano1_sound1_fileno = i+1;
-  var seek = curr_time - piano1_elapsed_time;
-  if(piano1_sound1_fileno <= durations_piano1.length){
-    new_piano11_howl(piano1_sound1_fileno, seek, true, false);
-
-    piano1_sound2_fileno = i+2;
-    if(piano1_sound2_fileno <= durations_piano1.length){
-      new_piano12_howl(piano1_sound2_fileno, 0, true);
-    }
-
-    curr_piano1_sound = piano1_sound1;
-
-    if(playing){
-      curr_piano1_sound.once("play", function(){
-        start_time_display();
-        curr_speaker_sound.play();
-      })
-      curr_piano1_sound.play();
-
-    }
-  }
-
-}
-
-function new_piano11_howl(fileno, seek, isLongest, isCurrent){
-  //console.log("piano1 1", fileno, seek, isLongest);
-
-  if (piano1_sound1!= null){
-    var old_howl = piano1_sound1;
-    old_howl.unload();
-  }
-
-  if (!isLongest){
-
-    if (!isCurrent){
-      piano1_sound1 = new Howl({
-        src: ["assets/audio/31'/31' - " + fileno.toString() + ".wav"],
-        onload: function(){
-          console.log("piano 1 loaded file ", fileno);
-        },
-        onend: function(){
-          piano1_on[0] = false;
-          console.log("piano1 1 ended");
-          curr_piano1_sound = piano1_sound2;
-        },
-        onplay: function(){
-          console.log("piano1 1 file ", fileno, " playing from ", this.seek());
-        },
-        mute: !check3.checked || !piano1_mute.checked,
-        volume: 0.75,
-        html5: true,
-        preload: true,
-        onpause: function(){
-          console.log("piano1 1 paused");
-        }
-      })
-    }
-
-
-    else{
-      piano1_sound1 = new Howl({
-        src: ["assets/audio/31'/31' - " + fileno.toString() + ".wav"],
-        onload: function(){
-          this.seek(seek);
-          if(playing){
-            this.play();
-          }
-          console.log("piano1 1 file ", fileno, " loaded at", this.seek());
-        },
-        onend: function(){
-          console.log("piano1 1 ended");
-          piano1_on[0] = false; //turn off play/pause indicator
-          curr_piano1_sound = piano1_sound2; //pass the buck to sound 2
-        },
-        onplay: function(){
-          console.log("piano1 1 file, ", fileno, " playing from ", this.seek());
-        },
-        mute: !check3.checked || !piano1_mute.checked,
-        volume: 0.75,
-        html5: true,
-        preload: true,
-        onpause: function(){
-          console.log("piano1 1 paused");
-        }
-      })
-
-      //
-      piano1_on = [true, false];
-
-    }
-    curr_piano1_sound = piano1_sound1;
-  }
-
-
-  else{
-    piano1_sound1 = new Howl({
-      src: ["assets/audio/31'/31' - " + fileno.toString() + ".wav"],
-      onload: function(){
-        this.seek(seek);
-        console.log("piano1 1 loaded file ", fileno);
-      },
-      onend: piano11_longest_ended,
-      onplay: function(){
-        console.log("piano1 1 file ", fileno, " playing from ", this.seek());
-      },
-      mute: !piano1_mute.checked,
-      volume: 0.75,
-      html5: true,
-      preload: true,
-      onpause: function(){
-        console.log("piano1 1 paused");
-      }
-    })
-  }
-}
-
-function new_piano12_howl(fileno, seek, isLongest){
-  //console.log("piano1 2 ", fileno, seek, isLongest);
-
-  if (piano1_sound2!= null){
-    var old_howl = piano1_sound2;
-    old_howl.unload();
-  }
-
-  if (!isLongest){
-    piano1_sound2 = new Howl({
-      src: ["assets/audio/31'/31' - " + fileno.toString() + ".wav"],
-      onload: function(){
-        console.log("piano1 2 loaded file ", fileno);
-      },
-      onend: function(){
-        piano1_on[1] = false;
-        console.log("piano1 2 ended");
-        curr_piano1_sound = piano1_sound1;
-      },
-      onplay: function(){
-        console.log("piano1 2 file ", fileno, " playing from ", this.seek());
-      },
-      mute: !check3.checked || !piano1_mute.checked,
-      volume: 0.75,
-      html5: true,
-      preload: true,
-      onpause: function(){
-        console.log("piano1 2 paused");
-      }
-    })
-  }
-
-  else{
-    piano1_sound2 = new Howl({
-      src: ["assets/audio/31'/31' - " + fileno.toString() + ".wav"],
-      onload: function(){
-        this.seek(seek);
-        console.log("piano1 2 loaded file ", fileno);
-      },
-      onend: piano12_longest_ended,
-      onplay: function(){
-        console.log("piano1 2 file ", fileno, " playing from ", this.seek());
-      },
-      mute: !piano1_mute.checked,
-      volume: 0.75,
-      html5: true,
-      preload: true,
-      onpause: function(){
-        console.log("piano1 2 paused");
-      }
-    })
-  }
-}
-
-function piano11_longest_ended(){
-  //if this isn't the last one, switch to piano1 2
-  if(piano1_sound1_fileno < durations_piano1.length){
-    curr_piano1_sound = piano1_sound2;
-    curr_piano1_sound.play();
-    console.log("playing piano1 sound 2 file ", piano1_sound2_fileno);
-
-    //if there's a next piano1 sound 1
-    if(piano1_sound1_fileno + 2 <= durations_piano1.length){
-      piano1_sound1_fileno += 2;
-      new_piano11_howl(piano1_sound1_fileno, 0, true, false);
-    }
-  }
-}
-
-function piano12_longest_ended(){
- //if this isn't the last one, switch to piano1 1
- if(piano1_sound2_fileno < durations_piano1.length){
-   curr_piano1_sound = piano1_sound1;
-   curr_piano1_sound.play();
-   console.log("playing piano1 sound 1 file ", piano1_sound1_fileno);
-
-   //if there's a next sound 2
-   if(piano1_sound2_fileno +2 <= durations_piano1.length){
-     piano1_sound2_fileno += 2;
-     new_piano12_howl(piano1_sound2_fileno, 0, true);
-   }
- }
-}
-
-
-
-
-function make_piano2_longest(){
-  console.log("make piano2 longest");
-  curr_piano2_sound.pause();
-  curr_speaker_sound.pause();
-
-  //find elapsed time
-  var i = 0;
-  var piano2_elapsed_time = 0;
-  while(curr_time > piano2_elapsed_time + durations_piano2[i]){
-    piano2_elapsed_time += durations_piano2[i];
-    i+= 1;
-  }
-
-  piano2_sound1_fileno = i+1;
-  var seek = curr_time - piano2_elapsed_time;
-  if(piano2_sound1_fileno <= durations_piano2.length){
-    new_piano21_howl(piano2_sound1_fileno, seek, true, false);
-
-    piano2_sound2_fileno = i+2;
-    if(piano2_sound2_fileno <= durations_piano2.length){
-      new_piano22_howl(piano2_sound2_fileno, 0, true);
-    }
-
-    curr_piano2_sound = piano2_sound1;
-
-    if(playing){
-      curr_piano2_sound.once("play", function(){
-        start_time_display();
-        curr_speaker_sound.play();
-      })
-      curr_piano2_sound.play();
-
-    }
-  }
-
-}
-
-function new_piano21_howl(fileno, seek, isLongest, isCurrent){
-  //console.log("piano2 1", fileno, seek, isLongest);
-
-  if (piano2_sound1!= null){
-    var old_howl = piano2_sound1;
-    old_howl.unload();
-  }
-
-  if (!isLongest){
-
-    if (!isCurrent){
-      piano2_sound1 = new Howl({
-        src: ["assets/audio/34'/34' - " + fileno.toString() + ".wav"],
-        onload: function(){
-          console.log("piano2 1 loaded file ", fileno);
-        },
-        onend: function(){
-          piano2_on[0] = false;
-          console.log("piano2 1 ended");
-          curr_piano2_sound = piano2_sound2;
-        },
-        onplay: function(){
-          console.log("piano2 1 file ", fileno, " playing from ", this.seek());
-        },
-        mute: !check4.checked || !piano2_mute.checked,
-        volume: 0.75,
-        html5: true,
-        preload: true,
-        onpause: function(){
-          console.log("piano2 1 paused");
-        }
-      })
-    }
-
-
-    else{
-      piano2_sound1 = new Howl({
-        src: ["assets/audio/34'/34' - " + fileno.toString() + ".wav"],
-        onload: function(){
-          this.seek(seek);
-          if(playing){
-            this.play();
-          }
-          console.log("piano2 1 file ", fileno, " loaded at", this.seek());
-        },
-        onend: function(){
-          console.log("piano2 1 ended");
-          piano2_on[0] = false; //turn off play/pause indicator
-          curr_piano2_sound = piano2_sound2; //pass the buck to sound 2
-        },
-        onplay: function(){
-          console.log("piano2 1 file ", fileno, " playing from ", this.seek());
-        },
-        mute: !check4.checked || !piano2_mute.checked,
-        volume: 0.75,
-        html5: true,
-        preload: true,
-        onpause: function(){
-          console.log("piano2 1 paused");
-        }
-      })
-
-      //
-      piano2_on = [true, false];
-
-    }
-    curr_piano2_sound = piano2_sound1;
-  }
-
-
-  else{
-    piano2_sound1 = new Howl({
-      src: ["assets/audio/34'/34' - " + fileno.toString() + ".wav"],
-      onload: function(){
-        this.seek(seek);
-        console.log("piano2 1 loaded file ", fileno);
-      },
-      onend: piano21_longest_ended,
-      onplay: function(){
-        console.log("piano2 1 file ", fileno, " playing from ", this.seek());
-      },
-      mute: !piano2_mute.checked,
-      volume: 0.75,
-      html5: true,
-      preload: true,
-      onpause: function(){
-        console.log("piano2 1 paused");
-      }
-    })
-  }
-}
-
-function new_piano22_howl(fileno, seek, isLongest){
-  //console.log("piano2 2", fileno, seek, isLongest);
-
-  if (piano2_sound2!= null){
-    var old_howl = piano2_sound2;
-    old_howl.unload();
-  }
-
-  if (!isLongest){
-    piano2_sound2 = new Howl({
-      src: ["assets/audio/34'/34' - " + fileno.toString() + ".wav"],
-      onload: function(){
-        console.log("piano2 2 loaded file ", fileno);
-      },
-      onend: function(){
-        piano2_on[1] = false;
-        console.log("piano2 2 ended");
-        curr_piano2_sound = piano2_sound1;
-      },
-      onplay: function(){
-        console.log("piano2 2 file ", fileno, " playing from ", this.seek());
-      },
-      mute: !check4.checked || !piano2_mute.checked,
-      volume: 0.75,
-      html5: true,
-      preload: true,
-      onpause: function(){
-        console.log("piano2 2 paused");
-      }
-    })
-  }
-
-  else{
-    piano2_sound2 = new Howl({
-      src: ["assets/audio/34'/34' - " + fileno.toString() + ".wav"],
-      onload: function(){
-        this.seek(seek);
-        console.log("piano2 2 loaded file ", fileno);
-      },
-      onend: piano22_longest_ended,
-      onplay: function(){
-        console.log("piano2 2 file ", fileno, " playing from ", this.seek());
-      },
-      mute: !piano2_mute.checked,
-      volume: 0.75,
-      html5: true,
-      preload: true,
-      onpause: function(){
-        console.log("piano2 2 paused");
-      }
-    })
-  }
-}
-
-function piano21_longest_ended(){
-  //if this isn't the last one, switch to piano2 2
-  if(piano2_sound1_fileno < durations_piano2.length){
-    curr_piano2_sound = piano2_sound2;
-    curr_piano2_sound.play();
-    console.log("playing piano2 sound 2 file ", piano2_sound2_fileno);
-
-    //if there's a next piano2 sound 1
-    if(piano2_sound1_fileno + 2 <= durations_piano2.length){
-      piano2_sound1_fileno += 2;
-      new_piano21_howl(piano2_sound1_fileno, 0, true, false);
-    }
-  }
-
-}
-
-function piano22_longest_ended(){
- //if this isn't the last one, switch to piano2 1
- if(piano2_sound2_fileno < durations_piano2.length){
-   curr_piano2_sound = piano2_sound1;
-   curr_piano2_sound.play();
-   console.log("playing piano2 sound 1 file ", piano2_sound1_fileno);
-
-   //if there's a next sound 2
-   if(piano2_sound2_fileno +2 <= durations_piano2.length){
-     piano2_sound2_fileno += 2;
-     new_piano22_howl(piano2_sound2_fileno, 0, true);
-   }
- }
-}
-
-
-
-
-
-
-
-
-
-
-
 
 
 
