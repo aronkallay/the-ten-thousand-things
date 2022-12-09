@@ -3,7 +3,7 @@ document.addEventListener('keyup', event => {
   if (event.code === 'Space') {
     event.preventDefault();
     if(playing){
-      pause();
+      pause(true);
     }
     else{
       play();
@@ -16,9 +16,6 @@ document.addEventListener('keyup', event => {
 const root = document.querySelector(':root');
 
 const audioCtx = new AudioContext();
-
-var ctx_started = false;
-
 
 
 // //   root.style.setProperty('--string-level', test_inc);
@@ -250,28 +247,58 @@ master_gain.connect(audioCtx.destination);
 
 //speaker nodes
 var speaker_gain = audioCtx.createGain();
-var speaker_analyser = audioCtx.createAnalyser();
+var speaker_analyser1 = audioCtx.createAnalyser();
+var speaker_analyser2 = audioCtx.createAnalyser();
 speaker_gain.connect(master_gain);
+
+speaker_analyser1.fftSize = 2048;
+speaker_analyser2.fftSize = 2048;
+const speaker_buffer = new Float32Array(2048);
+var monitor_speaker = false;
 
 //string nodes
 var string_gain = audioCtx.createGain();
-var string_analyser = audioCtx.createAnalyser();
+var string_analyser1 = audioCtx.createAnalyser();
+var string_analyser2 = audioCtx.createAnalyser();
 string_gain.connect(master_gain);
+
+string_analyser1.fftSize = 2048;
+string_analyser2.fftSize = 2048;
+const string_buffer = new Float32Array(2048);
+var monitor_string = false;
 
 //perc nodes
 var perc_gain = audioCtx.createGain();
-var perc_analyser = audioCtx.createAnalyser();
+var perc_analyser1 = audioCtx.createAnalyser();
+var perc_analyser2 = audioCtx.createAnalyser();
 perc_gain.connect(master_gain);
+
+perc_analyser1.fftSize = 2048;
+perc_analyser2.fftSize = 2048;
+const perc_buffer = new Float32Array(2048);
+var monitor_perc = false;
 
 //piano1 nodes
 var piano1_gain = audioCtx.createGain();
-var piano1_analyser = audioCtx.createAnalyser();
+var piano1_analyser1 = audioCtx.createAnalyser();
+var piano1_analyser2 = audioCtx.createAnalyser();
 piano1_gain.connect(master_gain);
+
+piano1_analyser1.fftSize = 2048;
+piano1_analyser2.fftSize = 2048;
+const piano1_buffer = new Float32Array(2048);
+var monitor_piano1 = false;
 
 //piano2 nodes
 var piano2_gain = audioCtx.createGain();
-var piano2_analyser = audioCtx.createAnalyser();
+var piano2_analyser1 = audioCtx.createAnalyser();
+var piano2_analyser2 = audioCtx.createAnalyser();
 piano2_gain.connect(master_gain);
+
+piano2_analyser1.fftSize = 2048;
+piano2_analyser2.fftSize = 2048;
+const piano2_buffer = new Float32Array(2048);
+var monitor_piano2 = false;
 
 //***********************************************************************************
 //speaker things*********************************************************************
@@ -302,11 +329,11 @@ speaker_sound2.muted = !check5.checked || !speaker_mute.checked;
 //connect webaudio stuff
 var speaker_sound1_node = audioCtx.createMediaElementSource(speaker_sound1);
 speaker_sound1_node.connect(speaker_gain);
-speaker_sound1_node.connect(speaker_analyser);
+speaker_sound1_node.connect(speaker_analyser1);
 
 var speaker_sound2_node = audioCtx.createMediaElementSource(speaker_sound2);
 speaker_sound2_node.connect(speaker_gain);
-speaker_sound2_node.connect(speaker_analyser);
+speaker_sound2_node.connect(speaker_analyser2);
 
 
 //initialize first two files
@@ -415,11 +442,11 @@ var string_sound2_fileno;
 //connnect webaudio stuff
 var string_sound1_node = audioCtx.createMediaElementSource(string_sound1);
 string_sound1_node.connect(string_gain);
-string_sound1_node.connect(string_analyser);
+string_sound1_node.connect(string_analyser1);
 
 var string_sound2_node = audioCtx.createMediaElementSource(string_sound2);
 string_sound2_node.connect(string_gain);
-string_sound2_node.connect(string_analyser);
+string_sound2_node.connect(string_analyser2);
 
 
 //keeping track of current string sound
@@ -599,11 +626,11 @@ var perc_sound2_fileno;
 //connect webaudio stuff
 var perc_sound1_node = audioCtx.createMediaElementSource(perc_sound1);
 perc_sound1_node.connect(perc_gain);
-perc_sound1_node.connect(perc_analyser);
+perc_sound1_node.connect(perc_analyser1);
 
 var perc_sound2_node = audioCtx.createMediaElementSource(perc_sound2);
 perc_sound2_node.connect(perc_gain);
-perc_sound2_node.connect(perc_analyser);
+perc_sound2_node.connect(perc_analyser2);
 
 //keeping track....
 var curr_perc_sound;
@@ -771,11 +798,11 @@ var piano1_sound2_fileno;
 //connect webaudio stuff
 var piano1_sound1_node = audioCtx.createMediaElementSource(piano1_sound1);
 piano1_sound1_node.connect(piano1_gain);
-piano1_sound1_node.connect(piano1_analyser);
+piano1_sound1_node.connect(piano1_analyser1);
 
 var piano1_sound2_node = audioCtx.createMediaElementSource(piano1_sound2);
 piano1_sound2_node.connect(piano1_gain);
-piano1_sound2_node.connect(piano1_analyser);
+piano1_sound2_node.connect(piano1_analyser2);
 
 //keeping track
 var curr_piano1_sound;
@@ -948,11 +975,11 @@ var piano2_sound2_fileno;
 //webaudio stuff
 var piano2_sound1_node = audioCtx.createMediaElementSource(piano2_sound1);
 piano2_sound1_node.connect(piano2_gain);
-piano2_sound1_node.connect(piano2_analyser);
+piano2_sound1_node.connect(piano2_analyser1);
 
 var piano2_sound2_node = audioCtx.createMediaElementSource(piano2_sound2);
 piano2_sound2_node.connect(piano2_gain);
-piano2_sound2_node.connect(piano2_analyser);
+piano2_sound2_node.connect(piano2_analyser2);
 
 
 //keeping traack
@@ -1161,6 +1188,8 @@ string_mute.addEventListener("change", function(){
 
       string_sound1.muted = false;
       string_sound2.muted = false;
+
+      monitor_string = true;
     }
     else if (!this.checked){
       string_gain.gain.setValueAtTime(string_gain.gain.value, audioCtx.currentTime);
@@ -1170,6 +1199,10 @@ string_mute.addEventListener("change", function(){
         string_sound1.muted = true;
         string_sound2.muted = true;
       }, 20);
+
+      setTimeout(function(){
+        monitor_string = false;
+      }, 100);
 
     }
 
@@ -1184,6 +1217,8 @@ perc_mute.addEventListener("change", function(){
 
       perc_sound1.muted = false;
       perc_sound2.muted = false;
+
+      monitor_perc = true;
     }
     else if (!this.checked){
       perc_gain.gain.setValueAtTime(perc_gain.gain.value, audioCtx.currentTime);
@@ -1193,6 +1228,10 @@ perc_mute.addEventListener("change", function(){
         perc_sound1.muted = true;
         perc_sound2.muted = true;
       }, 20);
+
+      setTimeout(function(){
+        monitor_perc = false;
+      }, 100);
     }
   }
 
@@ -1205,6 +1244,8 @@ piano1_mute.addEventListener("change", function(){
 
       piano1_sound1.muted = false;
       piano1_sound2.muted = false;
+
+      monitor_piano1 = true;
     }
     else if (!this.checked){
       piano1_gain.gain.setValueAtTime(piano1_gain.gain.value, audioCtx.currentTime);
@@ -1214,6 +1255,10 @@ piano1_mute.addEventListener("change", function(){
         piano1_sound1.muted = true;
         piano1_sound2.muted = true;
       }, 20);
+
+      setTimeout(function(){
+        monitor_piano1 = false;
+      }, 100);
     }
   }
 
@@ -1226,6 +1271,8 @@ piano2_mute.addEventListener("change", function(){
 
       piano2_sound1.muted = false;
       piano2_sound2.muted = false;
+
+      monitor_piano2 = true;
     }
     else{
       piano2_gain.gain.setValueAtTime(piano2_gain.gain.value, audioCtx.currentTime);
@@ -1235,6 +1282,10 @@ piano2_mute.addEventListener("change", function(){
         piano2_sound1.muted = true;
         piano2_sound2.muted = true;
       }, 20);
+
+      setTimeout(function(){
+        monitor_piano2 = false;
+      }, 100);
 
     }
   }
@@ -1248,6 +1299,9 @@ speaker_mute.addEventListener("change", function(){
 
       speaker_sound1.muted = false;
       speaker_sound2.muted = false;
+
+      monitor_speaker = true;
+
     }
     else if (!this.checked){
       speaker_gain.gain.setValueAtTime(speaker_gain.gain.value, audioCtx.currentTime);
@@ -1258,6 +1312,9 @@ speaker_mute.addEventListener("change", function(){
         speaker_sound2.muted = true;
       }, 20);
 
+      setTimeout(function(){
+        monitor_speaker = false;
+      }, 100);
     }
   }
 })
@@ -1280,7 +1337,7 @@ shuffle_button.addEventListener("click", function(){
 
 //pause/play button function
 pause_button.addEventListener("click", function(){
-  pause();
+  pause(true);
   this.blur();
 });
 play_button.addEventListener("click", function(){
@@ -1354,7 +1411,7 @@ function single_click(){
   console.log("at end", at_end);
 }
 //pause button function
-function pause(){
+function pause(change){
   if (playing){
     playing = false;
     console.log("paused");
@@ -1383,6 +1440,13 @@ function pause(){
       piano2_sound1.pause();
       piano2_sound2.pause();
     }, 20);
+
+    if(change){
+      setTimeout(function(){
+        animation_on = false;
+        console.log("animation off");
+      }, 100);
+    }
   }
 }
 //play button function
@@ -1402,70 +1466,71 @@ function play(){
   }
 
   if (playing == false){
-      console.log("playing");
-      playing = true;
-      start_time_display();
-      speaker_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-      string_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-      perc_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-      piano1_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-      piano2_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+    console.log("playing");
+    playing = true;
+    start_time_display();
+    speaker_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+    string_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+    perc_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+    piano1_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+    piano2_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
 
-      speaker_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
-      string_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
-      perc_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
-      piano1_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
-      piano2_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+    speaker_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+    string_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+    perc_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+    piano1_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+    piano2_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
 
-      curr_speaker_sound.play();
+    curr_speaker_sound.play();
 
-        if(longest == 1){
-          curr_string_sound.play();
-        }
-        else{
-          if(string_on[0]){
-            string_sound1.play();
-          }
-          if(string_on[1]){
-            string_sound2.play();
-          }
-        }
+    if(longest == 1){
+      curr_string_sound.play();
+    }
+    else{
+      if(string_on[0]){
+        string_sound1.play();
+      }
+      if(string_on[1]){
+        string_sound2.play();
+      }
+    }
 
-        if (longest == 2){
-          curr_perc_sound.play();
-        }
-        else{
-          if(perc_on[0]){
-            perc_sound1.play();
-          }
-          if(perc_on[1]){
-            perc_sound2.play();
-          }
-        }
+    if (longest == 2){
+      curr_perc_sound.play();
+    }
+    else{
+      if(perc_on[0]){
+        perc_sound1.play();
+      }
+      if(perc_on[1]){
+        perc_sound2.play();
+      }
+    }
 
-        if (longest == 3){
-          curr_piano1_sound.play();
-        }
-        else{
-          if(piano1_on[0]){
-            piano1_sound1.play();
-          }
-          if(piano1_on[1]){
-            piano1_sound2.play();
-          }
-        }
+    if (longest == 3){
+      curr_piano1_sound.play();
+    }
+    else{
+      if(piano1_on[0]){
+        piano1_sound1.play();
+      }
+      if(piano1_on[1]){
+        piano1_sound2.play();
+      }
+    }
 
-        if (longest == 4){
-          curr_piano2_sound.play();
-        }
-        else{
-          if(piano2_on[0]){
-            piano2_sound1.play();
-          }
-          if(piano2_on[1]){
-            piano2_sound2.play();
-          }
-        }
+    if (longest == 4){
+      curr_piano2_sound.play();
+    }
+    else{
+      if(piano2_on[0]){
+        piano2_sound1.play();
+      }
+      if(piano2_on[1]){
+        piano2_sound2.play();
+      }
+    }
+
   }
 }
 
@@ -1475,6 +1540,10 @@ var time_poller;
 function start_time_display(){
   stop_time_display();
   console.log("timer started");
+  if(!animation_on){
+    animation_on = true;
+    audio_level_loop();
+  }
   time_poller = setInterval(function(){
 
     //set current time
@@ -1511,7 +1580,7 @@ function start_time_display(){
       }
 
       else{
-        pause();
+        pause(true);
         at_end = true;
       }
 
@@ -1647,7 +1716,7 @@ function wiper_clicked(){
   console.log("wiper clicked");
 
   if(playing){
-    pause();
+    pause(false);
     playing = true;
   }
   //stop_time_display();
@@ -1726,6 +1795,7 @@ function wiper_clicked(){
           setTimeout(function(){
             curr_speaker_sound.play();
             start_time_display();
+
           }, 20);
         }, {once: true});
       }
@@ -1734,6 +1804,115 @@ function wiper_clicked(){
 
 }
 
+
+
+
+
+
+var animation_on = false;
+
+
+
+function audio_level_loop(){
+
+  //do speaker if speaker gain is up
+  if(monitor_speaker){
+
+    //do speaker 1 or 2, depending
+    if(curr_speaker_sound == speaker_sound1){
+      speaker_analyser1.getFloatTimeDomainData(speaker_buffer);
+    }
+    else if (curr_speaker_sound == speaker_sound2){
+      speaker_analyser2.getFloatTimeDomainData(speaker_buffer);
+    }
+    //get average power
+    speaker_avg_power = get_avg_power(speaker_buffer);
+    //display
+    display_level('--speaker-level', speaker_avg_power);
+  }
+  if(monitor_string){
+
+    //do string 1 or 2, depending
+    if(curr_string_sound == string_sound1){
+      string_analyser1.getFloatTimeDomainData(string_buffer);
+    }
+    else if (curr_string_sound == string_sound2){
+      string_analyser2.getFloatTimeDomainData(string_buffer);
+    }
+    //get average power
+    string_avg_power = get_avg_power(string_buffer);
+    //display
+    display_level('--string-level', string_avg_power);
+  }
+  if(monitor_perc){
+
+    //do speaker 1 or 2, depending
+    if(curr_perc_sound == perc_sound1){
+      perc_analyser1.getFloatTimeDomainData(perc_buffer);
+    }
+    else if (curr_perc_sound == perc_sound2){
+      perc_analyser2.getFloatTimeDomainData(perc_buffer);
+    }
+    //get average power
+    perc_avg_power = get_avg_power(perc_buffer);
+    //display
+    display_level('--perc-level', perc_avg_power);
+  }
+  if(monitor_piano1){
+
+    //do piano1 1 or 2, depending
+    if(curr_piano1_sound == piano1_sound1){
+      piano1_analyser1.getFloatTimeDomainData(piano1_buffer);
+    }
+    else if (curr_piano1_sound == piano1_sound2){
+      piano1_analyser2.getFloatTimeDomainData(piano1_buffer);
+    }
+    //get average power
+    piano1_avg_power = get_avg_power(piano1_buffer);
+    //display
+    display_level('--piano1-level', piano1_avg_power);
+  }
+  if(monitor_piano2){
+
+    //do piano2 1 or 2, depending
+    if(curr_piano2_sound == piano2_sound1){
+      piano2_analyser1.getFloatTimeDomainData(piano2_buffer);
+    }
+    else if (curr_piano2_sound == piano2_sound2){
+      piano2_analyser2.getFloatTimeDomainData(piano2_buffer);
+    }
+    //get average power
+    piano2_avg_power = get_avg_power(piano2_buffer);
+    //display
+    display_level('--piano2-level', piano2_avg_power);
+  }
+
+
+  if(animation_on){
+    requestAnimationFrame(audio_level_loop);
+  }
+}
+
+var max = 0;
+
+
+function display_level(property, avg_power){
+  avg_power = avg_power * 10/6 + 100;
+  console.log(property, avg_power);
+  root.style.setProperty(property, avg_power);
+}
+
+function get_avg_power(buffer){
+
+  let sumOfSquares = 0;
+    for (let i = 0; i < buffer.length; i++) {
+      sumOfSquares += buffer[i] ** 2;
+    }
+
+    const avgPowerDecibels = 10 * Math.log10(sumOfSquares / buffer.length);
+
+    return avgPowerDecibels;
+}
 
 
 
@@ -1795,9 +1974,11 @@ function update_track_activation(){
             string_gain.gain.setValueAtTime(string_gain.gain.value, audioCtx.currentTime);
             string_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
             console.log("string track on and not muted");
+            monitor_string = true;
           }
           else{
             console.log("string track on but muted");
+            monitor_string = false;
           }
 
         }
@@ -1808,9 +1989,11 @@ function update_track_activation(){
             perc_gain.gain.setValueAtTime(perc_gain.gain.value, audioCtx.currentTime);
             perc_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
             console.log("perc track on and not muted");
+            monitor_perc = true;
           }
           else{
             console.log("perc track on but muted");
+            monitor_perc = false;
           }
         }
         else if(i==2){
@@ -1820,9 +2003,12 @@ function update_track_activation(){
             piano1_gain.gain.setValueAtTime(piano1_gain.gain.value, audioCtx.currentTime);
             piano1_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
             console.log("piano1 track on and not muted");
+
+            monitor_piano1 = true;
           }
           else{
             console.log("piano1 track on but muted");
+            monitor_piano2 = false;
           }
 
         }
@@ -1833,9 +2019,12 @@ function update_track_activation(){
             piano2_gain.gain.setValueAtTime(piano2_gain.gain.value, audioCtx.currentTime);
             piano2_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
             console.log("piano2 track on and not muted");
+
+            monitor_piano2 = true;
           }
           else{
             console.log("piano2 track on but muted");
+            monitor_piano2 = false;
           }
 
         }
@@ -1846,9 +2035,14 @@ function update_track_activation(){
             speaker_gain.gain.setValueAtTime(speaker_gain.gain.value, audioCtx.currentTime);
             speaker_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
             console.log("speaker track on and not muted");
+
+            monitor_speaker = true;
           }
           else{
             console.log("speaker track on but muted");
+
+            monitor_speaker = false;
+
           }
         }
 
@@ -1868,6 +2062,10 @@ function update_track_activation(){
             string_sound2.muted = true;
             console.log("string track off");
           }, 20);
+
+          setTimeout(function(){
+            monitor_string = false;
+          }, 100);
         }
         else if(i==1){
           perc_gain.gain.setValueAtTime(perc_gain.gain.value, audioCtx.currentTime);
@@ -1877,6 +2075,10 @@ function update_track_activation(){
             perc_sound2.muted = true;
             console.log("perc off");
           }, 20);
+
+          setTimeout(function(){
+            monitor_perc = false;
+          }, 100);
         }
         else if(i==2){
           piano1_gain.gain.setValueAtTime(piano1_gain.gain.value, audioCtx.currentTime);
@@ -1886,7 +2088,11 @@ function update_track_activation(){
             piano1_sound1.muted = true;
             piano1_sound2.muted = true;
             console.log("piano1 off");
-          })
+          }, 20);
+
+          setTimeout(function(){
+            monitor_piano1 = false;
+          }, 100);
         }
         else if(i==3){
           piano2_gain.gain.setValueAtTime(piano2_gain.gain.value, audioCtx.currentTime);
@@ -1898,6 +2104,10 @@ function update_track_activation(){
             console.log("piano2 off");
           }, 20);
 
+          setTimeout(function(){
+            monitor_piano2 = false;
+          }, 100);
+
         }
         else if(i==4){
           speaker_gain.gain.setValueAtTime(speaker_gain.gain.value, audioCtx.currentTime);
@@ -1906,7 +2116,12 @@ function update_track_activation(){
             speaker_sound1.muted = true;
             speaker_sound2.muted = true;
             console.log("speaker track off");
+
           }, 20);
+
+          setTimeout(function(){
+            monitor_speaker = false;
+          }, 100);
         }
       }
     }
@@ -2100,7 +2315,7 @@ function load_sound_files(){
   //first, pause EVERYTHING .....
   if(playing){
     console.log("pausing from load sound files");
-    pause();
+    pause(false);
     playing = true;
   }
 
@@ -2140,6 +2355,7 @@ function load_sound_files(){
           curr_string_sound.play();
           curr_speaker_sound.play();
           start_time_display();
+
         }
         else if (longest == 2){
           if(perc_mute.checked){
@@ -2149,6 +2365,7 @@ function load_sound_files(){
           curr_perc_sound.play();
           curr_speaker_sound.play();
           start_time_display();
+
         }
         else if (longest == 3){
           if(piano1_mute.checked){
@@ -2158,6 +2375,7 @@ function load_sound_files(){
           curr_piano1_sound.play();
           curr_speaker_sound.play();
           start_time_display();
+
         }
         else if (longest == 4){
           if(piano2_mute.checked){
