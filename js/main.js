@@ -172,12 +172,19 @@ var piano2_order = [...Array(num_piano2_segs).keys()];
 
 
 
-
-
-const durations_speaker = [190.65049886621316, 175.34950113378684, 167.45727891156463,
-                            344.04272108843537, 184.75, 273.75, 159.5, 298.5,
-                           267.3750113378685, 274.6250113378685, 251.75,
-                            129.25766439909296]
+const durations_speaker = [46.0, 45.275510204081634, 50.541655328798186, 48.833333333333336,
+                          47.849501133786845, 45.0, 37.96301587301587, 44.53698412698413,
+                           65.0, 57.0, 45.45727891156463, 81.58333333333333, 113.70938775510204,
+                          95.99269841269842, 52.75730158730159, 92.49895691609977, 92.25104308390023,
+                          127.88852607709751, 147.1114739229025, 159.5, 96.5, 95.2843537414966,
+                          106.7156462585034, 112.70102040816326, 154.6739909297052, 108.62501133786849,
+                          166.0, 129.9421768707483, 60.68281179138322, 61.12501133786848, 44.15936507936508,
+                          85.09829931972789]
+//
+// const durations_speaker = [190.65049886621316, 175.34950113378684, 167.45727891156463,
+//                             344.04272108843537, 184.75, 273.75, 159.5, 298.5,
+//                            267.3750113378685, 274.6250113378685, 251.75,
+//                             129.25766439909296]
 const num_speaker_segs = durations_speaker.length;
 var speaker_total_dur = 0;
 for (var i = 0; i < num_speaker_segs; i++){ speaker_total_dur += durations_speaker[i]; };
@@ -362,7 +369,7 @@ function speaker1_ended(){
 
 
   //load next audio file
-  if (speaker_sound1_fileno < 11){
+  if (speaker_sound1_fileno < 31){
     speaker_sound1_fileno += 2;
     new_speaker1_sound(0);
   }
@@ -374,7 +381,7 @@ function speaker2_ended(){
   elapsed_time += speaker_sound2.duration;
 
   //console.log(sec_to_minsec(Math.round(elapsed_time)));
-  if (speaker_sound2_fileno < 12){
+  if (speaker_sound2_fileno < 32){
     //add audio time to elapsed time
     //elapsed_time += speaker_sound2.duration();
     //switch to first audio object
@@ -1441,12 +1448,12 @@ function pause(change){
       piano2_sound2.pause();
     }, 20);
 
-    if(change){
-      setTimeout(function(){
-        animation_on = false;
-        console.log("animation off");
-      }, 100);
-    }
+    // if(change){
+    //   setTimeout(function(){
+    //     animation_on = false;
+    //     console.log("animation off");
+    //   }, 100);
+    // }
   }
 }
 //play button function
@@ -1540,10 +1547,10 @@ var time_poller;
 function start_time_display(){
   stop_time_display();
   console.log("timer started");
-  if(!animation_on){
-    animation_on = true;
-    audio_level_loop();
-  }
+  // if(!animation_on){
+  //   animation_on = true;
+  //   audio_level_loop();
+  // }
   time_poller = setInterval(function(){
 
     //set current time
@@ -1714,7 +1721,7 @@ function piano2_event(){
 function wiper_clicked(){
 
   console.log("wiper clicked");
-
+  wiper.blur();
   if(playing){
     pause(false);
     playing = true;
@@ -1751,7 +1758,7 @@ function wiper_clicked(){
       new_speaker1_sound(Math.round(curr_time - elapsed_time));
 
       //get speaker 2 file
-      if (i+2 <= 12){
+      if (i+2 <= 32){
         //console.log("assign speaker 2");
         speaker_sound2_fileno = i+2;
         new_speaker2_sound(0);
@@ -1767,7 +1774,7 @@ function wiper_clicked(){
       new_speaker2_sound(Math.round(curr_time - elapsed_time));
 
       //get speaker 1 file
-      if (i+2 <= 11){
+      if (i+2 <= 31){
 
         //console.log("assign speaker 1")
         speaker_sound1_fileno = i+2;
@@ -1816,81 +1823,93 @@ var animation_on = false;
 function audio_level_loop(){
 
   //do speaker if speaker gain is up
-  if(monitor_speaker){
 
-    //do speaker 1 or 2, depending
-    if(curr_speaker_sound == speaker_sound1){
-      speaker_analyser1.getFloatTimeDomainData(speaker_buffer);
+  if(playing){
+    if(monitor_speaker){
+
+      //do speaker 1 or 2, depending
+      if(curr_speaker_sound == speaker_sound1){
+        speaker_analyser1.getFloatTimeDomainData(speaker_buffer);
+      }
+      else if (curr_speaker_sound == speaker_sound2){
+        speaker_analyser2.getFloatTimeDomainData(speaker_buffer);
+      }
+      //get average power
+      speaker_avg_power = get_avg_power(speaker_buffer);
+      //display
+      display_level('--speaker-level', speaker_avg_power);
     }
-    else if (curr_speaker_sound == speaker_sound2){
-      speaker_analyser2.getFloatTimeDomainData(speaker_buffer);
+    if(monitor_string){
+
+      //do string 1 or 2, depending
+      if(curr_string_sound == string_sound1){
+        string_analyser1.getFloatTimeDomainData(string_buffer);
+      }
+      else if (curr_string_sound == string_sound2){
+        string_analyser2.getFloatTimeDomainData(string_buffer);
+      }
+      //get average power
+      string_avg_power = get_avg_power(string_buffer);
+      //display
+      display_level('--string-level', string_avg_power);
     }
-    //get average power
-    speaker_avg_power = get_avg_power(speaker_buffer);
-    //display
-    display_level('--speaker-level', speaker_avg_power);
+    if(monitor_perc){
+
+      //do speaker 1 or 2, depending
+      if(curr_perc_sound == perc_sound1){
+        perc_analyser1.getFloatTimeDomainData(perc_buffer);
+      }
+      else if (curr_perc_sound == perc_sound2){
+        perc_analyser2.getFloatTimeDomainData(perc_buffer);
+      }
+      //get average power
+      perc_avg_power = get_avg_power(perc_buffer);
+      //display
+      display_level('--perc-level', perc_avg_power);
+    }
+    if(monitor_piano1){
+
+      //do piano1 1 or 2, depending
+      if(curr_piano1_sound == piano1_sound1){
+        piano1_analyser1.getFloatTimeDomainData(piano1_buffer);
+      }
+      else if (curr_piano1_sound == piano1_sound2){
+        piano1_analyser2.getFloatTimeDomainData(piano1_buffer);
+      }
+      //get average power
+      piano1_avg_power = get_avg_power(piano1_buffer);
+      //display
+      display_level('--piano1-level', piano1_avg_power);
+    }
+    if(monitor_piano2){
+
+      //do piano2 1 or 2, depending
+      if(curr_piano2_sound == piano2_sound1){
+        piano2_analyser1.getFloatTimeDomainData(piano2_buffer);
+      }
+      else if (curr_piano2_sound == piano2_sound2){
+        piano2_analyser2.getFloatTimeDomainData(piano2_buffer);
+      }
+      //get average power
+      piano2_avg_power = get_avg_power(piano2_buffer);
+      //display
+      display_level('--piano2-level', piano2_avg_power);
+    }
   }
-  if(monitor_string){
 
-    //do string 1 or 2, depending
-    if(curr_string_sound == string_sound1){
-      string_analyser1.getFloatTimeDomainData(string_buffer);
-    }
-    else if (curr_string_sound == string_sound2){
-      string_analyser2.getFloatTimeDomainData(string_buffer);
-    }
-    //get average power
-    string_avg_power = get_avg_power(string_buffer);
-    //display
-    display_level('--string-level', string_avg_power);
-  }
-  if(monitor_perc){
 
-    //do speaker 1 or 2, depending
-    if(curr_perc_sound == perc_sound1){
-      perc_analyser1.getFloatTimeDomainData(perc_buffer);
+  if(animate_tracks){
+    track_container.style.width = "calc(" + track_animation_counter.toString() + " * var(--main-width))";
+    track_animation_counter += 0.01;
+    if(track_animation_counter >1){
+      animate_tracks = false;
     }
-    else if (curr_perc_sound == perc_sound2){
-      perc_analyser2.getFloatTimeDomainData(perc_buffer);
-    }
-    //get average power
-    perc_avg_power = get_avg_power(perc_buffer);
-    //display
-    display_level('--perc-level', perc_avg_power);
-  }
-  if(monitor_piano1){
-
-    //do piano1 1 or 2, depending
-    if(curr_piano1_sound == piano1_sound1){
-      piano1_analyser1.getFloatTimeDomainData(piano1_buffer);
-    }
-    else if (curr_piano1_sound == piano1_sound2){
-      piano1_analyser2.getFloatTimeDomainData(piano1_buffer);
-    }
-    //get average power
-    piano1_avg_power = get_avg_power(piano1_buffer);
-    //display
-    display_level('--piano1-level', piano1_avg_power);
-  }
-  if(monitor_piano2){
-
-    //do piano2 1 or 2, depending
-    if(curr_piano2_sound == piano2_sound1){
-      piano2_analyser1.getFloatTimeDomainData(piano2_buffer);
-    }
-    else if (curr_piano2_sound == piano2_sound2){
-      piano2_analyser2.getFloatTimeDomainData(piano2_buffer);
-    }
-    //get average power
-    piano2_avg_power = get_avg_power(piano2_buffer);
-    //display
-    display_level('--piano2-level', piano2_avg_power);
   }
 
 
-  if(animation_on){
+  // if(animation_on){
     requestAnimationFrame(audio_level_loop);
-  }
+  // }
 }
 
 var max = 0;
@@ -1898,7 +1917,7 @@ var max = 0;
 
 function display_level(property, avg_power){
   avg_power = avg_power * 10/6 + 100;
-  console.log(property, avg_power);
+  //console.log(property, avg_power);
   root.style.setProperty(property, avg_power);
 }
 
@@ -1917,7 +1936,7 @@ function get_avg_power(buffer){
 
 
 
-
+audio_level_loop();
 
 
 
@@ -2585,16 +2604,22 @@ function get_check_status(){
 
 //animate width of track container to load tracks
 //swipes the width for the animation; no actual changing of track info!
+
+var animate_tracks = false;
+var track_animation_counter = 0;
 function load_tracks(){
-  track_container.style.transition = "none";
   track_container.style.width = "0px";
-  setTimeout(() => {
-    track_container.style.transition = "2000ms linear";
-    track_container.style.width = "calc(1204/1296 * var(--main-width))";
-  }, 2);
-  setTimeout(() => {
-    track_container.style.transition = "none";
-  }, 1004);
+  track_animation_counter = 0;
+  animate_tracks = true;
+  // track_container.style.transition = "none";
+  // track_container.style.width = "0px";
+  // setTimeout(() => {
+  //   track_container.style.transition = "2000ms linear";
+  //   track_container.style.width = "calc(1204/1296 * var(--main-width))";
+  // }, 2);
+  // setTimeout(() => {
+  //   track_container.style.transition = "none";
+  // }, 1004);
 }
 
 //updates timeline based on checked values
