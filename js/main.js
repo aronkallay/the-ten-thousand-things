@@ -1482,7 +1482,7 @@ function play(){
     at_end = false;
   }
 
-  if (playing == false){
+  if (playing == false && longest != 0){
     console.log("playing");
     playing = true;
     start_time_display();
@@ -1749,7 +1749,7 @@ function wiper_clicked(){
       at_end = false;
     }
 
-    if(longest != 5){
+    if(longest != 5 && longest != 0){
       make_longest_funcs[longest-1]();
     }
     //find elapsed time
@@ -2363,12 +2363,12 @@ function load_sound_files(){
     if (longest_changed){
       //console.log("change longest & have them play through");
       //do nothing for longest == 5, since that's always playing through
-      if (longest != 5){
+      if (longest != 5 && longest != 0){
         //console.log(longest-1, "make it playthrough");
         console.log("making longest ", wiper.max/60, curr_time);
         make_longest_funcs[longest-1]();
       }
-      else{
+      else if(longest == 5){
         if(playing){
           speaker_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
           speaker_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
@@ -2376,6 +2376,11 @@ function load_sound_files(){
           start_time_display();
         }
 
+      }
+      else if(longest == 0){
+        pause(false);
+        need_rewind = true;
+        at_end = true;
       }
     }
     //then load non-longest files
@@ -2515,82 +2520,88 @@ var title_len_options = ["", "26\' 1.1499\"", "27\' 10.554\"", "31\' 57.9864\"",
 var title_instr_options = ["", "string player", "percussionist", "pianist", "pianist", "speaker"];
 function update_title(){
 
-  //if all are checked, use ten thousand things title
-  if (all_checked){
-    title.innerHTML = "The Ten Thousand Things for speaker, string player, percussionist, and two pianists";
+  if(longest == 0){
+    title.innerHTML = "";
   }
   else{
-    //fix two pianists issue for 34'
-    var two_pianists = false;
-    if (longest == 4 && checks[2].checked){
-      title.innerHTML = title_len_options[longest] + " for ";
-      two_pianists = true;
+    if (all_checked){
+      title.innerHTML = "The Ten Thousand Things for speaker, string player, percussionist, and two pianists";
     }
     else{
-      //otherwise get first instrument from longest
-      title.innerHTML = title_len_options[longest] + " for ";
-      if (num_checked <= 2 && longest != 5){
-        title.innerHTML += " a ";
-      }
-      title.innerHTML += title_instr_options[longest];
-    }
-
-
-    //get array of remaining instruments, with checking for two pianists
-    var title_part2 = [];
-
-    if (two_pianists){
-      if (checks[0].checked){
-        title_part2.push(title_instr_options[1]);
-      }
-      if (checks[1].checked){
-        title_part2.push(title_instr_options[2]);
-      }
-    }
-
-    else{
-      for (var i = 0; i < longest-1; i++){
-        if (checks[i].checked){
-          title_part2.push(title_instr_options[i+1]);
-        }
-      }
-    }
-
-
-    //fix two pianists issue for 45'....
-    if (new Set(title_part2).size != title_part2.length){
-      title_part2[title_part2.indexOf("pianist")] = "two pianists";
-      title_part2.splice(title_part2.indexOf("pianist"), 1);
-    }
-
-    //add remaining instruments to title string
-    if (two_pianists){
-      if (title_part2.length > 0){
-        for (var i = 0; i < title_part2.length; i++){
-          title.innerHTML += title_part2[i];
-          if (title_part2.length > 1){
-            title.innerHTML += ", "; //oxford comma....
-          }
-        }
-        title.innerHTML += " and two pianists";
+      //fix two pianists issue for 34'
+      var two_pianists = false;
+      if (longest == 4 && checks[2].checked){
+        title.innerHTML = title_len_options[longest] + " for ";
+        two_pianists = true;
       }
       else{
-        title.innerHTML += "two pianists";
-      }
-    }
-    else{
-      if (title_part2.length > 0){
-        for (var i = 0; i < title_part2.length-1; i++){
-          title.innerHTML += ", " + title_part2[i];
+        //otherwise get first instrument from longest
+        title.innerHTML = title_len_options[longest] + " for ";
+        if (num_checked <= 2 && longest != 5){
+          title.innerHTML += " a ";
         }
-        if (title_part2.length > 1){
-          title.innerHTML += ","; //oxford comma....
-        }
-        title.innerHTML += " and " + title_part2[title_part2.length-1];
+        title.innerHTML += title_instr_options[longest];
       }
-    }
 
+
+      //get array of remaining instruments, with checking for two pianists
+      var title_part2 = [];
+
+      if (two_pianists){
+        if (checks[0].checked){
+          title_part2.push(title_instr_options[1]);
+        }
+        if (checks[1].checked){
+          title_part2.push(title_instr_options[2]);
+        }
+      }
+
+      else{
+        for (var i = 0; i < longest-1; i++){
+          if (checks[i].checked){
+            title_part2.push(title_instr_options[i+1]);
+          }
+        }
+      }
+
+
+      //fix two pianists issue for 45'....
+      if (new Set(title_part2).size != title_part2.length){
+        title_part2[title_part2.indexOf("pianist")] = "two pianists";
+        title_part2.splice(title_part2.indexOf("pianist"), 1);
+      }
+
+      //add remaining instruments to title string
+      if (two_pianists){
+        if (title_part2.length > 0){
+          for (var i = 0; i < title_part2.length; i++){
+            title.innerHTML += title_part2[i];
+            if (title_part2.length > 1){
+              title.innerHTML += ", "; //oxford comma....
+            }
+          }
+          title.innerHTML += " and two pianists";
+        }
+        else{
+          title.innerHTML += "two pianists";
+        }
+      }
+      else{
+        if (title_part2.length > 0){
+          for (var i = 0; i < title_part2.length-1; i++){
+            title.innerHTML += ", " + title_part2[i];
+          }
+          if (title_part2.length > 1){
+            title.innerHTML += ","; //oxford comma....
+          }
+          title.innerHTML += " and " + title_part2[title_part2.length-1];
+        }
+      }
+
+    }
   }
+  //if all are checked, use ten thousand things title
+
 }
 
 //get info about checkboxes
