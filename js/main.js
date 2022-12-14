@@ -2607,6 +2607,8 @@ function load_non_longest_files(){
   piano1_on = [false, false];
   piano2_on = [false, false];
 
+  var tracking_currents = [null, null, null, null];
+
   //load current events first
   for (var i = 0; i < longest - 1; i++){
     var sound1_seek;
@@ -2616,7 +2618,7 @@ function load_non_longest_files(){
     var file_locs = audio_file_locations[i];
     var sound_funcs = all_new_sound_funcs[i];
 
-    var current;
+    var current = false;
     //figure out what to load....
     //first, load current event, if applicable
     if (current_events[i] != null){
@@ -2628,6 +2630,7 @@ function load_non_longest_files(){
       current = true;
       sound_funcs[0](filenos[0], sound1_seek, false, current, true, true);
     }
+    tracking_currents[i] = current;
   }
 
   //then load next events
@@ -2649,6 +2652,12 @@ function load_non_longest_files(){
         //console.log(i, " load next", next_events[i], " sound 2");
         filenos[1] = order[next_events[i]] + 1;
         sound_funcs[1](filenos[1], 0, false);
+      }
+    }
+    else{
+      if (tracking_currents[i] == false){
+        console.log("no events at all for ", i, ", adding to curr loaded");
+        loading_proxy.curr_loaded += 1;
       }
     }
     //then, if current event was not loaded AND there's an event after the next event, load the next-next event
