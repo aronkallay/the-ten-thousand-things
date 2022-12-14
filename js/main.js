@@ -1909,6 +1909,13 @@ function audio_level_loop(){
     }
   }
 
+  else{
+    root.style.setProperty("--speaker-level", 0);
+    root.style.setProperty("--string-level", 0);
+    root.style.setProperty("--perc-level", 0);
+    root.style.setProperty("--piano1-level", 0);
+    root.style.setProperty("--piano2-level", 0);
+  }
 
   if(animate_tracks){
     track_container.style.width = "calc(" + track_animation_counter.toString() + " * var(--main-width))";
