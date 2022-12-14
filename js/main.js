@@ -1546,81 +1546,84 @@ function play(){
   if (playing == false && longest != 0){
     console.log("playing");
     playing = true;
-    start_time_display();
-    speaker_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-    string_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-    perc_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-    piano1_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-    piano2_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+    if(loading_proxy.curr_loaded == loading_proxy.num_to_wait){
+      start_time_display();
+      speaker_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      string_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      perc_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      piano1_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+      piano2_gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
 
-    speaker_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
-    string_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
-    perc_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
-    piano1_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
-    piano2_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+      speaker_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+      string_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+      perc_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+      piano1_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
+      piano2_gain.gain.exponentialRampToValueAtTime(1, audioCtx.currentTime + 0.015);
 
-    curr_speaker_sound.play();
-    console.log("speaker playing from play");
+      curr_speaker_sound.play();
+      console.log("speaker playing from play");
 
-    if(longest == 1){
-      curr_string_sound.play();
-      console.log("string playing from play string longest");
-    }
-    else{
-      if(string_on[0]){
-        string_sound1.play();
-        console.log("string 1 playing from play string on");
+      if(longest == 1){
+        curr_string_sound.play();
+        console.log("string playing from play string longest");
       }
-      if(string_on[1]){
-        string_sound2.play();
-        console.log("string 2 playing from play string on");
+      else{
+        if(string_on[0]){
+          string_sound1.play();
+          console.log("string 1 playing from play string on");
+        }
+        if(string_on[1]){
+          string_sound2.play();
+          console.log("string 2 playing from play string on");
+        }
+      }
+
+      if (longest == 2){
+        curr_perc_sound.play();
+        console.log("perc playing from play perc longeest");
+      }
+      else{
+        if(perc_on[0]){
+          perc_sound1.play();
+          console.log("perc 1 playing from play perc on");
+        }
+        if(perc_on[1]){
+          perc_sound2.play();
+          console.log("perc 2 plaaying from play perc on");
+        }
+      }
+
+      if (longest == 3){
+        curr_piano1_sound.play();
+        console.log("piaano1 plaayin from play piano1 longest");
+      }
+      else{
+        if(piano1_on[0]){
+          piano1_sound1.play();
+          console.log("piano1 1 plaaying from play piano1 on");
+        }
+        if(piano1_on[1]){
+          piano1_sound2.play();
+          console.log("piano1 2 playing from play piano1 on");
+        }
+      }
+
+      if (longest == 4){
+        curr_piano2_sound.play();
+        console.log("piano2 playing from plaay piano2 longest");
+      }
+      else{
+        if(piano2_on[0]){
+          piano2_sound1.play();
+          console.log("piano2 1 playing from plaay piaano2 on");
+        }
+        if(piano2_on[1]){
+          piano2_sound2.play();
+          console.log("piano2 2 plaaying from plaay piano2 on");
+        }
       }
     }
 
-    if (longest == 2){
-      curr_perc_sound.play();
-      console.log("perc playing from play perc longeest");
-    }
-    else{
-      if(perc_on[0]){
-        perc_sound1.play();
-        console.log("perc 1 playing from play perc on");
-      }
-      if(perc_on[1]){
-        perc_sound2.play();
-        console.log("perc 2 plaaying from play perc on");
-      }
-    }
-
-    if (longest == 3){
-      curr_piano1_sound.play();
-      console.log("piaano1 plaayin from play piano1 longest");
-    }
-    else{
-      if(piano1_on[0]){
-        piano1_sound1.play();
-        console.log("piano1 1 plaaying from play piano1 on");
-      }
-      if(piano1_on[1]){
-        piano1_sound2.play();
-        console.log("piano1 2 playing from play piano1 on");
-      }
-    }
-
-    if (longest == 4){
-      curr_piano2_sound.play();
-      console.log("piano2 playing from plaay piano2 longest");
-    }
-    else{
-      if(piano2_on[0]){
-        piano2_sound1.play();
-        console.log("piano2 1 playing from plaay piaano2 on");
-      }
-      if(piano2_on[1]){
-        piano2_sound2.play();
-        console.log("piano2 2 plaaying from plaay piano2 on");
-      }
-    }
 
   }
 }
@@ -1885,8 +1888,9 @@ function wiper_clicked(){
       curr_speaker_sound = speaker_sound2;
     }
     curr_speaker_sound.addEventListener("loadedmetadata", function(){
-      loading_proxy.curr_loaded += 1;
-      console.log("speaker loaded added to curr loaded");
+        loading_proxy.curr_loaded += 1;
+        console.log("speaker loaded added to curr loaded");
+
     }, {once: true});
 
     //find next events
