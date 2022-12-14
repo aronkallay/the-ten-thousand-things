@@ -481,7 +481,7 @@ function make_string_longest(){
   string_sound1_fileno = i+1;
   var seek = curr_time - string_elapsed_time;
   if(string_sound1_fileno <= durations_string.length){
-    new_string1_sound(string_sound1_fileno, seek, true, false);
+    new_string1_sound(string_sound1_fileno, seek, true, false, true);
 
     string_sound2_fileno = i+2;
     if(string_sound2_fileno <= durations_string.length){
@@ -512,7 +512,7 @@ function string1_longest_ended(){
     //if there's a next string sound 1
     if(string_sound1_fileno + 2 <= durations_string.length){
       string_sound1_fileno += 2;
-      new_string1_sound(string_sound1_fileno, 0, true, false);
+      new_string1_sound(string_sound1_fileno, 0, true, false, false);
     }
   }
 
@@ -532,7 +532,7 @@ function string2_longest_ended(){
 }
 
 //switch srcs and add diff event listeners as necessary
-function new_string1_sound(fileno, seek, isLongest, isCurrent){
+function new_string1_sound(fileno, seek, isLongest, isCurrent, isFirst){
 
   string_sound1_fileno = fileno;
 
@@ -546,6 +546,7 @@ function new_string1_sound(fileno, seek, isLongest, isCurrent){
     string_sound1.addEventListener("ended", function(){
       string_on[0] = false;
       curr_string_sound = string_sound2;
+      console.log("string 1 switched to string 2");
     }, {once: true});
     if (!isCurrent){
       string_sound1.addEventListener("loadedmetadata", function(){
@@ -564,7 +565,9 @@ function new_string1_sound(fileno, seek, isLongest, isCurrent){
       }, {once: true});
       string_on = [true, false];
     }
-    curr_string_sound = string_sound1;
+    if(isFirst){
+      curr_string_sound = string_sound1;
+    }
   }
 
   else{
@@ -659,7 +662,7 @@ function make_perc_longest(){
   perc_sound1_fileno = i+1;
   var seek = curr_time - perc_elapsed_time;
   if(perc_sound1_fileno <= durations_perc.length){
-    new_perc1_sound(perc_sound1_fileno, seek, true, false);
+    new_perc1_sound(perc_sound1_fileno, seek, true, false, true);
 
     perc_sound2_fileno = i+2;
     if(perc_sound2_fileno <= durations_perc.length){
@@ -688,7 +691,7 @@ function perc1_longest_ended(){
     //if there's a next perc sound 1
     if(perc_sound1_fileno + 2 <= durations_perc.length){
       perc_sound1_fileno += 2;
-      new_perc1_sound(perc_sound1_fileno, 0, true, false);
+      new_perc1_sound(perc_sound1_fileno, 0, true, false, false);
     }
   }
 
@@ -706,7 +709,7 @@ function perc2_longest_ended(){
  }
 }
 
-function new_perc1_sound(fileno, seek, isLongest, isCurrent){
+function new_perc1_sound(fileno, seek, isLongest, isCurrent, isFirst){
   //console.log("perc 1", fileno, seek, isLongest);
   perc_sound1_fileno = fileno;
 
@@ -736,7 +739,10 @@ function new_perc1_sound(fileno, seek, isLongest, isCurrent){
       }, {once: true});
       perc_on = [true, false];
     }
-    curr_perc_sound = perc_sound1;
+    if(isFirst){
+      curr_perc_sound = perc_sound1;
+    }
+
   }
 
   //for longest
@@ -830,7 +836,7 @@ function make_piano1_longest(){
   piano1_sound1_fileno = i+1;
   var seek = curr_time - piano1_elapsed_time;
   if(piano1_sound1_fileno <= durations_piano1.length){
-    new_piano11_sound(piano1_sound1_fileno, seek, true, false);
+    new_piano11_sound(piano1_sound1_fileno, seek, true, false, true);
 
     piano1_sound2_fileno = i+2;
     if(piano1_sound2_fileno <= durations_piano1.length){
@@ -852,7 +858,7 @@ function make_piano1_longest(){
 
 }
 
-function new_piano11_sound(fileno, seek, isLongest, isCurrent){
+function new_piano11_sound(fileno, seek, isLongest, isCurrent, isFirst){
   //console.log("piano1 1", fileno, seek, isLongest);
   piano1_sound1_fileno = fileno;
 
@@ -884,7 +890,9 @@ function new_piano11_sound(fileno, seek, isLongest, isCurrent){
       }, {once: true});
       piano1_on = [true, false];
     }
-    curr_piano1_sound = piano1_sound1;
+    if(isFirst){
+      curr_piano1_sound = piano1_sound1;
+    }
   }
 
 
@@ -934,7 +942,7 @@ function piano11_longest_ended(){
     //if there's a next piano1 sound 1
     if(piano1_sound1_fileno + 2 <= durations_piano1.length){
       piano1_sound1_fileno += 2;
-      new_piano11_sound(piano1_sound1_fileno, 0, true, false);
+      new_piano11_sound(piano1_sound1_fileno, 0, true, false, false);
     }
   }
 }
@@ -959,7 +967,7 @@ function piano12_longest_ended(){
 var piano2_sound1 = new Audio();
 piano2_sound1.preload = "auto";
 piano2_sound1.addEventListener("play", function(){
-  console.log("piano2 2 playing file ", piano2_sound1_fileno, " at ", piano2_sound1.currentTime);
+  console.log("piano2 1 playing file ", piano2_sound1_fileno, " at ", piano2_sound1.currentTime);
 });
 piano2_sound1.addEventListener("pause", function(){ pauseLog("piano2 1") });
 piano2_sound1.addEventListener("ended", function(){ endLog("piano2 1") });
@@ -1007,7 +1015,7 @@ function make_piano2_longest(){
   piano2_sound1_fileno = i+1;
   var seek = curr_time - piano2_elapsed_time;
   if(piano2_sound1_fileno <= durations_piano2.length){
-    new_piano21_sound(piano2_sound1_fileno, seek, true, false);
+    new_piano21_sound(piano2_sound1_fileno, seek, true, false, true);
 
     piano2_sound2_fileno = i+2;
     if(piano2_sound2_fileno <= durations_piano2.length){
@@ -1029,7 +1037,7 @@ function make_piano2_longest(){
 
 }
 
-function new_piano21_sound(fileno, seek, isLongest, isCurrent){
+function new_piano21_sound(fileno, seek, isLongest, isCurrent, isFirst){
   //console.log("piano2 1", fileno, seek, isLongest);
   piano2_sound1_fileno = fileno;
 
@@ -1059,7 +1067,9 @@ function new_piano21_sound(fileno, seek, isLongest, isCurrent){
       }, {once: true});
       piano2_on = [true, false];
     }
-    curr_piano2_sound = piano2_sound1;
+    if(isFirst){
+      curr_piano2_sound = piano2_sound1;
+    }
   }
 
 
@@ -1109,7 +1119,7 @@ function piano21_longest_ended(){
     //if there's a next piano2 sound 1
     if(piano2_sound1_fileno + 2 <= durations_piano2.length){
       piano2_sound1_fileno += 2;
-      new_piano21_sound(piano2_sound1_fileno, 0, true, false);
+      new_piano21_sound(piano2_sound1_fileno, 0, true, false, false);
     }
   }
 
@@ -1626,7 +1636,7 @@ function string_event(){
     //load next string sound into string_sound1
     if(next_events[0] < durations_string.length){
       string_sound1_fileno = next_events[0] + 1;
-      new_string1_sound(string_sound1_fileno, 0, false, false);
+      new_string1_sound(string_sound1_fileno, 0, false, false, false);
     }
   }
 
@@ -1655,7 +1665,7 @@ function perc_event(){
     //load next string sound into string_sound1
     if(next_events[1] < durations_perc.length){
       perc_sound1_fileno = next_events[1] + 1;
-      new_perc1_sound(perc_sound1_fileno, 0, false, false);
+      new_perc1_sound(perc_sound1_fileno, 0, false, false, false);
     }
   }
 }
@@ -1684,7 +1694,7 @@ function piano1_event(){
     //load next string sound into string_sound1
     if(next_events[2] < durations_piano1.length){
       piano1_sound1_fileno = next_events[2] + 1;
-      new_piano11_sound(piano1_sound1_fileno, 0, false, false);
+      new_piano11_sound(piano1_sound1_fileno, 0, false, false, false);
     }
   }
 }
@@ -1712,7 +1722,7 @@ function piano2_event(){
     //load next string sound into string_sound1
     if(next_events[3] < durations_piano2.length){
       piano2_sound1_fileno = next_events[3] + 1;
-      new_piano21_sound(piano2_sound1_fileno, 0, false, false);
+      new_piano21_sound(piano2_sound1_fileno, 0, false, false, false);
     }
   }
 }
@@ -1841,13 +1851,15 @@ function audio_level_loop(){
     }
     if(monitor_string){
 
+
       //do string 1 or 2, depending
       if(curr_string_sound == string_sound1){
         string_analyser1.getFloatTimeDomainData(string_buffer);
       }
-      else if (curr_string_sound == string_sound2){
+      else {
         string_analyser2.getFloatTimeDomainData(string_buffer);
       }
+
       //get average power
       string_avg_power = get_avg_power(string_buffer);
       //display
@@ -1859,7 +1871,7 @@ function audio_level_loop(){
       if(curr_perc_sound == perc_sound1){
         perc_analyser1.getFloatTimeDomainData(perc_buffer);
       }
-      else if (curr_perc_sound == perc_sound2){
+      else {
         perc_analyser2.getFloatTimeDomainData(perc_buffer);
       }
       //get average power
@@ -1873,7 +1885,7 @@ function audio_level_loop(){
       if(curr_piano1_sound == piano1_sound1){
         piano1_analyser1.getFloatTimeDomainData(piano1_buffer);
       }
-      else if (curr_piano1_sound == piano1_sound2){
+      else{
         piano1_analyser2.getFloatTimeDomainData(piano1_buffer);
       }
       //get average power
@@ -1887,7 +1899,7 @@ function audio_level_loop(){
       if(curr_piano2_sound == piano2_sound1){
         piano2_analyser1.getFloatTimeDomainData(piano2_buffer);
       }
-      else if (curr_piano2_sound == piano2_sound2){
+      else {
         piano2_analyser2.getFloatTimeDomainData(piano2_buffer);
       }
       //get average power
@@ -2450,7 +2462,7 @@ function load_non_longest_files(){
       //console.log(i, "file", filenos[0], "seek", sound1_seek);
       //console.log(all_durations[i][order[current_events[i][0]]]);
       current = true;
-      sound_funcs[0](filenos[0], sound1_seek, false, current);
+      sound_funcs[0](filenos[0], sound1_seek, false, current, true);
     }
   }
 
@@ -2467,7 +2479,7 @@ function load_non_longest_files(){
       if (current_events[i] == null){
         console.log(i, " load next", next_events[i], " sound 1");
         filenos[0] = order[next_events[i]] + 1;
-        sound_funcs[0](filenos[0], 0, false, false);
+        sound_funcs[0](filenos[0], 0, false, false, true);
       }
       else{
         console.log(i, " load next", next_events[i], " sound 2");
