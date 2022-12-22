@@ -1,0 +1,5 @@
+NOTE: on replacing audio files with higher quality versions
+
+1. For string, percussion, piano1, and piano2 files, make sure they're named in the same convention (e.g. "34' - 1.wav", "34' - 2.wav") and replace the files in the corresponding folders under assets/audio. If the durations of the files change, update the variables [durations_string], [durations_perc], [durations_piano1], and [durations_piano2] with arrays containing the durations of each audio file, in order. 
+
+2. For the speaker file, it will have to be chopped into smaller pieces. Make sure there's an EVEN number of pieces. Replace the [durations_speaker] variable with an array containing the durations of each piece (in order). Make sure the files are properly named, and place them in the assets/audio/45' for a Speaker folder. 

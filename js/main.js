@@ -171,7 +171,7 @@ const durations_speaker = [46.0, 45.275510204081634, 50.541655328798186, 48.8333
                           127.88852607709751, 147.1114739229025, 159.5, 96.5, 95.2843537414966,
                           106.7156462585034, 112.70102040816326, 154.6739909297052, 108.62501133786849,
                           166.0, 129.9421768707483, 60.68281179138322, 61.12501133786848, 44.15936507936508,
-                          85.09829931972789]
+                          85.09829931972789];
 const num_speaker_segs = durations_speaker.length;
 var speaker_total_dur = 0;
 for (var i = 0; i < num_speaker_segs; i++){ speaker_total_dur += durations_speaker[i]; };
@@ -349,12 +349,12 @@ function speaker1_ended(){
   elapsed_time += speaker_sound1.duration;
   curr_speaker_sound = speaker_sound2;
   curr_speaker_sound.play();
-  console.log("speaker 2 playing from speaker 1 ended");
+  //console.log("speaker 2 playing from speaker 1 ended");
 
 
 
   //load next audio file
-  if (speaker_sound1_fileno < 31){
+  if (speaker_sound1_fileno < num_speaker_segs - 1){
     speaker_sound1_fileno += 2;
     new_speaker1_sound(0);
   }
@@ -365,13 +365,13 @@ function speaker2_ended(){
   elapsed_time += speaker_sound2.duration;
 
   //console.log(sec_to_minsec(Math.round(elapsed_time)));
-  if (speaker_sound2_fileno < 32){
+  if (speaker_sound2_fileno < num_speaker_segs){
     //add audio time to elapsed time
     //elapsed_time += speaker_sound2.duration();
     //switch to first audio object
     curr_speaker_sound = speaker_sound1;
     curr_speaker_sound.play();
-    console.log('speaker 1 playing from speaker 2 ended');
+    //console.log('speaker 1 playing from speaker 2 ended');
 
     //load next audio file
     speaker_sound2_fileno += 2;
@@ -469,13 +469,13 @@ function make_string_longest(){
   var seek = curr_time - string_elapsed_time;
   if(string_sound1_fileno <= durations_string.length){
     new_string1_sound(string_sound1_fileno, seek, true, false, true, true);
-    console.log("string 1 fileno", string_sound1_fileno);
+    //console.log("string 1 fileno", string_sound1_fileno);
 
     string_sound2_fileno = string_order[i+1] + 1;
     string_sound2_orderind = i+1 ;
     if(string_sound2_fileno <= durations_string.length){
       new_string2_sound(string_sound2_fileno, 0, true);
-      console.log("string 2 fileno", string_sound2_fileno);
+      //console.log("string 2 fileno", string_sound2_fileno);
     }
 
     curr_string_sound = string_sound1;
@@ -554,9 +554,9 @@ function new_string1_sound(fileno, seek, isLongest, isCurrent, isFirst, needsWai
       //console.log("string 1 switched to string 2");
     }, {once: true});
     if (!isCurrent){
-      string_sound1.addEventListener("loadedmetadata", function(){
-        //console.log("string 1 loaded file ", string_sound1_fileno, " at ", string_sound1.currentTime);
-      }, {once: true});
+      // string_sound1.addEventListener("loadedmetadata", function(){
+      //   //console.log("string 1 loaded file ", string_sound1_fileno, " at ", string_sound1.currentTime);
+      // }, {once: true});
     }
     else{
       string_on = [true, false];
@@ -601,9 +601,9 @@ function new_string2_sound(fileno, seek, isLongest){
       string_on[1] = false;
       curr_string_sound = string_sound1;
     }, {once: true});
-    string_sound2.addEventListener("loadedmetadata", function(){
-      //console.log("string 2 loaded file ", string_sound2_fileno, "at ", string_sound2.currentTime);
-    }, {once: true});
+    // string_sound2.addEventListener("loadedmetadata", function(){
+    //   //console.log("string 2 loaded file ", string_sound2_fileno, "at ", string_sound2.currentTime);
+    // }, {once: true});
   }
 
   else{
@@ -676,13 +676,13 @@ function make_perc_longest(){
   var seek = curr_time - perc_elapsed_time;
   if(perc_sound1_fileno <= durations_perc.length){
     new_perc1_sound(perc_sound1_fileno, seek, true, false, true, true);
-    console.log("perc 1 fileno", perc_sound1_fileno);
+    //console.log("perc 1 fileno", perc_sound1_fileno);
 
     perc_sound2_fileno = perc_order[i+1]+1;
     perc_sound2_orderind = i + 1;
     if(perc_sound2_fileno <= durations_perc.length){
       new_perc2_sound(perc_sound2_fileno, 0, true);
-      console.log("perc 2 fileno", perc_sound2_fileno);
+      //console.log("perc 2 fileno", perc_sound2_fileno);
     }
     curr_perc_sound = perc_sound1;
 
@@ -706,13 +706,13 @@ function perc1_longest_ended(){
   if(perc_sound1_fileno < durations_perc.length){
     curr_perc_sound = perc_sound2;
     curr_perc_sound.play();
-    console.log("perc 2 playing from perc 1 longest ended");
+    //console.log("perc 2 playing from perc 1 longest ended");
     //if there's a next perc sound 1
     if(perc_sound1_orderind + 2 < durations_perc.length){
       perc_sound1_orderind += 2;
       perc_sound1_fileno = perc_order[perc_sound1_orderind] + 1;
       new_perc1_sound(perc_sound1_fileno, 0, true, false, false, false);
-      console.log("perc 1 fileno", perc_sound1_fileno);
+      //console.log("perc 1 fileno", perc_sound1_fileno);
     }
   }
 
@@ -722,13 +722,13 @@ function perc2_longest_ended(){
  if(perc_sound2_fileno < durations_perc.length){
    curr_perc_sound = perc_sound1;
    curr_perc_sound.play();
-   console.log("perc 1 playing from perc 2 longest ended");
+   //console.log("perc 1 playing from perc 2 longest ended");
    //if there's a next sound 2
    if(perc_sound2_orderind +2 < durations_perc.length){
      perc_sound2_orderind += 2;
      perc_sound2_fileno = perc_order[perc_sound2_orderind] + 1;
      new_perc2_sound(perc_sound2_fileno, 0, true);
-     console.log("perc 2 fileno", perc_sound2_fileno);
+     //console.log("perc 2 fileno", perc_sound2_fileno);
    }
  }
 }
@@ -756,9 +756,9 @@ function new_perc1_sound(fileno, seek, isLongest, isCurrent, isFirst, needsWaiti
       curr_perc_sound = perc_sound2;
     }, {once: true});
     if (!isCurrent){
-      perc_sound1.addEventListener("loadedmetadata", function(){
-        //console.log("perc 1 loaded file ", perc_sound1_fileno, " at ", perc_sound1.currentTime);
-      }, {once: true});
+      // perc_sound1.addEventListener("loadedmetadata", function(){
+      //   //console.log("perc 1 loaded file ", perc_sound1_fileno, " at ", perc_sound1.currentTime);
+      // }, {once: true});
     }
     else{
       perc_on = [true, false];
@@ -798,9 +798,9 @@ function new_perc2_sound(fileno, seek, isLongest){
   perc_sound2.muted = !check2.checked || !perc_mute.checked;
 
   if (!isLongest){
-    perc_sound2.addEventListener("loadedmetadata", function(){
-      //console.log("perc 2 loaded file ", perc_sound2_fileno, " at ", perc_sound2.currentTime);
-    }, {once: true});
+    // perc_sound2.addEventListener("loadedmetadata", function(){
+    //   //console.log("perc 2 loaded file ", perc_sound2_fileno, " at ", perc_sound2.currentTime);
+    // }, {once: true});
     perc_sound2.addEventListener("ended", function(){
       perc_on[1] = false;
       curr_perc_sound = perc_sound1;
@@ -875,13 +875,13 @@ function make_piano1_longest(){
   var seek = curr_time - piano1_elapsed_time;
   if(piano1_sound1_fileno <= durations_piano1.length){
     new_piano11_sound(piano1_sound1_fileno, seek, true, false, true, true);
-    console.log("piano1 1 fileno ", piano1_sound1_fileno);
+    //console.log("piano1 1 fileno ", piano1_sound1_fileno);
 
     piano1_sound2_fileno = piano1_order[i+1] + 1;
     piano1_sound2_orderind = i+1;
     if(piano1_sound2_fileno <= durations_piano1.length){
       new_piano12_sound(piano1_sound2_fileno, 0, true);
-      console.log("piano1 2 fileno", piano1_sound2_fileno);
+      //console.log("piano1 2 fileno", piano1_sound2_fileno);
     }
 
     curr_piano1_sound = piano1_sound1;
@@ -926,9 +926,9 @@ function new_piano11_sound(fileno, seek, isLongest, isCurrent, isFirst, needsWai
       curr_piano1_sound = piano1_sound2;
     }, {once: true});
     if (!isCurrent){
-      piano1_sound1.addEventListener("loadedmetadata", function(){
-        //console.log("piano1 1 loaded file ", piano1_sound1_fileno, " at ", piano1_sound1.currentTime);
-      }, {once: true});
+      // piano1_sound1.addEventListener("loadedmetadata", function(){
+      //   //console.log("piano1 1 loaded file ", piano1_sound1_fileno, " at ", piano1_sound1.currentTime);
+      // }, {once: true});
     }
     else{
       piano1_on = [true, false];
@@ -969,13 +969,13 @@ function new_piano12_sound(fileno, seek, isLongest){
 
 
   if (!isLongest){
-    piano1_sound2.addEventListener("loadedmetadata", function(){
-      //console.log("piano1 2 loaded file ", piano1_sound2_fileno, " at ", piano1_sound2.currentTime);
-    })
+    // piano1_sound2.addEventListener("loadedmetadata", function(){
+    //   //console.log("piano1 2 loaded file ", piano1_sound2_fileno, " at ", piano1_sound2.currentTime);
+    // }, {once: true});
     piano1_sound2.addEventListener("ended", function(){
       piano1_on[1] = false;
       curr_piano1_sound = piano1_sound1;
-    })
+    }, {once: true});
   }
 
   else{
@@ -992,13 +992,13 @@ function piano11_longest_ended(){
   if(piano1_sound1_fileno < durations_piano1.length){
     curr_piano1_sound = piano1_sound2;
     curr_piano1_sound.play();
-    console.log("piano1 2 playing from piano11 longest ended");
+    //console.log("piano1 2 playing from piano11 longest ended");
     //if there's a next piano1 sound 1
     if(piano1_sound1_orderind + 2 < durations_piano1.length){
       piano1_sound1_orderind += 2;
       piano1_sound1_fileno = piano1_order[piano1_sound1_orderind] + 1;
       new_piano11_sound(piano1_sound1_fileno, 0, true, false, false, false);
-      console.log("piano1 1 fileno", piano1_sound1_fileno);
+      //console.log("piano1 1 fileno", piano1_sound1_fileno);
     }
   }
 }
@@ -1008,14 +1008,14 @@ function piano12_longest_ended(){
  if(piano1_sound2_fileno < durations_piano1.length){
    curr_piano1_sound = piano1_sound1;
    curr_piano1_sound.play();
-   console.log("piano1 1 playing from piano12 longest ended");
+   //console.log("piano1 1 playing from piano12 longest ended");
 
    //if there's a next sound 2
    if(piano1_sound2_orderind +2 < durations_piano1.length){
      piano1_sound2_orderind += 2;
      piano1_sound2_fileno = piano1_order[piano1_sound2_orderind] + 1;
      new_piano12_sound(piano1_sound2_fileno, 0, true);
-     console.log("piano1 2 fileno", piano1_sound2_fileno);
+     //console.log("piano1 2 fileno", piano1_sound2_fileno);
    }
  }
 }
@@ -1078,13 +1078,13 @@ function make_piano2_longest(){
   var seek = curr_time - piano2_elapsed_time;
   if(piano2_sound1_fileno <= durations_piano2.length){
     new_piano21_sound(piano2_sound1_fileno, seek, true, false, true, true); //have to wait till loaded here
-    console.log("piano2 1 fileno", piano2_sound1_fileno);
+    //console.log("piano2 1 fileno", piano2_sound1_fileno);
 
     piano2_sound2_fileno = piano2_order[i+1]+1;
     piano2_sound2_orderind = i+1;
     if(piano2_sound2_fileno <= durations_piano2.length){
       new_piano22_sound(piano2_sound2_fileno, 0, true);
-      console.log("piano2 2 fileno", piano2_sound2_fileno);
+      //console.log("piano2 2 fileno", piano2_sound2_fileno);
     }
 
     curr_piano2_sound = piano2_sound1;
@@ -1127,9 +1127,9 @@ function new_piano21_sound(fileno, seek, isLongest, isCurrent, isFirst, needsWai
       curr_piano2_sound = piano2_sound2;
     }, {once: true});
     if (!isCurrent){
-      piano2_sound1.addEventListener("loadedmetadata", function(){
-        //console.log("piano2 1 loaded file ", piano2_sound1_fileno, " at ", piano2_sound1.currentTime);
-      }, {once: true});
+      // piano2_sound1.addEventListener("loadedmetadata", function(){
+      //   //console.log("piano2 1 loaded file ", piano2_sound1_fileno, " at ", piano2_sound1.currentTime);
+      // }, {once: true});
     }
     else{
       piano2_on = [true, false];
@@ -1171,9 +1171,9 @@ function new_piano22_sound(fileno, seek, isLongest){
 
 
   if (!isLongest){
-    piano2_sound2.addEventListener("loadedmetadata", function(){
-      //console.log("piano2 2 loaded file ", piano2_sound2_fileno, " at ", piano2_sound2.currentTime);
-    }, {once: true});
+    // piano2_sound2.addEventListener("loadedmetadata", function(){
+    //   //console.log("piano2 2 loaded file ", piano2_sound2_fileno, " at ", piano2_sound2.currentTime);
+    // }, {once: true});
     piano2_sound2.addEventListener("ended", function(){
       piano2_on[1] = false;
       curr_piano2_sound = piano2_sound1;
@@ -1200,7 +1200,7 @@ function piano21_longest_ended(){
       piano2_sound1_orderind += 2;
       piano2_sound1_fileno = piano2_order[piano2_sound1_orderind] + 1;
       new_piano21_sound(piano2_sound1_fileno, 0, true, false, false, false);
-      console.log("piano2 1 fileno", piano2_sound1_fileno);
+      //console.log("piano2 1 fileno", piano2_sound1_fileno);
     }
   }
 
@@ -1217,7 +1217,7 @@ function piano22_longest_ended(){
      piano2_sound2_orderind += 2;
      piano2_sound2_fileno = piano2_order[piano2_sound2_orderind] + 1;
      new_piano22_sound(piano2_sound2_fileno, 0, true);
-     console.log("piano2 2 fileno", piano2_sound2_fileno);
+     //console.log("piano2 2 fileno", piano2_sound2_fileno);
    }
  }
 }
@@ -1509,25 +1509,26 @@ function double_click(){
 
   console.log("double");
 
+  //shuffle longest if necessary
   if(!longest_changed && longest != 5 && longest!= 0){
-    console.log("NEW SHUFFLE LONGEST");
+    //console.log("NEW SHUFFLE LONGEST");
     longest_shuffled = true;
-    console.log("SHUFFLING LONGEST ..... ");
+    //console.log("SHUFFLING LONGEST ..... ");
     if(longest == 1){
       string_order = shuffle(string_order);
-      console.log(string_order);
+      //console.log(string_order);
     }
     else if (longest == 2){
       perc_order = shuffle(perc_order);
-      console.log(perc_order);
+      //console.log(perc_order);
     }
     else if (longest == 3){
       piano1_order = shuffle(piano1_order);
-      console.log(piano1_order);
+      //console.log(piano1_order);
     }
     else if (longest == 4){
       piano2_order = shuffle(piano2_order);
-      console.log(piano2_order);
+      //console.log(piano2_order);
     }
   }
 
@@ -1641,7 +1642,7 @@ function play(){
   if (playing == false && longest != 0){
     console.log("playing");
     playing = true;
-    console.log(loading_proxy.curr_loaded, loading_proxy.num_to_wait);
+    //console.log(loading_proxy.curr_loaded, loading_proxy.num_to_wait);
     //play only if files are loaded (if not, they'll play once loaded)
     if(loading_proxy.curr_loaded >= loading_proxy.num_to_wait){
       start_time_display();
@@ -1742,12 +1743,12 @@ function wiper_clicked(){
 
   //see how many files we should wait for
   if(longest == 5 || longest == 0){
-    console.log("waiting for", longest, "files to load");
+    //console.log("waiting for", longest, "files to load");
     loading_proxy.curr_loaded = 0;
     loading_proxy.num_to_wait = longest;
   }
   else{
-    console.log("waiting for", longest+1, "files to load");
+    //console.log("waiting for", longest+1, "files to load");
     loading_proxy.curr_loaded = 0;
     loading_proxy.num_to_wait = longest+1;
   }
@@ -1784,7 +1785,7 @@ function wiper_clicked(){
       new_speaker1_sound(Math.round(curr_time - elapsed_time));
 
       //get speaker 2 file
-      if (i+2 <= 32){
+      if (i+2 <= num_speaker_segs){
         //console.log("assign speaker 2");
         speaker_sound2_fileno = i+2;
         new_speaker2_sound(0);
@@ -1800,7 +1801,7 @@ function wiper_clicked(){
       new_speaker2_sound(Math.round(curr_time - elapsed_time));
 
       //get speaker 1 file
-      if (i+2 <= 31){
+      if (i+2 <= num_speaker_segs - 1){
 
         //console.log("assign speaker 1")
         speaker_sound1_fileno = i+2;
@@ -1812,7 +1813,7 @@ function wiper_clicked(){
     }
     //count speaker file once it's loaded
     curr_speaker_sound.addEventListener("loadedmetadata", function(){
-      console.log("speaker loaded");
+      //console.log("speaker loaded");
       loading_proxy.curr_loaded += 1;
     }, {once: true});
 
@@ -2504,10 +2505,10 @@ function load_sound_files(){
 
   //figure out how many sound files to wait for
   if(longest != 5){
-    console.log("waiting for", longest, "sound files to load");
+    //console.log("waiting for", longest, "sound files to load");
     loading_proxy.curr_loaded = 0;
     loading_proxy.num_to_wait = longest;
-    console.log(loading_proxy.curr_loaded, loading_proxy.num_to_wait);
+    //console.log(loading_proxy.curr_loaded, loading_proxy.num_to_wait);
 
   }
   // else if (longest == 1){
@@ -2516,10 +2517,10 @@ function load_sound_files(){
   //   loading_proxy.num_to_wait = 1;
   // }
   else{
-    console.log("waiting for", longest-1, "sound files to load");
+    //console.log("waiting for", longest-1, "sound files to load");
     loading_proxy.curr_loaded = 0 ;
     loading_proxy.num_to_wait = longest - 1;
-    console.log(loading_proxy.curr_loaded, loading_proxy.num_to_wait);
+    //console.log(loading_proxy.curr_loaded, loading_proxy.num_to_wait);
   }
 
   //first, pause EVERYTHING .....
@@ -2539,12 +2540,12 @@ function load_sound_files(){
         //console.log(longest-1, "make it playthrough");
         //console.log("making longest ", wiper.max/60, curr_time);
 
-        console.log("PUT LONGEST BACK IN ORDER");
+        //console.log("PUT LONGEST BACK IN ORDER");
         order = all_orders[longest-1];
         all_orders[longest-1] = all_orders[longest-1].sort(function(a, b){
           return a - b;
         });
-        console.log(all_orders[longest-1]);
+        //console.log(all_orders[longest-1]);
         //console.log(piano2_order);
         longest_shuffled = false;
         make_longest_funcs[longest-1]();
@@ -2575,7 +2576,7 @@ function load_sound_files(){
       }
     }
     else if (longest != 5 && longest != 0){
-      console.log("RELOAD LONGEST");
+      //console.log("RELOAD LONGEST");
       make_longest_funcs[longest-1]();
     }
     //then load non-longest files
@@ -2648,7 +2649,7 @@ function load_non_longest_files(){
     else{
       //handles end-case when there's no files to be loaded
       if (tracking_currents[i] == false){
-        console.log("no events at all for ", i, ", adding to curr loaded");
+        //console.log("no events at all for ", i, ", adding to curr loaded");
         loading_proxy.curr_loaded += 1;
       }
     }
