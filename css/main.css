@@ -6,11 +6,11 @@ body{
 :root {
   --main-width: 90vw;
   --main-height: calc(90vw / 2.3);
-  --string-level:100;
-  --perc-level: 100;
-  --piano1-level: 100;
-  --piano2-level: 100;
-  --speaker-level: 100;
+  --string-level:0;
+  --perc-level: 0;
+  --piano1-level: 0;
+  --piano2-level: 0;
+  --speaker-level: 0;
 
 }
 
