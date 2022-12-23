@@ -4,21 +4,19 @@ body{
   padding: 0;
   margin: 0;
   overflow: hidden;
-  width: 100vw;
-  height: 100vh;
-  height: var(--app-height);
+  width: 100%;
+  height: 100%;
 }
 
 :root {
   --main-width: 90vw;
   --main-height: calc(90vw / 2.3);
-  --main-height: -webkit-calc(90vw / 2.3);
   --string-level:0;
   --perc-level: 0;
   --piano1-level: 0;
   --piano2-level: 0;
   --speaker-level: 0;
-  --app-height: 100vh;
+  --app-height: 100%;
 
 }
 
@@ -27,24 +25,24 @@ body{
   position: absolute;
   display: block;
   top: 50vh;
-  left: 50%;
+  left: 50vw;
   transform: translate(-50%, -50%);
-  width: 50%;
+  width: 50vw;
   opacity:1;
   z-index: 2;
 }
 .logo-link {
   position: absolute;
-  top: calc(50vh + .4 * var(--main-height));
+  top: calc(50vh + 15.65vw);
   right: 2vw;
-  width: 10%;
+  width: 10vw;
   z-index: 2;
 }
 
 .hexagram{
   position: absolute;
   width: 4.7%;
-  top: calc(50vh + .25 * var(--main-height));
+  top: calc(50vh + 9.78vw);
   transform: translate(50%, 50%);
   z-index: 2;
   left: 29.5vw;
@@ -52,7 +50,7 @@ body{
 
 .signature{
   position: absolute;
-  top: calc(50vh + .21*var(--main-height));
+  top: calc(50vh + 8.217vw);
   right: 30vw;
   transform: translate(50%, 50%);
   width: 14%;
@@ -88,7 +86,7 @@ body{
   transform: translate(-50%, -50%);
   width: calc(362/1296 * var(--main-width));
   height: calc(322/563 * var(--main-height));
-  top: calc(50vh - 8/563 * var(--main-height));
+  top: calc(50vh - 0.556vw);
   left: 50%;
   z-index: 6;
   opacity: 0.1;
@@ -153,16 +151,16 @@ body{
 /* Style the checkmark/indicator */
 .check-container .checkmark:after {
   content: "\2713";
-  font-size: calc(.071*var(--main-height));
+  font-size: 2.778vw;
   bottom: calc(-0.0124*var(--main-height));
 }
 
 .check-container .check-1 {
-  top: calc(50vh - .23*var(--main-height));
+  top: calc(50vh - 8.99vw);
   transform: translate(-50%, -50%);
 }
 .check-container .check-2 {
-  top: calc(50vh - .115*var(--main-height));
+  top: calc(50vh - 4.499vw);
   transform: translate(-50%, -50%);
 }
 .check-container .check-3 {

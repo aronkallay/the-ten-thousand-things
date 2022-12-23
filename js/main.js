@@ -11,13 +11,13 @@ document.addEventListener('keyup', event => {
   }
 });
 
-
-const appHeight = () => {
-    const doc = document.documentElement;
-    doc.style.setProperty('--app-height', window.innerHeight);
-}
-window.addEventListener('resize', appHeight);
-appHeight();
+// 
+// const appHeight = () => {
+//     const doc = document.documentElement;
+//     doc.style.setProperty('--app-height', window.innerHeight);
+// }
+// window.addEventListener('resize', appHeight);
+// appHeight();
 
 
 //for setting audio level display
