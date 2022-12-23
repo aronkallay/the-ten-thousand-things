@@ -1591,6 +1591,8 @@ function single_click(){
 function pause(){
   if (playing){
     playing = false;
+    play_button.style.backgroundColor = "#d9d9d9";
+    pause_button.style.backgroundColor = "#569416";
     console.log("paused");
     stop_time_display();
 
@@ -1629,6 +1631,8 @@ function play(){
     single_click();
     first_clicked = true;
     playing = true;
+    play_button.style.backgroundColor = "#569416";
+    pause_button.style.backgroundColor = "#d9d9d9";
   }
 
   //rewind if at end
@@ -1642,6 +1646,8 @@ function play(){
   if (playing == false && longest != 0){
     console.log("playing");
     playing = true;
+    play_button.style.backgroundColor = "#569416";
+    pause_button.style.backgroundColor = "#d9d9d9";
     //console.log(loading_proxy.curr_loaded, loading_proxy.num_to_wait);
     //play only if files are loaded (if not, they'll play once loaded)
     if(loading_proxy.curr_loaded >= loading_proxy.num_to_wait){
@@ -1735,6 +1741,8 @@ function wiper_clicked(){
   if(playing){
     pause(); //playing gets handled by loading_proxy counting loaded files
     playing = true;
+    play_button.style.backgroundColor = "#569416";
+    pause_button.style.backgroundColor = "#d9d9d9";
   }
 
   //then, freeze current time
@@ -1872,6 +1880,8 @@ function start_time_display(){
       else{
         pause();
         at_end = true;
+        pause_button.style.backgroundColor = "#d9d9d9";
+        console.log("reached end");
       }
 
     }
@@ -2528,6 +2538,8 @@ function load_sound_files(){
     //console.log("pausing from load sound files");
     pause(); //play will be handled when all sounds haave loaded
     playing = true;
+    play_button.style.backgroundColor = "#569416";
+    pause_button.style.backgroundColor = "#d9d9d9";
   }
 
   //wait until pause has taken effect....
