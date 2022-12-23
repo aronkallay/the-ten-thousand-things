@@ -1,23 +1,32 @@
 body{
   background-color: #AAAAAA;
   z-index: 0;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  height: var(--app-height);
 }
 
 :root {
   --main-width: 90vw;
   --main-height: calc(90vw / 2.3);
+  --main-height: -webkit-calc(90vw / 2.3);
   --string-level:0;
   --perc-level: 0;
   --piano1-level: 0;
   --piano2-level: 0;
   --speaker-level: 0;
+  --app-height: 100vh;
 
 }
 
 /* cover image */
 .cover-image {
   position: absolute;
-  top: 50%;
+  display: block;
+  top: 50vh;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 50%;
@@ -26,7 +35,7 @@ body{
 }
 .logo-link {
   position: absolute;
-  bottom: calc((100vh - var(--main-height))/2 - 5vw);
+  top: calc(50vh + .4 * var(--main-height));
   right: 2vw;
   width: 10%;
   z-index: 2;
@@ -52,7 +61,8 @@ body{
 
 .player {
   position: absolute;
-  top: 50%;
+  display: block;
+  top: 50vh;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
@@ -65,7 +75,7 @@ body{
   position: absolute;
   width: var(--main-width);
   height: var(--main-height);
-  top: 50%;
+  top: 50vh;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;
@@ -88,7 +98,7 @@ body{
   position: absolute;
   width: var(--main-width);
   height: var(--main-height);
-  top: 50%;
+  top: 50vh;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 7;
@@ -278,19 +288,23 @@ body{
 
 /****************PLAYBACK BUTTONS ***********************/
 .buttons {
+  -webkit-appearance: none;
+  appearance: none;
   cursor: pointer;
   border: calc(0.0053*var(--main-height)) solid black;
   border-radius: calc(0.013*var(--main-height));
   z-index: 9;
   position: absolute;
   height: calc(0.0639*var(--main-height));
-  display: block;
-
+  display: flex;
+  overflow: hidden;
+  padding: 0px;
+  margin: 0px;
 }
 
 .playback-controls{
-  width: calc(0.0366*var(--main-width));
   top: calc(50vh + .3*var(--main-height));
+  width: 3.5vw;
 }
 
 .popup-buttons{
@@ -319,6 +333,8 @@ body{
   background: url('../assets/graphics/return.png') no-repeat, #d9d9d9;
   background-size: contain;
   background-position: center;
+  padding: 0px;
+  margin: 0px;
 }
 
 .pause{
@@ -326,6 +342,8 @@ body{
   background: url('../assets/graphics/pause.png') no-repeat, #d9d9d9;
   background-size: contain;
   background-position: center;
+  padding: 0px;
+  margin: 0px;
 }
 
 .play{
@@ -333,6 +351,8 @@ body{
   background: url('../assets/graphics/play.png') no-repeat, #d9d9d9;
   background-size: contain;
   background-position: center;
+  padding: 0px;
+  margin: 0px;
 }
 
 .shuffle{
@@ -340,6 +360,9 @@ body{
   background: url('../assets/graphics/shuffle.png') no-repeat, #d9d9d9;
   background-size: contain;
   background-position: center;
+  padding: 0px;
+  margin: 0px;
+
 }
 
 .instructions{
@@ -374,8 +397,7 @@ body{
   width: calc(20 / 563 * var(--main-height));
   height: calc(10 / 563 * var(--main-height));
   border-radius: calc(4 / 563 * var(--main-height));
-  border-style: solid;
-  border-color: black;
+
   border-width: calc(3 / 563 * var(--main-height));
   background: white;
   cursor: pointer;

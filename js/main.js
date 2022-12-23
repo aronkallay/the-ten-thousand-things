@@ -12,6 +12,14 @@ document.addEventListener('keyup', event => {
 });
 
 
+const appHeight = () => {
+    const doc = document.documentElement;
+    doc.style.setProperty('--app-height', window.innerHeight);
+}
+window.addEventListener('resize', appHeight);
+appHeight();
+
+
 //for setting audio level display
 const root = document.querySelector(':root');
 
@@ -31,6 +39,7 @@ var play_button = document.getElementById("play-button");
 var pause_button = document.getElementById("pause-button");
 var shuffle_button = document.getElementById("shuffle-button");
 var time_display = document.getElementById("timer");
+
 
 var master_slider = document.getElementById("master-slider");
 var master_mute = document.getElementById("master-vol");
@@ -2870,7 +2879,7 @@ function fadeout(element, time) {
     var timer = setInterval(function () {
         if (op <= 0.05){
             clearInterval(timer);
-            element.style.display = 'none';
+            element.style.display = "none";
         }
         element.style.opacity = op;
         element.style.filter = 'alpha(opacity=' + op * 100 + ")";
