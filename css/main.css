@@ -448,7 +448,7 @@ body{
   font-size: calc( 27 / 563 * var(--main-height));
   font-family: Papyrus, fantasy;
   font-style: italic;
-  z-index:9;
+  z-index:7;
 }
 
 .title{
